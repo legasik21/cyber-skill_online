@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { motion } from "framer-motion"
+import Link from "next/link"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 
@@ -38,48 +39,56 @@ export default function Home() {
       description: "Increase your stats and improve your WN8 rating efficiently.",
       icon: <Target className="h-10 w-10 text-primary" />,
       price: "From $10",
+      link: "/services/wn8-boost",
     },
     {
       title: "Credit Farming",
       description: "Get millions of credits quickly without the grind.",
       icon: <Zap className="h-10 w-10 text-primary" />,
       price: "From $15",
+      link: "#services",
     },
     {
       title: "Campaign Missions",
       description: "Complete difficult missions (Obj. 279e, Chimera) with ease.",
       icon: <Trophy className="h-10 w-10 text-primary" />,
       price: "Custom",
+      link: "#services",
     },
     {
       title: "Mark of Excellence",
       description: "Get 3 marks on your favorite tanks. Top 1% performance.",
       icon: <Star className="h-10 w-10 text-primary" />,
       price: "From $20",
+      link: "#services",
     },
     {
       title: "Powerleveling",
       description: "Rapidly level up your tanks and crews to tier X.",
       icon: <ChevronsUp className="h-10 w-10 text-primary" />,
       price: "From $25",
+      link: "#services",
     },
     {
       title: "Exp Farm",
       description: "Gain experience points for any tank in your garage.",
       icon: <BookOpen className="h-10 w-10 text-primary" />,
       price: "From $5",
+      link: "#services",
     },
     {
       title: "Onslaught",
       description: "Dominate the Onslaught mode and climb the ranks.",
       icon: <Swords className="h-10 w-10 text-primary" />,
       price: "Custom",
+      link: "#services",
     },
     {
       title: "Ace Tanker",
       description: "Get the Ace Tanker mastery badge on your vehicles.",
       icon: <Medal className="h-10 w-10 text-primary" />,
       price: "From $15",
+      link: "#services",
     },
   ]
 
@@ -304,7 +313,7 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {services.map((service, index) => (
-              <Card key={index} className="border-border/50 bg-card/50 hover:bg-card transition-colors">
+              <Card key={index} className="border-border/50 bg-card/50 hover:bg-card hover:border-primary/50 transition-all group">
                 <CardHeader>
                   <div className="mb-4">{service.icon}</div>
                   <CardTitle>{service.title}</CardTitle>
@@ -312,7 +321,19 @@ export default function Home() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-primary mb-4">{service.price}</div>
-                  <Button className="w-full" variant="secondary">Order Now</Button>
+                  <Button 
+                    className="w-full" 
+                    variant="secondary"
+                    asChild={service.link.startsWith('/services')}
+                  >
+                    {service.link.startsWith('/services') ? (
+                      <Link href={service.link}>
+                        Learn More <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                      </Link>
+                    ) : (
+                      <span>Order Now</span>
+                    )}
+                  </Button>
                 </CardContent>
               </Card>
             ))}

@@ -10,7 +10,7 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const services = [
-    { id: "wn8-boost", label: "WN8 Boosting", href: "#services" },
+    { id: "wn8-boost", label: "WN8 Boosting", href: "/services/wn8-boost" },
     { id: "credit-farm", label: "Credit Farming", href: "#services" },
     { id: "campaign", label: "Campaign Missions", href: "#services" },
     { id: "moe", label: "Mark of Excellence", href: "#services" },
