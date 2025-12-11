@@ -60,7 +60,7 @@ export default function Home() {
       description: "Get 3 marks on your favorite tanks. Top 1% performance.",
       icon: <Star className="h-10 w-10 text-primary" />,
       price: "From $20",
-      link: "#services",
+      link: "/services/mark-of-excellence",
     },
     {
       title: "Powerleveling",
