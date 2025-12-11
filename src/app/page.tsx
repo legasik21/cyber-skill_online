@@ -53,7 +53,7 @@ export default function Home() {
       description: "Complete difficult missions (Obj. 279e, Chimera) with ease.",
       icon: <Trophy className="h-10 w-10 text-primary" />,
       price: "Custom",
-      link: "#services",
+      link: "/services/campaign-missions",
     },
     {
       title: "Mark of Excellence",
