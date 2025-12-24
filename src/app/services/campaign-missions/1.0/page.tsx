@@ -61,18 +61,344 @@ const orderFormSchema = z.object({
   additionalInfo: z.string().optional(),
 });
 
-// Calculate price for a mission number
-function getMissionPrice(missionNumber: number): number {
-  if (missionNumber >= 1 && missionNumber <= 5) return 5 + missionNumber;
-  if (missionNumber >= 6 && missionNumber <= 10) return 9 + (missionNumber - 5);
-  if (missionNumber >= 11 && missionNumber <= 15)
-    return 15 + (missionNumber - 10);
-  return 5;
+const MISSION_PRICES: Record<string, Record<string, (n: number) => number>> = {
+  "stug-iv": {
+    lt: (n) => (n <= 7 ? 1 : n <= 14 ? 2 : 8),
+    mt: (n) => (n <= 8 ? 1 : n <= 14 ? 2 : 9),
+    ht: (n) => (n <= 6 ? 1 : n <= 14 ? 2 : 6),
+    td: (n) => (n <= 7 ? 1 : n <= 14 ? 2 : 7),
+    spg: (n) => (n <= 5 ? 1 : n <= 14 ? 2 : 9),
+  },
+  "t28-concept": {
+    lt: (n) =>
+      n <= 7 ? 2 : n === 8 ? 4 : n <= 10 ? 2 : n === 11 ? 3 : n <= 14 ? 4 : 10,
+    mt: (n) =>
+      n <= 5
+        ? 2
+        : n <= 7
+        ? 3
+        : n === 8
+        ? 4
+        : n <= 11
+        ? 3
+        : n === 12
+        ? 8
+        : n === 13
+        ? 3
+        : n === 14
+        ? 6
+        : 10,
+    ht: (n) =>
+      n <= 6
+        ? 2
+        : n === 7
+        ? 4
+        : n === 8
+        ? 2
+        : n <= 11
+        ? 3
+        : n === 12
+        ? 5
+        : n <= 14
+        ? 4
+        : 9,
+    td: (n) =>
+      n <= 2
+        ? 2
+        : n === 3
+        ? 1
+        : n <= 5
+        ? 2
+        : n <= 7
+        ? 3
+        : n === 8
+        ? 4
+        : n <= 13
+        ? 3
+        : n === 14
+        ? 4
+        : 8,
+    spg: (n) =>
+      n <= 3
+        ? 2
+        : n === 4
+        ? 3
+        : n === 5
+        ? 2
+        : n <= 7
+        ? 4
+        : n <= 9
+        ? 3
+        : n <= 12
+        ? 4
+        : n <= 14
+        ? 5
+        : 12,
+  },
+  t55a: {
+    lt: (n) =>
+      n <= 3
+        ? 2
+        : n <= 5
+        ? 4
+        : n === 6
+        ? 8
+        : n === 7
+        ? 10
+        : n === 8
+        ? 8
+        : n === 9
+        ? 5
+        : n === 10
+        ? 4
+        : n <= 12
+        ? 5
+        : n === 13
+        ? 4
+        : n === 14
+        ? 7
+        : 18,
+    mt: (n) =>
+      n === 1
+        ? 2
+        : n <= 4
+        ? 3
+        : n === 5
+        ? 4
+        : n === 6
+        ? 5
+        : n === 7
+        ? 8
+        : n === 8
+        ? 4
+        : n === 9
+        ? 7
+        : n === 10
+        ? 4
+        : n === 11
+        ? 6
+        : n === 12
+        ? 7
+        : n === 13
+        ? 5
+        : n === 14
+        ? 4
+        : 16,
+    ht: (n) =>
+      n <= 2
+        ? 2
+        : n === 3
+        ? 5
+        : n === 4
+        ? 4
+        : n === 5
+        ? 3
+        : n <= 7
+        ? 8
+        : n === 8
+        ? 4
+        : n === 9
+        ? 2
+        : n === 10
+        ? 5
+        : n === 11
+        ? 4
+        : n === 12
+        ? 10
+        : n === 13
+        ? 4
+        : n === 14
+        ? 6
+        : 16,
+    td: (n) =>
+      n <= 2
+        ? 2
+        : n === 3
+        ? 3
+        : n <= 5
+        ? 4
+        : n === 6
+        ? 5
+        : n === 7
+        ? 6
+        : n === 8
+        ? 8
+        : n === 9
+        ? 4
+        : n <= 13
+        ? 5
+        : n === 14
+        ? 6
+        : 16,
+    spg: (n) =>
+      n === 1
+        ? 3
+        : n <= 4
+        ? 6
+        : n === 5
+        ? 10
+        : n === 6
+        ? 8
+        : n === 7
+        ? 6
+        : n === 8
+        ? 3
+        : n <= 10
+        ? 4
+        : n === 11
+        ? 9
+        : n === 12
+        ? 10
+        : n === 13
+        ? 5
+        : n === 14
+        ? 6
+        : 30,
+  },
+  "object-260": {
+    lt: (n) =>
+      n === 1
+        ? 4
+        : n === 2
+        ? 8
+        : n <= 4
+        ? 6
+        : n === 5
+        ? 5
+        : n === 6
+        ? 6
+        : n === 7
+        ? 16
+        : n === 8
+        ? 10
+        : n === 9
+        ? 8
+        : n === 10
+        ? 7
+        : n === 11
+        ? 8
+        : n === 12
+        ? 9
+        : n === 13
+        ? 7
+        : n === 14
+        ? 8
+        : 20,
+    mt: (n) =>
+      n === 1
+        ? 2
+        : n === 2
+        ? 8
+        : n === 3
+        ? 6
+        : n === 4
+        ? 5
+        : n <= 6
+        ? 6
+        : n === 7
+        ? 7
+        : n === 8
+        ? 8
+        : n === 9
+        ? 6
+        : n === 10
+        ? 4
+        : n === 11
+        ? 8
+        : n === 12
+        ? 10
+        : n <= 14
+        ? 6
+        : 20,
+    ht: (n) =>
+      n === 1
+        ? 4
+        : n === 2
+        ? 5
+        : n === 3
+        ? 7
+        : n === 4
+        ? 6
+        : n === 5
+        ? 4
+        : n === 6
+        ? 6
+        : n === 7
+        ? 8
+        : n === 8
+        ? 5
+        : n === 9
+        ? 6
+        : n === 10
+        ? 5
+        : n === 11
+        ? 6
+        : n === 12
+        ? 14
+        : n <= 14
+        ? 6
+        : 22,
+    td: (n) =>
+      n === 1
+        ? 2
+        : n === 2
+        ? 8
+        : n === 3
+        ? 4
+        : n === 4
+        ? 8
+        : n <= 6
+        ? 6
+        : n === 7
+        ? 9
+        : n === 8
+        ? 12
+        : n === 9
+        ? 6
+        : n === 10
+        ? 10
+        : n <= 14
+        ? 6
+        : 25,
+    spg: (n) =>
+      n === 1
+        ? 2
+        : n <= 4
+        ? 4
+        : n === 5
+        ? 8
+        : n <= 7
+        ? 6
+        : n === 8
+        ? 8
+        : n === 9
+        ? 4
+        : n === 10
+        ? 6
+        : n === 11
+        ? 10
+        : n === 12
+        ? 12
+        : n <= 14
+        ? 6
+        : 40,
+  },
+};
+
+// Calculate price for a mission
+function getMissionPrice(
+  tankId: string,
+  typeId: string,
+  missionNumber: number
+): number {
+  return MISSION_PRICES[tankId]?.[typeId]?.(missionNumber) ?? 5;
 }
 
 export default function Campaign1Page() {
   const [activeTank, setActiveTank] = useState<string>(TANKS[0].id);
-  const [selectedMissions, setSelectedMissions] = useState<SelectedMissions>({});
+  const [selectedMissions, setSelectedMissions] = useState<SelectedMissions>(
+    {}
+  );
 
   const form = useForm<z.infer<typeof orderFormSchema>>({
     resolver: zodResolver(orderFormSchema),
@@ -193,16 +519,16 @@ export default function Campaign1Page() {
     let originalPrice = 0;
     let totalDiscount = 0;
 
-    Object.entries(selectedMissions).forEach(([, tankMissions]) => {
+    Object.entries(selectedMissions).forEach(([tankId, tankMissions]) => {
       const isFullTank = MISSION_TYPES.every(
         (type) => tankMissions[type.id]?.length === MISSIONS_PER_TYPE
       );
 
       if (isFullTank) {
         let tankBasePrice = 0;
-        MISSION_TYPES.forEach(() => {
+        MISSION_TYPES.forEach((type) => {
           for (let i = 1; i <= MISSIONS_PER_TYPE; i++)
-            tankBasePrice += getMissionPrice(i);
+            tankBasePrice += getMissionPrice(tankId, type.id, i);
         });
 
         originalPrice += tankBasePrice;
@@ -210,12 +536,12 @@ export default function Campaign1Page() {
         totalPrice += discounted;
         totalDiscount += tankBasePrice - discounted;
       } else {
-        Object.entries(tankMissions).forEach(([, missions]) => {
+        Object.entries(tankMissions).forEach(([typeId, missions]) => {
           const isFullType = missions.length === MISSIONS_PER_TYPE;
           let typeBasePrice = 0;
 
           missions.forEach((num) => {
-            typeBasePrice += getMissionPrice(num);
+            typeBasePrice += getMissionPrice(tankId, typeId, num);
           });
 
           originalPrice += typeBasePrice;
@@ -296,7 +622,8 @@ export default function Campaign1Page() {
                 </h1>
               </div>
               <p className="text-lg text-muted-foreground mb-4">
-                Complete campaign missions and earn prestigious reward tanks including Object 260, T 55A, and more.
+                Complete campaign missions and earn prestigious reward tanks
+                including Object 260, T 55A, and more.
               </p>
               <div className="flex items-center gap-4 mb-6">
                 <div className="flex items-center gap-2">
@@ -479,7 +806,11 @@ export default function Campaign1Page() {
                                           type.id,
                                           num
                                         );
-                                        const price = getMissionPrice(num);
+                                        const price = getMissionPrice(
+                                          tank.id,
+                                          type.id,
+                                          num
+                                        );
 
                                         return (
                                           <td
@@ -521,7 +852,7 @@ export default function Campaign1Page() {
                   <div className="flex flex-wrap items-center justify-between gap-3 px-2">
                     <div className="flex-1">
                       <p className="text-xs text-muted-foreground italic">
-                        *If you need to perform a second (additional) task on some missions, please leave a comment in the order form or contact our manager. Additional tasks usually cost $5-$10 extra per mission.
+                        *If you need to complete any mission with honors (with second task), it will cost an additional 50% of the mission price. Please leave a comment in the order form or contact our manager.
                       </p>
                     </div>
                     {totalMissions > 0 && (
@@ -653,6 +984,18 @@ export default function Campaign1Page() {
                             ${priceDetails.total}
                           </span>
                         </div>
+                        <Button
+                          className="w-full mt-4"
+                          onClick={() =>
+                            document
+                              .getElementById("order-form")
+                              ?.scrollIntoView({ behavior: "smooth" })
+                          }
+                          disabled={totalMissions === 0}
+                        >
+                          Continue the order
+                          <ChevronRight className="ml-2 h-4 w-4" />
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>

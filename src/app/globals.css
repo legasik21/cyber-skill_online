@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+}
+
 :root {
   /* Custom Theme Colors */
   --background: #050505;
@@ -76,10 +80,9 @@ input[type="number"] {
   appearance: none;
   background: transparent;
   cursor: pointer;
-  pointer-events: none; /* Track doesn't receive events */
+  pointer-events: none;
 }
 
-/* Webkit browsers (Chrome, Safari, Edge) */
 .dual-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -91,7 +94,7 @@ input[type="number"] {
   cursor: grab;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
-  pointer-events: auto; /* Thumb receives events! */
+  pointer-events: auto;
   position: relative;
   z-index: 10;
 }
@@ -111,7 +114,6 @@ input[type="number"] {
   height: 100%;
 }
 
-/* Firefox */
 .dual-range-slider::-moz-range-thumb {
   width: 22px;
   height: 22px;
@@ -121,7 +123,7 @@ input[type="number"] {
   cursor: grab;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
-  pointer-events: auto; /* Thumb receives events! */
+  pointer-events: auto;
 }
 
 .dual-range-slider::-moz-range-thumb:hover {
@@ -139,7 +141,6 @@ input[type="number"] {
   height: 100%;
 }
 
-/* General range inputs (non-dual) */
 input[type="range"]:not(.dual-range-slider) {
   -webkit-appearance: none;
   appearance: none;
@@ -167,4 +168,13 @@ input[type="range"]:not(.dual-range-slider)::-moz-range-thumb {
   border: 2px solid var(--background);
   cursor: pointer;
   box-shadow: 0 0 0 2px var(--primary);
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 8s infinite ease-in-out;
 }

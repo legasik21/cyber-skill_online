@@ -59,12 +59,42 @@ const orderFormSchema = z.object({
   additionalInfo: z.string().optional(),
 });
 
-// Calculate price for a mission number (Campaign 2.0 is harder -> higher prices)
-function getMissionPrice(missionNumber: number): number {
-  if (missionNumber >= 1 && missionNumber <= 5) return 15 + missionNumber;
-  if (missionNumber >= 6 && missionNumber <= 10) return 25 + (missionNumber - 5);
-  if (missionNumber >= 11 && missionNumber <= 15) return 40 + (missionNumber - 10) * 2;
-  return 15;
+const MISSION_PRICES: Record<string, Record<string, (n: number) => number>> = {
+  excalibur: {
+    union: (n) =>
+      n === 1 ? 3 : n === 2 ? 5 : n === 3 ? 4 : n === 4 ? 3 : n === 5 ? 5 : n === 6 ? 4 : n === 7 ? 5 : n === 8 ? 3 : n <= 10 ? 4 : n === 11 ? 5 : n === 12 ? 8 : n === 13 ? 3 : n === 14 ? 5 : 8,
+    bloc: (n) =>
+      n === 1 ? 4 : n === 2 ? 5 : n === 3 ? 6 : n === 4 ? 4 : n === 5 ? 3 : n === 6 ? 5 : n === 7 ? 9 : n === 8 ? 6 : n <= 11 ? 4 : n === 12 ? 8 : n === 13 ? 5 : n === 14 ? 8 : 10,
+    alliance: (n) =>
+      n === 1 ? 4 : n === 2 ? 3 : n === 3 ? 4 : n === 4 ? 3 : n === 5 ? 4 : n <= 7 ? 3 : n === 8 ? 4 : n <= 10 ? 3 : n === 11 ? 5 : n === 12 ? 6 : n <= 14 ? 5 : 8,
+    coalition: (n) =>
+      n <= 2 ? 3 : n === 3 ? 4 : n <= 5 ? 3 : n <= 7 ? 4 : n <= 9 ? 3 : n <= 11 ? 5 : n === 12 ? 2 : n <= 14 ? 3 : 9,
+  },
+  chimera: {
+    union: (n) =>
+      n === 1 ? 2 : n === 2 ? 4 : n === 3 ? 3 : n <= 5 ? 5 : n === 6 ? 9 : n === 7 ? 4 : n === 8 ? 10 : n === 9 ? 5 : n === 10 ? 3 : n <= 12 ? 6 : n <= 14 ? 10 : 16,
+    bloc: (n) =>
+      n === 1 ? 6 : n === 2 ? 8 : n <= 4 ? 3 : n === 5 ? 7 : n === 6 ? 5 : n === 7 ? 8 : n === 8 ? 10 : n === 9 ? 5 : n === 10 ? 7 : n === 11 ? 9 : n === 12 ? 4 : n === 13 ? 11 : n === 14 ? 8 : 18,
+    alliance: (n) =>
+      n === 1 ? 8 : n <= 3 ? 4 : n === 4 ? 8 : n === 5 ? 10 : n === 6 ? 5 : n === 7 ? 3 : n <= 9 ? 8 : n === 10 ? 6 : n === 11 ? 5 : n === 12 ? 9 : n === 13 ? 5 : n === 14 ? 4 : 14,
+    coalition: (n) =>
+      n === 1 ? 4 : n === 2 ? 5 : n === 3 ? 3 : n === 4 ? 4 : n === 5 ? 9 : n === 6 ? 4 : n === 7 ? 8 : n === 8 ? 3 : n === 9 ? 4 : n === 10 ? 6 : n === 11 ? 8 : n <= 13 ? 7 : n === 14 ? 15 : 17,
+  },
+  "object-279e": {
+    union: (n) =>
+      n <= 2 ? 8 : n === 3 ? 6 : n === 4 ? 7 : n === 5 ? 6 : n === 6 ? 8 : n === 7 ? 20 : n === 8 ? 5 : n === 9 ? 4 : n === 10 ? 5 : n === 11 ? 6 : n === 12 ? 4 : n === 13 ? 12 : n === 14 ? 7 : 16,
+    bloc: (n) =>
+      n === 1 ? 5 : n === 2 ? 8 : n <= 6 ? 5 : n === 7 ? 9 : n === 8 ? 3 : n === 9 ? 7 : n === 10 ? 8 : n === 11 ? 4 : n === 12 ? 6 : n === 13 ? 10 : n === 14 ? 4 : 16,
+    alliance: (n) =>
+      n <= 2 ? 4 : n === 3 ? 10 : n <= 6 ? 5 : n === 7 ? 8 : n === 8 ? 18 : n === 9 ? 8 : n === 10 ? 7 : n === 11 ? 5 : n === 12 ? 6 : n === 13 ? 12 : n === 14 ? 6 : 16,
+    coalition: (n) =>
+      n === 1 ? 9 : n === 2 ? 4 : n === 3 ? 6 : n === 4 ? 18 : n === 5 ? 6 : n === 6 ? 5 : n === 7 ? 6 : n === 8 ? 16 : n === 9 ? 7 : n <= 13 ? 6 : n === 14 ? 8 : 16,
+  },
+};
+
+// Calculate price for a mission
+function getMissionPrice(tankId: string, typeId: string, missionNumber: number): number {
+  return MISSION_PRICES[tankId]?.[typeId]?.(missionNumber) ?? 15;
 }
 
 export default function Campaign2Page() {
@@ -188,16 +218,16 @@ export default function Campaign2Page() {
     let originalPrice = 0;
     let totalDiscount = 0;
 
-    Object.entries(selectedMissions).forEach(([, tankMissions]) => {
+    Object.entries(selectedMissions).forEach(([tankId, tankMissions]) => {
       const isFullTank = MISSION_TYPES.every(
         (type) => tankMissions[type.id]?.length === MISSIONS_PER_TYPE
       );
 
       if (isFullTank) {
         let tankBasePrice = 0;
-        MISSION_TYPES.forEach(() => {
+        MISSION_TYPES.forEach((type) => {
           for (let i = 1; i <= MISSIONS_PER_TYPE; i++)
-            tankBasePrice += getMissionPrice(i);
+            tankBasePrice += getMissionPrice(tankId, type.id, i);
         });
 
         originalPrice += tankBasePrice;
@@ -205,12 +235,12 @@ export default function Campaign2Page() {
         totalPrice += discounted;
         totalDiscount += tankBasePrice - discounted;
       } else {
-        Object.entries(tankMissions).forEach(([, missions]) => {
+        Object.entries(tankMissions).forEach(([typeId, missions]) => {
           const isFullType = missions.length === MISSIONS_PER_TYPE;
           let typeBasePrice = 0;
 
           missions.forEach((num) => {
-            typeBasePrice += getMissionPrice(num);
+            typeBasePrice += getMissionPrice(tankId, typeId, num);
           });
 
           originalPrice += typeBasePrice;
@@ -469,37 +499,41 @@ export default function Campaign2Page() {
                                         </div>
                                       </td>
                                       {range1to15().map((num) => {
-                                        const isSelected = isMissionSelected(
-                                          tank.id,
-                                          type.id,
-                                          num
-                                        );
-                                        const price = getMissionPrice(num);
+                                          const isSelected = isMissionSelected(
+                                            tank.id,
+                                            type.id,
+                                            num
+                                          );
+                                          const price = getMissionPrice(
+                                            tank.id,
+                                            type.id,
+                                            num
+                                          );
 
-                                        return (
-                                          <td
-                                            key={num}
-                                            className="p-0.5 align-middle"
-                                          >
-                                            <button
-                                              type="button"
-                                              onClick={() =>
-                                                toggleMission(
-                                                  tank.id,
-                                                  type.id,
-                                                  num
-                                                )
-                                              }
-                                              className={`w-full h-7 rounded text-[10px] font-medium transition-all ${
-                                                isSelected
-                                                  ? "bg-primary text-primary-foreground"
-                                                  : "bg-secondary/50 hover:bg-primary/20 text-foreground"
-                                              }`}
+                                          return (
+                                            <td
+                                              key={num}
+                                              className="p-0.5 align-middle"
                                             >
-                                              ${price}
-                                            </button>
-                                          </td>
-                                        );
+                                              <button
+                                                type="button"
+                                                onClick={() =>
+                                                  toggleMission(
+                                                    tank.id,
+                                                    type.id,
+                                                    num
+                                                  )
+                                                }
+                                                className={`w-full h-7 rounded text-[10px] font-medium transition-all ${
+                                                  isSelected
+                                                    ? "bg-primary text-primary-foreground"
+                                                    : "bg-secondary/50 hover:bg-primary/20 text-foreground"
+                                                }`}
+                                              >
+                                                ${price}
+                                              </button>
+                                            </td>
+                                          );
                                       })}
                                     </tr>
                                   );
@@ -516,7 +550,7 @@ export default function Campaign2Page() {
                   <div className="flex flex-wrap items-center justify-between gap-3 px-2">
                     <div className="flex-1">
                       <p className="text-xs text-muted-foreground italic">
-                        *If you need to perform a second (additional) task on some missions, please leave a comment in the order form or contact our manager. Additional tasks usually cost $10-$15 extra per mission.
+                        *If you need to complete any mission with honors (with second task), it will cost an additional 50% of the mission price. Please leave a comment in the order form or contact our manager.
                       </p>
                     </div>
                     {totalMissions > 0 && (
@@ -648,6 +682,18 @@ export default function Campaign2Page() {
                             ${priceDetails.total}
                           </span>
                         </div>
+                        <Button
+                          className="w-full mt-4"
+                          onClick={() =>
+                            document
+                              .getElementById("order-form")
+                              ?.scrollIntoView({ behavior: "smooth" })
+                          }
+                          disabled={totalMissions === 0}
+                        >
+                          Continue the order
+                          <ChevronRight className="ml-2 h-4 w-4" />
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>

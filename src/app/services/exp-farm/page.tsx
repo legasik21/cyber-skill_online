@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Input } from "@/components/ui/Input"
-import { Target, Shield, ChevronRight, Check, ArrowLeft, Calculator, Percent } from "lucide-react"
+import { Zap, Shield, ChevronRight, Check, ArrowLeft, Calculator, Percent, BookOpen } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -13,50 +13,34 @@ import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Link from "next/link"
 
-// Service types
-type ServiceType = "wn8" | "winrate" | "damage"
-
-// Pricing per battle based on WN8 tier
-const WN8_PRICING = {
-  "2500-3000": 1.1,  // $1.1 per battle
-  "3000-4000": 1.5,  // $1.5 per battle
-  "4000+": 1.8,      // $1.8 per battle
+// Pricing per 10,000 XP based on WN8 tier
+const EXP_PRICING = {
+  "under-2500": 3.0,    // $3 per 10k XP for Under 2500 WN8
+  "over-2500": 4.5,     // $4.5 per 10k XP for More than 2500 WN8
 }
 
-// Winrate boosting pricing
-const WINRATE_PRICING = {
-  "60%": 1.0,   // $1 per battle
-  "65%": 1.5,   // $1 + 50% = $1.5 per battle
-  "70%": 2.5,   // $1 + 150% = $2.5 per battle
-}
-
-// High Damage pricing
-const DAMAGE_PRICING = {
-  "4000+": 1.75, // $1.75 per battle
-  "4500+": 2.0,  // $2 per battle
-  "5000+": 2.5,  // $2.5 per battle
+const WN8_TIER_LABELS = {
+  "under-2500": "Under 2500 WN8",
+  "over-2500": "More than 2500 WN8",
 }
 
 const orderFormSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   discordTag: z.string().min(3, { message: "Please enter your Discord tag" }),
-  serviceType: z.enum(["wn8", "winrate", "damage"], { message: "Please select a service type" }),
-  tier: z.string().min(1, { message: "Please select a tier" }),
-  numberOfBattles: z.number().min(20, { message: "Minimum 20 battles required" }),
+  wn8Tier: z.enum(["under-2500", "over-2500"], { message: "Please select a WN8 tier" }),
+  cannotUseXPBoosters: z.boolean(),
+  expAmount: z.number().min(10, { message: "Minimum 10k XP required" }), // Minimum 10k
   server: z.string().min(1, { message: "Please select a server" }),
   additionalInfo: z.string().optional(),
-  playSPG: z.boolean().optional(),
-  getReplays: z.boolean().optional(),
 })
 
-export default function WN8BoostPage() {
-  const [serviceType, setServiceType] = useState<ServiceType>("wn8")
-  const [numberOfBattles, setNumberOfBattles] = useState<number | "">(20)
-  const [selectedTier, setSelectedTier] = useState<string>("2500-3000")
-  const [playSPG, setPlaySPG] = useState<boolean>(false)
-  const [getReplays, setGetReplays] = useState<boolean>(false)
+export default function ExpFarmPage() {
+  const [expAmount, setExpAmount] = useState<number | "">(50) // Default 50k
+  const [selectedWN8Tier, setSelectedWN8Tier] = useState<keyof typeof EXP_PRICING>("under-2500")
+  const [cannotUseXPBoosters, setCannotUseXPBoosters] = useState<boolean>(false)
   const [basePrice, setBasePrice] = useState<number>(0)
   const [discount, setDiscount] = useState<number>(0)
+  const [xpBoostersCharge, setXpBoostersCharge] = useState<number>(0)
   const [finalPrice, setFinalPrice] = useState<number>(0)
 
   const form = useForm<z.infer<typeof orderFormSchema>>({
@@ -64,91 +48,68 @@ export default function WN8BoostPage() {
     defaultValues: {
       email: "",
       discordTag: "",
-      serviceType: "wn8",
-      tier: "2500-3000",
-      numberOfBattles: 20,
+      wn8Tier: "under-2500",
+      cannotUseXPBoosters: false,
+      expAmount: 50,
       server: "",
       additionalInfo: "",
-      playSPG: false,
-      getReplays: false,
     },
   })
 
-  // Reset playSPG when switching to tiers where it's not available
+  // Calculate pricing whenever xp amount, tier, or boosters changes
   useEffect(() => {
-    const isSPGAvailable = 
-      (serviceType === "wn8" && (selectedTier === "2500-3000" || selectedTier === "3000-4000")) ||
-      (serviceType === "winrate" && selectedTier === "60%")
+    const amount = expAmount === "" ? 0 : expAmount
     
-    if (!isSPGAvailable && playSPG) {
-      setPlaySPG(false)
-    }
-  }, [serviceType, selectedTier, playSPG])
-
-  // Calculate pricing whenever battles, service type, or tier changes
-  useEffect(() => {
-    const battles = numberOfBattles === "" ? 0 : numberOfBattles
-    
-    if (battles < 20) {
+    if (amount < 1) {
       setBasePrice(0)
       setDiscount(0)
+      setXpBoostersCharge(0)
       setFinalPrice(0)
       return
     }
 
-    let pricePerBattle = 0
-    
-    // Get base price based on service type
-    if (serviceType === "wn8") {
-      pricePerBattle = WN8_PRICING[selectedTier as keyof typeof WN8_PRICING] || 0
-      // Apply SPG modifier (+100% for tiers 2500-3000 and 3000-4000 only)
-      if (playSPG && (selectedTier === "2500-3000" || selectedTier === "3000-4000")) {
-        pricePerBattle = pricePerBattle * 2
-      }
-    } else if (serviceType === "winrate") {
-      pricePerBattle = WINRATE_PRICING[selectedTier as keyof typeof WINRATE_PRICING] || 0
-      // Apply SPG modifier (+100% for 60% winrate only)
-      if (playSPG && selectedTier === "60%") {
-        pricePerBattle = pricePerBattle * 2
-      }
-    } else if (serviceType === "damage") {
-      pricePerBattle = DAMAGE_PRICING[selectedTier as keyof typeof DAMAGE_PRICING] || 0
-      // No SPG modifier for damage service type
-    }
-    
-    const base = battles * pricePerBattle
+    const pricePer10k = EXP_PRICING[selectedWN8Tier]
+    // amount is in thousands (e.g. 50 = 50,000 XP)
+    // Pricing is per 10k, so we divide amount by 10
+    const unitsOf10k = amount / 10
+    const base = unitsOf10k * pricePer10k
     
     let discountPercent = 0
-    if (battles >= 100) {
+    if (amount >= 500) { // 500k XP
       discountPercent = 20
-    } else if (battles >= 50) {
+    } else if (amount >= 250) { // 250k XP
       discountPercent = 15
+    } else if (amount >= 100) { // 100k XP
+      discountPercent = 10
     }
     
     const discountAmount = base * (discountPercent / 100)
-    let final = base - discountAmount
+    const afterDiscount = base - discountAmount
     
-    // Apply "Get the Replays" option (+10% to total)
-    if (getReplays) {
-      final = final * 1.1
+    // Calculate XP boosters charge
+    let boostersCharge = 0
+    if (cannotUseXPBoosters) {
+      boostersCharge = afterDiscount * 0.30 // 30% additional charge
     }
+    
+    const final = afterDiscount + boostersCharge
     
     setBasePrice(base)
     setDiscount(discountPercent)
+    setXpBoostersCharge(boostersCharge)
     setFinalPrice(final)
-  }, [numberOfBattles, selectedTier, playSPG, getReplays, serviceType])
+  }, [expAmount, selectedWN8Tier, cannotUseXPBoosters])
 
   function onSubmit(values: z.infer<typeof orderFormSchema>) {
     const orderData = {
       ...values,
-      playSPG,
-      getReplays,
       basePrice,
       discount,
+      xpBoostersCharge,
       finalPrice,
     }
     console.log(orderData)
-    alert(`Order submitted!\n\nService Type: ${serviceType.toUpperCase()}\nTier: ${values.tier}\nBattles: ${values.numberOfBattles}\nPlay SPG: ${playSPG ? 'Yes (+100%)' : 'No'}\nGet Replays: ${getReplays ? 'Yes (+10%)' : 'No'}\nTotal: $${finalPrice.toFixed(2)}\n\nWe will contact you within 30 minutes.`)
+    alert(`Order submitted!\n\nWN8 Tier: ${WN8_TIER_LABELS[values.wn8Tier]}\nXP Boosters: ${values.cannotUseXPBoosters ? 'Dont use XP boosters (+30%)' : 'Will use them'}\nAmount: ${values.expAmount}k XP\nTotal: $${finalPrice.toFixed(2)}\n\nWe will contact you within 30 minutes.`)
   }
 
   return (
@@ -166,13 +127,13 @@ export default function WN8BoostPage() {
                 Back to Home
               </Link>
               <div className="flex items-center gap-3 mb-4">
-                <Target className="h-10 w-10 text-primary" />
+                <BookOpen className="h-10 w-10 text-primary" />
                 <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-                  WN8, Winrate, High Damage Service
+                  Experience (XP) Farming
                 </h1>
               </div>
               <p className="text-lg text-muted-foreground mb-6">
-                Professional boosting to elevate your WN8 rating through expertly played battles
+                Level up your tanks and unlock new tiers faster with our professional XP farming service
               </p>
               <Button 
                 size="lg" 
@@ -203,130 +164,31 @@ export default function WN8BoostPage() {
                         <Calculator className="h-5 w-5 text-primary" />
                         <CardTitle className="text-2xl">Price Calculator</CardTitle>
                       </div>
-                      <CardDescription>Configure your boost and see the price instantly</CardDescription>
+                      <CardDescription>Configure your XP order and see costs instantly</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                       
-                      {/* Service Type Selection */}
+                      {/* WN8 Tier Selection */}
                       <div>
-                        <label className="text-sm font-medium mb-3 block">Service Type</label>
-                        <div className="grid grid-cols-3 gap-2 p-1 bg-secondary/30 rounded-lg">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setServiceType("wn8")
-                              setSelectedTier("2500-3000")
-                            }}
-                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                              serviceType === "wn8"
-                                ? 'bg-primary text-primary-foreground shadow-sm'
-                                : 'text-muted-foreground hover:text-foreground'
-                            }`}
-                          >
-                            WN8
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setServiceType("winrate")
-                              setSelectedTier("60%")
-                            }}
-                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                              serviceType === "winrate"
-                                ? 'bg-primary text-primary-foreground shadow-sm'
-                                : 'text-muted-foreground hover:text-foreground'
-                            }`}
-                          >
-                            Winrate
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setServiceType("damage")
-                              setSelectedTier("4000+")
-                            }}
-                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                              serviceType === "damage"
-                                ? 'bg-primary text-primary-foreground shadow-sm'
-                                : 'text-muted-foreground hover:text-foreground'
-                            }`}
-                          >
-                            High Damage
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Tier Selection */}
-                      <div>
-                        <label className="text-sm font-medium mb-3 block">
-                          {serviceType === "wn8" && "Target WN8 Tier"}
-                          {serviceType === "winrate" && "Target Winrate"}
-                          {serviceType === "damage" && "Target Damage"}
-                        </label>
+                        <label className="text-sm font-medium mb-3 block">Package Tier</label>
                         <div className="space-y-2">
-                          {serviceType === "wn8" && Object.entries(WN8_PRICING).map(([tier, price]) => (
+                          {Object.entries(EXP_PRICING).map(([tier, price]) => (
                             <button
                               key={tier}
                               type="button"
-                              onClick={() => setSelectedTier(tier)}
+                              onClick={() => setSelectedWN8Tier(tier as keyof typeof EXP_PRICING)}
                               className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
-                                selectedTier === tier
+                                selectedWN8Tier === tier
                                   ? 'border-primary bg-primary/10'
                                   : 'border-border hover:border-primary/50 bg-card/50'
                               }`}
                             >
                               <div className="flex items-center justify-between">
                                 <div>
-                                  <div className="font-semibold text-lg">{tier} WN8</div>
-                                  <div className="text-sm text-muted-foreground">${price} per battle</div>
+                                  <div className="font-semibold text-lg">{WN8_TIER_LABELS[tier as keyof typeof WN8_TIER_LABELS]}</div>
+                                  <div className="text-sm text-muted-foreground">${price} per 10k XP</div>
                                 </div>
-                                {selectedTier === tier && (
-                                  <Check className="h-5 w-5 text-primary" />
-                                )}
-                              </div>
-                            </button>
-                          ))}
-                          
-                          {serviceType === "winrate" && Object.entries(WINRATE_PRICING).map(([tier, price]) => (
-                            <button
-                              key={tier}
-                              type="button"
-                              onClick={() => setSelectedTier(tier)}
-                              className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
-                                selectedTier === tier
-                                  ? 'border-primary bg-primary/10'
-                                  : 'border-border hover:border-primary/50 bg-card/50'
-                              }`}
-                            >
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <div className="font-semibold text-lg">{tier} Winrate</div>
-                                  <div className="text-sm text-muted-foreground">${price} per battle</div>
-                                </div>
-                                {selectedTier === tier && (
-                                  <Check className="h-5 w-5 text-primary" />
-                                )}
-                              </div>
-                            </button>
-                          ))}
-                          
-                          {serviceType === "damage" && Object.entries(DAMAGE_PRICING).map(([tier, price]) => (
-                            <button
-                              key={tier}
-                              type="button"
-                              onClick={() => setSelectedTier(tier)}
-                              className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
-                                selectedTier === tier
-                                  ? 'border-primary bg-primary/10'
-                                  : 'border-border hover:border-primary/50 bg-card/50'
-                              }`}
-                            >
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <div className="font-semibold text-lg">{tier} DMG</div>
-                                  <div className="text-sm text-muted-foreground">${price} per battle</div>
-                                </div>
-                                {selectedTier === tier && (
+                                {selectedWN8Tier === tier && (
                                   <Check className="h-5 w-5 text-primary" />
                                 )}
                               </div>
@@ -335,68 +197,57 @@ export default function WN8BoostPage() {
                         </div>
                       </div>
 
-                      {/* Number of Battles */}
+                      {/* XP Boosters Options */}
                       <div>
-                        <label htmlFor="battles" className="text-sm font-medium mb-2 block">
-                          Number of Battles
+                        <label className="text-sm font-medium mb-3 block">XP Boosters (Personal Reserves)</label>
+                        <div className="p-4 rounded-lg border-2 border-border bg-card/50">
+                          <div className="flex items-start gap-3">
+                            <input
+                              type="checkbox"
+                              id="xpBoosters"
+                              checked={cannotUseXPBoosters}
+                              onChange={(e) => setCannotUseXPBoosters(e.target.checked)}
+                              className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                            />
+                            <div className="flex-1">
+                              <label htmlFor="xpBoosters" className="text-sm font-medium cursor-pointer block mb-1">
+                                Dont use my XP Boosters
+                              </label>
+                              <p className="text-xs text-muted-foreground">
+                                If we can't use your own Personal Reserves (XP Boosters), the price will be <span className="font-semibold text-amber-500">30% more</span>.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* XP Amount */}
+                      <div>
+                        <label htmlFor="xp" className="text-sm font-medium mb-2 block">
+                          XP Amount (in thousands)
                         </label>
                         <Input
-                          id="battles"
+                          id="xp"
                           type="number"
-                          value={numberOfBattles}
-                          onFocus={() => setNumberOfBattles("")}
+                          value={expAmount}
+                          onFocus={() => setExpAmount("")}
                           onChange={(e) => {
                             const val = e.target.value
                             if (val === "") {
-                              setNumberOfBattles("")
+                              setExpAmount("")
                             } else {
-                              setNumberOfBattles(parseInt(val) || 0)
+                              setExpAmount(parseInt(val) || 0)
                             }
                           }}
                           className="text-lg h-12 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                          placeholder="Enter number of battles"
+                          placeholder="e.g. 50 for 50,000 XP"
                         />
-                        {numberOfBattles !== "" && numberOfBattles < 20 && numberOfBattles > 0 && (
-                          <p className="text-sm text-red-500 mt-1">20 is a minimum number of battles</p>
+                        {expAmount !== "" && expAmount < 10 && expAmount >= 0 && (
+                          <p className="text-sm text-red-500 mt-1">10k XP is the minimum (enter 10)</p>
                         )}
-                      </div>
-
-                      {/* Additional Options */}
-                      <div className="space-y-3">
-                        <label className="text-sm font-medium block">Additional Options</label>
-                        
-                        {/* Play on SPG Option */}
-                        {((serviceType === "wn8" && (selectedTier === "2500-3000" || selectedTier === "3000-4000")) || (serviceType === "winrate" && selectedTier === "60%")) && (
-                          <div className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card/50 hover:bg-card transition-colors">
-                            <input
-                              type="checkbox"
-                              id="playSPG"
-                              checked={playSPG}
-                              onChange={(e) => setPlaySPG(e.target.checked)}
-                              className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                            />
-                            <label htmlFor="playSPG" className="flex-1 cursor-pointer">
-                              <div className="font-medium text-sm">Play on SPG (Artillery)</div>
-                              <div className="text-xs text-muted-foreground">+100% to base price</div>
-                            </label>
-                          </div>
-                        )}
-
-                        
-                        {/* Get Replays Option */}
-                        <div className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card/50 hover:bg-card transition-colors">
-                          <input
-                            type="checkbox"
-                            id="getReplays"
-                            checked={getReplays}
-                            onChange={(e) => setGetReplays(e.target.checked)}
-                            className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                          />
-                          <label htmlFor="getReplays" className="flex-1 cursor-pointer">
-                            <div className="font-medium text-sm">Get the Replays</div>
-                            <div className="text-xs text-muted-foreground">+10% to total cost</div>
-                          </label>
-                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Enter 50 for 50,000 XP, 100 for 100,000 XP, etc.
+                        </p>
                       </div>
 
                       {/* Price Breakdown */}
@@ -405,13 +256,6 @@ export default function WN8BoostPage() {
                           <span className="text-muted-foreground">Base Price:</span>
                           <span className="font-medium">${basePrice.toFixed(2)}</span>
                         </div>
-                        
-                        {playSPG && ((serviceType === "wn8" && (selectedTier === "2500-3000" || selectedTier === "3000-4000")) || (serviceType === "winrate" && selectedTier === "60%")) && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">SPG Modifier included</span>
-                            <span className="font-medium text-blue-500">+100%</span>
-                          </div>
-                        )}
                         
                         {discount > 0 && (
                           <div className="flex justify-between text-sm">
@@ -423,10 +267,10 @@ export default function WN8BoostPage() {
                           </div>
                         )}
                         
-                        {getReplays && (
+                        {xpBoostersCharge > 0 && (
                           <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Get Replays</span>
-                            <span className="font-medium text-blue-500">+10%</span>
+                            <span className="text-muted-foreground">XP Boosters (+30%):</span>
+                            <span className="font-medium text-amber-500">+${xpBoostersCharge.toFixed(2)}</span>
                           </div>
                         )}
                         
@@ -442,11 +286,11 @@ export default function WN8BoostPage() {
                         <div className="space-y-1 text-xs text-muted-foreground">
                           <div className="flex items-center gap-2">
                             <Check className="h-3 w-3 text-primary" />
-                            <span>50-99 battles: <strong className="text-foreground">15% OFF</strong></span>
+                            <span>250k-499k XP: <strong className="text-foreground">15% OFF</strong></span>
                           </div>
                           <div className="flex items-center gap-2">
                             <Check className="h-3 w-3 text-primary" />
-                            <span>100+ battles: <strong className="text-foreground">20% OFF</strong></span>
+                            <span>500k+ XP: <strong className="text-foreground">20% OFF</strong></span>
                           </div>
                         </div>
                       </div>
@@ -520,40 +364,28 @@ export default function WN8BoostPage() {
                         </div>
 
                         {/* Hidden fields that sync with calculator */}
-                        <input type="hidden" {...form.register("serviceType")} value={serviceType} />
-                        <input type="hidden" {...form.register("tier")} value={selectedTier} />
-                        <input type="hidden" {...form.register("numberOfBattles", { valueAsNumber: true })} value={numberOfBattles === "" ? 0 : numberOfBattles} />
-                        <input type="hidden" {...form.register("playSPG")} value={playSPG.toString()} />
-                        <input type="hidden" {...form.register("getReplays")} value={getReplays.toString()} />
+                        <input type="hidden" {...form.register("wn8Tier")} value={selectedWN8Tier} />
+                        <input type="hidden" {...form.register("cannotUseXPBoosters")} value={cannotUseXPBoosters ? "true" : "false"} />
+                        <input type="hidden" {...form.register("expAmount", { valueAsNumber: true })} value={expAmount === "" ? 0 : expAmount} />
 
                         {/* Order Summary */}
                         <div className="bg-secondary/20 rounded-lg p-4 space-y-2">
                           <div className="text-sm font-semibold mb-2">Order Summary:</div>
                           <div className="space-y-1 text-sm">
                             <div className="flex justify-between">
-                              <span className="text-muted-foreground">Service Type:</span>
-                              <span className="font-medium">{serviceType.toUpperCase()}</span>
+                              <span className="text-muted-foreground">Package:</span>
+                              <span className="font-medium">{WN8_TIER_LABELS[selectedWN8Tier]}</span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-muted-foreground">Tier:</span>
-                              <span className="font-medium">{selectedTier}</span>
+                              <span className="text-muted-foreground">Boosters:</span>
+                              <span className="font-medium">
+                                {cannotUseXPBoosters ? "Dont use XP boosters (+30%)" : "Use XP boosters"}
+                              </span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-muted-foreground">Battles:</span>
-                              <span className="font-medium">{numberOfBattles}</span>
+                              <span className="text-muted-foreground">Experience:</span>
+                              <span className="font-medium">{expAmount}k XP</span>
                             </div>
-                            {playSPG && ((serviceType === "wn8" && (selectedTier === "2500-3000" || selectedTier === "3000-4000")) || (serviceType === "winrate" && selectedTier === "60%")) && (
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">Play on SPG:</span>
-                                <span className="font-medium text-blue-500">Yes (+100%)</span>
-                              </div>
-                            )}
-                            {getReplays && (
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">Get Replays:</span>
-                                <span className="font-medium text-blue-500">Yes (+10%)</span>
-                              </div>
-                            )}
                             <div className="flex justify-between border-t border-border pt-2 mt-2">
                               <span className="text-muted-foreground">Total Cost:</span>
                               <span className="font-bold text-primary text-lg">${finalPrice.toFixed(2)}</span>
@@ -568,7 +400,7 @@ export default function WN8BoostPage() {
                             id="additionalInfo"
                             {...form.register("additionalInfo")}
                             className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                            placeholder="Any specific requirements or preferences..."
+                            placeholder="Any specific tanks, goals, or requirements..."
                           />
                         </div>
 
@@ -606,19 +438,19 @@ export default function WN8BoostPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold mb-1">100% Secure</h3>
-                    <p className="text-sm text-muted-foreground">VPN protection, encrypted connections, and complete privacy guaranteed.</p>
+                    <p className="text-sm text-muted-foreground">VPN protection and strict privacy protocols for your account safety.</p>
                   </div>
                 </div>
 
                 <div className="flex gap-4">
                   <div className="flex-shrink-0">
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Target className="h-5 w-5 text-primary" />
+                      <Zap className="h-5 w-5 text-primary" />
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-1">Expert Boosters</h3>
-                    <p className="text-sm text-muted-foreground">Only top 0.1% players (3500+ WN8) handle your account.</p>
+                    <h3 className="font-semibold mb-1">Fast Progression</h3>
+                    <p className="text-sm text-muted-foreground">Maximize XP earnings per hour with our expert players.</p>
                   </div>
                 </div>
 
@@ -629,8 +461,8 @@ export default function WN8BoostPage() {
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-1">Progress Tracking</h3>
-                    <p className="text-sm text-muted-foreground">Real-time updates on completed battles and WN8 progress.</p>
+                    <h3 className="font-semibold mb-1">Specific Goals</h3>
+                    <p className="text-sm text-muted-foreground">We focus on the exact tanks and modules you want to unlock.</p>
                   </div>
                 </div>
 
@@ -641,8 +473,8 @@ export default function WN8BoostPage() {
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-1">Volume Discounts</h3>
-                    <p className="text-sm text-muted-foreground">Save up to 20% when ordering 100+ battles.</p>
+                    <h3 className="font-semibold mb-1">Great Discounts</h3>
+                    <p className="text-sm text-muted-foreground">Get up to 20% off on larger XP orders.</p>
                   </div>
                 </div>
               </div>
@@ -661,11 +493,11 @@ export default function WN8BoostPage() {
                     <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl font-bold mx-auto mb-3">
                       1
                     </div>
-                    <CardTitle className="text-lg">Select Your Target</CardTitle>
+                    <CardTitle className="text-lg">Select XP Amount</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground text-sm">
-                      Choose your desired WN8 tier and the number of battles you want us to play on your account.
+                      Choose how much Experience (XP) you need and your preferred efficiency tier.
                     </p>
                   </CardContent>
                 </Card>
@@ -675,11 +507,11 @@ export default function WN8BoostPage() {
                     <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl font-bold mx-auto mb-3">
                       2
                     </div>
-                    <CardTitle className="text-lg">Expert Plays</CardTitle>
+                    <CardTitle className="text-lg">We Grind</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground text-sm">
-                      Our professional boosters (WN8 3500+) play the specified number of battles achieving your target WN8.
+                      Our pro players battle consistently to earn XP and unlock upgrades for you.
                     </p>
                   </CardContent>
                 </Card>
@@ -689,11 +521,11 @@ export default function WN8BoostPage() {
                     <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl font-bold mx-auto mb-3">
                       3
                     </div>
-                    <CardTitle className="text-lg">Enjoy Results</CardTitle>
+                    <CardTitle className="text-lg">Unlock Tiers</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground text-sm">
-                      Your WN8 rating improves to the target level. Track progress in real-time and enjoy your new stats!
+                      Log in to find your tanks leveled up and ready for the next tier of research!
                     </p>
                   </CardContent>
                 </Card>

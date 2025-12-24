@@ -17,11 +17,12 @@ export default function Footer() {
     { label: "Terms of Service", href: "/terms" },
     { label: "Privacy Policy", href: "/privacy" },
     { label: "Cookie Policy", href: "/cookies" },
+    { label: "Guarantee", href: "/guarantee" },
   ]
 
   const serviceLinks = [
-    { label: "WN8 Boosting", href: "#services" },
-    { label: "Credit Farming", href: "#services" },
+    { label: "WN8, Winrate, High Damage", href: "#services" },
+    { label: "Credit and Bonds Farming", href: "#services" },
     { label: "Campaign Missions", href: "#services" },
     { label: "Mark of Excellence", href: "#services" },
   ]
