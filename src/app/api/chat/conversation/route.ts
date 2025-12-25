@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       .from('conversations')
       .insert({
         visitor_id: visitorId,
-        status: 'active',
+        status: 'new',
       })
       .select()
       .single();

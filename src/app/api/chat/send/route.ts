@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/db';
 import { messageSchema } from '@/lib/validation';
 import { MESSAGE_RATE_LIMIT, checkRateLimit } from '@/lib/ratelimit';
 import { publishToChannel } from '@/lib/ably';
+import { sendTelegramNotification } from '@/lib/telegram';
 
 /**
  * Send a message from visitor to chat
@@ -103,6 +104,16 @@ export async function POST(request: NextRequest) {
     } catch (ablyError) {
       console.error('Error publishing to Ably:', ablyError);
       // Message is already in DB, so we don't fail the request
+    }
+
+    // Send Telegram notification only for NEW conversations (manager hasn't replied yet)
+    if (conversation.status === 'new') {
+      sendTelegramNotification({
+        visitorId,
+        messageBody,
+        conversationId: conversation_id,
+        isNewConversation: true,
+      }).catch(err => console.error('Telegram notification error:', err));
     }
 
     return NextResponse.json({

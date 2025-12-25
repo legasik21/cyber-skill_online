@@ -14,9 +14,9 @@ npm install
 2. In the SQL Editor, run the schema from `database/schema.sql`
 3. Go to Settings → API to get your keys:
 
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY` (found in "service_role" secret)
+   - `https://ebjquwgehfjirxoiagqw.supabase.co`
+   - `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVianF1d2dlaGZqaXJ4b2lhZ3F3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY1OTI4NjMsImV4cCI6MjA4MjE2ODg2M30.jCCU2AkzeTIiDKm35ixfy-RQMgjJxjFs68xK1tT119g`
+   - `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVianF1d2dlaGZqaXJ4b2lhZ3F3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NjU5Mjg2MywiZXhwIjoyMDgyMTY4ODYzfQ.n2r7jN_gt0W_O2ux_Pj69fXGq-W-m6SEp9jYH3t6lEQ` (found in "service_role" secret)
 
 4. Create your first admin user:
    - Go to Authentication → Users → Add User
@@ -28,8 +28,9 @@ npm install
 1. Go to [https://ably.com](https://ably.com) and create a free account
 2. Create a new app
 3. Go to API Keys tab and copy:
-   - Root API Key for `ABLY_API_KEY`
-   - Create a new publishable key for `NEXT_PUBLIC_ABLY_KEY`
+   - Root API Key for `WgDsjQ.18GxGw:nAQXbcVLv5QG64Nm3-iDj8uhezTjchcLBkzORqTae9o`
+   - Create a new publishable key for `WgDsjQ.gzWAmQ:YIafRxdP0dj6MA9LsKJC-dsXGs_jLBE7pnkbSLrQgZ0
+`
 
 ### 4. Configure Environment Variables
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
 import { closeConversationSchema } from '@/lib/validation';
+import { publishToChannel } from '@/lib/ably';
 
 /**
  * Close a conversation
@@ -60,6 +61,18 @@ export async function POST(request: NextRequest) {
         conversation_id,
         details: {},
       });
+
+    // Notify client that conversation is closed via Ably
+    try {
+      await publishToChannel(
+        `chat:${conversation_id}`,
+        'conversation_closed',
+        { conversation_id, status: 'closed' }
+      );
+    } catch (ablyError) {
+      console.error('Error publishing conversation closed event:', ablyError);
+      // Don't fail the request if Ably publish fails
+    }
 
     return NextResponse.json({
       success: true,

@@ -17,8 +17,10 @@ export default function ChatWidget() {
     isConnected,
     isLoading,
     error,
+    isClosed,
     sendMessage,
     createConversation,
+    resetConversation,
   } = useChat({ conversationId });
 
   // Auto-scroll to bottom when new messages arrive
@@ -53,6 +55,20 @@ export default function ChatWidget() {
     } catch (err) {
       // Error already handled in hook
     }
+  };
+
+  const handleNewConversation = async () => {
+    resetConversation();
+    setConversationId(undefined);
+    // Wait a moment then create new conversation
+    setTimeout(async () => {
+      try {
+        const convId = await createConversation();
+        setConversationId(convId);
+      } catch (err) {
+        console.error('Failed to create new conversation:', err);
+      }
+    }, 100);
   };
 
   const toggleChat = () => {
@@ -94,11 +110,11 @@ export default function ChatWidget() {
               <div className={styles.statusIndicator}>
                 <span
                   className={`${styles.statusDot} ${
-                    isConnected ? styles.connected : styles.disconnected
+                    isClosed ? styles.closed : isConnected ? styles.connected : styles.disconnected
                   }`}
                 />
                 <span className={styles.statusText}>
-                  {isConnected ? 'Online' : 'Connecting...'}
+                  {isClosed ? 'Closed' : isConnected ? 'Online' : 'Connecting...'}
                 </span>
               </div>
             </div>
@@ -147,42 +163,64 @@ export default function ChatWidget() {
               </div>
             )}
 
-            {!isConnected && messages.length > 0 && (
+            {!isConnected && !isClosed && messages.length > 0 && (
               <div className={styles.offlineNotice}>
                 <span>Reconnecting...</span>
               </div>
             )}
+
+            {/* Conversation Closed Message */}
+            {isClosed && (
+              <div className={styles.closedMessage}>
+                <div className={styles.closedIcon}>
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                  </svg>
+                </div>
+                <h4>Conversation Closed</h4>
+                <p>If you have any additional questions, start a new conversation.</p>
+                <button
+                  className={styles.newConversationButton}
+                  onClick={handleNewConversation}
+                >
+                  New Conversation
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Input */}
-          <form className={styles.inputContainer} onSubmit={handleSendMessage}>
-            <input
-              type="text"
-              className={styles.messageInput}
-              placeholder="Type your message..."
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              disabled={!isConnected || !conversationId}
-            />
-            <button
-              type="submit"
-              className={styles.sendButton}
-              disabled={!inputValue.trim() || !isConnected || !conversationId}
-              aria-label="Send message"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
+          {/* Input - hidden when closed */}
+          {!isClosed && (
+            <form className={styles.inputContainer} onSubmit={handleSendMessage}>
+              <input
+                type="text"
+                className={styles.messageInput}
+                placeholder="Type your message..."
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                disabled={!isConnected || !conversationId}
+              />
+              <button
+                type="submit"
+                className={styles.sendButton}
+                disabled={!inputValue.trim() || !isConnected || !conversationId}
+                aria-label="Send message"
               >
-                <line x1="22" y1="2" x2="11" y2="13" />
-                <polygon points="22 2 15 22 11 13 2 9 22 2" />
-              </svg>
-            </button>
-          </form>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <line x1="22" y1="2" x2="11" y2="13" />
+                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                </svg>
+              </button>
+            </form>
+          )}
         </div>
       )}
     </div>

@@ -4,7 +4,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 export interface Conversation {
   id: string;
   visitor_id: string;
-  status: 'active' | 'closed';
+  status: 'new' | 'active' | 'closed';
   assigned_agent_id: string | null;
   created_at: string;
   last_message_at: string;

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import * as Ably from 'ably';
-import { Message } from '@/lib/db';
+import { Message, createSupabaseClient } from '@/lib/db';
 
 interface UseChatOptions {
   conversationId?: string;
@@ -8,13 +8,26 @@ interface UseChatOptions {
   adminId?: string;
 }
 
+// Helper to get auth token for admin requests
+async function getAuthToken(): Promise<string | null> {
+  try {
+    const supabase = createSupabaseClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.access_token || null;
+  } catch {
+    return null;
+  }
+}
+
 interface UseChatReturn {
   messages: Message[];
   isConnected: boolean;
   isLoading: boolean;
   error: string | null;
+  isClosed: boolean;
   sendMessage: (body: string) => Promise<void>;
   createConversation: () => Promise<string>;
+  resetConversation: () => void;
 }
 
 export function useChat(options: UseChatOptions = {}): UseChatReturn {
@@ -24,6 +37,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isClosed, setIsClosed] = useState(false);
   
   const ablyClientRef = useRef<Ably.Realtime | null>(null);
   const channelRef = useRef<Ably.RealtimeChannel | null>(null);
@@ -32,9 +46,20 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const initializeAbly = useCallback(async (convId: string) => {
     try {
       // Get Ably token from server
+      const headers: Record<string, string> = { 
+        'Content-Type': 'application/json' 
+      };
+
+      if (isAdmin) {
+        const token = await getAuthToken();
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+      }
+
       const response = await fetch('/api/chat/token', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           conversation_id: convId,
           is_admin: isAdmin,
@@ -86,6 +111,11 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         });
       });
 
+      // Subscribe to conversation_closed event
+      channel.subscribe('conversation_closed', () => {
+        setIsClosed(true);
+      });
+
     } catch (err) {
       console.error('Error initializing Ably:', err);
       setError(err instanceof Error ? err.message : 'Connection error');
@@ -101,7 +131,18 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         ? `/api/admin/chat/messages/${convId}`
         : `/api/chat/conversation?id=${convId}`;
       
-      const response = await fetch(endpoint);
+      // Add auth token for admin requests
+      const headers: Record<string, string> = {};
+      if (isAdmin) {
+        const token = await getAuthToken();
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+      }
+
+      const response = await fetch(endpoint, {
+        headers: isAdmin ? headers : undefined
+      });
       
       if (!response.ok) {
         throw new Error('Failed to load messages');
@@ -156,9 +197,21 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         ? '/api/admin/chat/send'
         : '/api/chat/send';
 
+      // Prepare headers
+      const headers: Record<string, string> = { 
+        'Content-Type': 'application/json' 
+      };
+
+      if (isAdmin) {
+        const token = await getAuthToken();
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+      }
+
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           conversation_id: conversationId,
           body: body.trim(),
@@ -196,12 +249,28 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     };
   }, [conversationId, loadMessages, initializeAbly]);
 
+  // Reset conversation (for starting new conversation after closed)
+  const resetConversation = useCallback(() => {
+    setMessages([]);
+    setIsClosed(false);
+    setError(null);
+    // Cleanup existing connection
+    if (channelRef.current) {
+      channelRef.current.unsubscribe();
+    }
+    if (ablyClientRef.current) {
+      ablyClientRef.current.close();
+    }
+  }, []);
+
   return {
     messages,
     isConnected,
     isLoading,
     error,
+    isClosed,
     sendMessage,
     createConversation,
+    resetConversation,
   };
 }

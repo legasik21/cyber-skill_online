@@ -9,7 +9,7 @@ import styles from './chat.module.css';
 interface Conversation {
   id: string;
   visitor_id: string;
-  status: 'active' | 'closed';
+  status: 'new' | 'active' | 'closed';
   assigned_agent_id: string | null;
   created_at: string;
   last_message_at: string;
@@ -50,23 +50,38 @@ export default function AdminChatPage() {
 
   // Load conversations
   useEffect(() => {
-    if (!user) return;
+    if (!user?.id) return;
 
     loadConversations();
     
     // Refresh every 30 seconds
     const interval = setInterval(loadConversations, 30000);
     return () => clearInterval(interval);
-  }, [user]);
+  }, [user?.id]);
 
   const loadConversations = async () => {
     try {
       setIsLoading(true);
       
-      const response = await fetch('/api/admin/chat/conversations');
+      // Get current session for access token
+      const supabase = createSupabaseClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        console.error('No access token available');
+        return;
+      }
+      
+      const response = await fetch('/api/admin/chat/conversations', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+      });
       
       if (!response.ok) {
-        throw new Error('Failed to load conversations');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Failed to load conversations:', response.status, errorData);
+        throw new Error(errorData.error || `Failed to load conversations (${response.status})`);
       }
 
       const data = await response.json();
@@ -84,9 +99,21 @@ export default function AdminChatPage() {
 
   const handleCloseConversation = async (conversationId: string) => {
     try {
+      // Get auth token
+      const supabase = createSupabaseClient();
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        console.error('No access token');
+        return;
+      }
+
       const response = await fetch('/api/admin/chat/close', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
         body: JSON.stringify({ conversation_id: conversationId }),
       });
 

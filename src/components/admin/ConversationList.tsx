@@ -4,7 +4,7 @@ import styles from './ConversationList.module.css';
 interface Conversation {
   id: string;
   visitor_id: string;
-  status: 'active' | 'closed';
+  status: 'new' | 'active' | 'closed';
   last_message_at: string;
   last_message?: {
     body: string;
@@ -18,6 +18,32 @@ interface ConversationListProps {
   onSelectConversation: (id: string) => void;
   isLoading: boolean;
   onRefresh: () => void;
+}
+
+function getStatusBadgeClass(status: Conversation['status']): string {
+  switch (status) {
+    case 'new':
+      return styles.newBadge;
+    case 'active':
+      return styles.activeBadge;
+    case 'closed':
+      return styles.closedBadge;
+    default:
+      return '';
+  }
+}
+
+function getStatusLabel(status: Conversation['status']): string {
+  switch (status) {
+    case 'new':
+      return 'New';
+    case 'active':
+      return 'Active';
+    case 'closed':
+      return 'Closed';
+    default:
+      return status;
+  }
 }
 
 export default function ConversationList({
@@ -61,7 +87,7 @@ export default function ConversationList({
               <p>Loading conversations...</p>
             </>
           ) : (
-            <p>No active conversations</p>
+            <p>No conversations</p>
           )}
         </div>
       ) : (
@@ -100,9 +126,9 @@ export default function ConversationList({
                   </div>
                 )}
 
-                {conversation.status === 'closed' && (
-                  <span className={styles.closedBadge}>Closed</span>
-                )}
+                <span className={`${styles.statusBadge} ${getStatusBadgeClass(conversation.status)}`}>
+                  {getStatusLabel(conversation.status)}
+                </span>
               </div>
             );
           })}

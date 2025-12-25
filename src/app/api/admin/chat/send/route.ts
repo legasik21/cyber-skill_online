@@ -48,6 +48,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // If conversation is 'new', change to 'active' when admin first replies
+    if (conversation.status === 'new') {
+      await supabaseAdmin
+        .from('conversations')
+        .update({ status: 'active' })
+        .eq('id', conversation_id);
+    }
+
     // Insert message into database
     const { data: message, error: messageError } = await supabaseAdmin
       .from('messages')

@@ -3,7 +3,7 @@ import { supabaseAdmin } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
 
 /**
- * Get list of active conversations for admin
+ * Get list of conversations for admin
  */
 export async function GET(request: NextRequest) {
   try {
@@ -19,8 +19,8 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
-    const status = searchParams.get('status') || 'active';
+    const limit = parseInt(searchParams.get('limit') || '50');
+    const status = searchParams.get('status') || 'all';
     
     const offset = (page - 1) * limit;
 
@@ -39,6 +39,7 @@ export async function GET(request: NextRequest) {
       .order('last_message_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
+    // Filter by status if not 'all'
     if (status !== 'all') {
       query = query.eq('status', status);
     }

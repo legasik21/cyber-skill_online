@@ -2,7 +2,7 @@
 CREATE TABLE conversations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   visitor_id UUID NOT NULL,
-  status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'closed')),
+  status VARCHAR(20) DEFAULT 'new' CHECK (status IN ('new', 'active', 'closed')),
   assigned_agent_id UUID,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   last_message_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
