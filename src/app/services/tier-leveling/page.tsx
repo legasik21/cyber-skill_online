@@ -4,13 +4,14 @@ import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Input } from "@/components/ui/Input"
-import { ChevronsUp, ChevronRight, Calculator, Coins, Zap } from "lucide-react"
+import { ChevronsUp, ChevronRight, Calculator, Coins, Zap, Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Link from "next/link"
+import { useOrderSubmit } from "@/hooks/useOrderSubmit"
 
 // Price for each tier (cumulative from tier 1)
 const TIER_PRICES: Record<number, number> = {
@@ -54,6 +55,7 @@ function calculateTierPrice(fromTier: number, toTier: number): number {
 }
 
 export default function TierLevelingPage() {
+  const { submitOrder, isSubmitting } = useOrderSubmit()
   const [fromTier, setFromTier] = useState(1)
   const [toTier, setToTier] = useState(11)
   const [dontUseBoosters, setDontUseBoosters] = useState(false)
@@ -121,20 +123,29 @@ export default function TierLevelingPage() {
   const leftPct = ((fromTier - 1) / 10) * 100
   const rightPct = ((11 - toTier) / 10) * 100
 
-  function onSubmit(values: z.infer<typeof orderFormSchema>) {
-    const orderData = {
-      ...values,
-      service: "Tier Leveling",
-      fromTier,
-      toTier,
-      dontUseBoosters,
-      isSPG,
-      silverFarm: selectedSilverIds,
-      priceDetails,
-    }
-    
-    console.log(orderData)
-    alert(`Order submitted!\n\nService: Tier Leveling\nLevels: ${fromTier} → ${toTier}\nTotal: $${priceDetails.total.toFixed(2)}\n\nWe will contact you within 30 minutes.`)
+  async function onSubmit(values: z.infer<typeof orderFormSchema>) {
+    const silverLabel = SILVER_OPTIONS.find(o => o.id === selectedSilverIds)?.label || 'None'
+
+    await submitOrder({
+      email: values.email,
+      discordTag: values.discordTag,
+      service: 'tier-leveling',
+      message: values.additionalInfo,
+      page: 'Tier Leveling Service',
+      orderDetails: {
+          tierRange: `${fromTier} → ${toTier}`,
+          levelsToBoost: `${toTier - fromTier} tiers`,
+          spg: isSPG ? 'Yes (+30%)' : 'No',
+          xpBoosters: dontUseBoosters ? 'No XP Boosters (+30%)' : 'Use Boosters',
+          silverFarm: silverLabel,
+          server: values.server,
+          basePrice: `$${priceDetails.base.toFixed(2)}`,
+          spgSurcharge: priceDetails.spgSurcharge > 0 ? `$${priceDetails.spgSurcharge.toFixed(2)}` : 'None',
+          noBoostersSurcharge: priceDetails.noBoostersSurcharge > 0 ? `$${priceDetails.noBoostersSurcharge.toFixed(2)}` : 'None',
+          silverPrice: priceDetails.silverPrice > 0 ? `$${priceDetails.silverPrice.toFixed(2)}` : 'None',
+          totalPrice: `$${priceDetails.total.toFixed(2)}`,
+      },
+    })
   }
 
   return (
@@ -610,10 +621,19 @@ export default function TierLevelingPage() {
                       type="submit" 
                       className="w-full h-12 text-base" 
                       size="lg"
-                      disabled={fromTier >= toTier}
+                      disabled={fromTier >= toTier || isSubmitting}
                     >
-                      {fromTier < toTier ? `Submit Order - $${priceDetails.total.toFixed(2)}` : "Select Tier Range"}
-                      <ChevronRight className="ml-2 h-5 w-5" />
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Sending Order...
+                        </>
+                      ) : (
+                        <>
+                          {fromTier < toTier ? `Submit Order - $${priceDetails.total.toFixed(2)}` : "Select Tier Range"}
+                          <ChevronRight className="ml-2 h-5 w-5" />
+                        </>
+                      )}
                     </Button>
 
                     <p className="text-xs text-center text-muted-foreground">

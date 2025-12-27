@@ -22,6 +22,7 @@ import {
   Calculator,
   X,
   Trash2,
+  Loader2,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,6 +30,7 @@ import * as z from "zod";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Link from "next/link";
+import { useOrderSubmit } from "@/hooks/useOrderSubmit"
 
 const TANKS = [
   { id: "stug-iv", name: "Stug IV" },
@@ -395,6 +397,7 @@ function getMissionPrice(
 }
 
 export default function Campaign1Page() {
+  const { submitOrder, isSubmitting } = useOrderSubmit()
   const [activeTank, setActiveTank] = useState<string>(TANKS[0].id);
   const [selectedMissions, setSelectedMissions] = useState<SelectedMissions>(
     {}
@@ -586,17 +589,37 @@ export default function Campaign1Page() {
     setSelectedMissions({});
   };
 
-  function onSubmit(values: z.infer<typeof orderFormSchema>) {
-    const orderData = {
-      ...values,
-      campaign: "1.0",
-      selectedMissions,
-      priceDetails,
-    };
-    console.log(orderData);
-    alert(
-      `Order submitted!\n\nCampaign: 1.0\nMissions Selected: ${totalMissions}\nTotal: $${priceDetails.total}\n\nWe will contact you within 30 minutes.`
-    );
+  async function onSubmit(values: z.infer<typeof orderFormSchema>) {
+    // Format selected missions for detailed view
+    const formattedMissions = Object.entries(selectedMissions)
+      .map(([tankId, types]) => {
+        const tankName = TANKS.find((t) => t.id === tankId)?.name || tankId;
+        const typeDetails = Object.entries(types)
+          .map(([typeId, missions]) => {
+            const typeName = MISSION_TYPES.find((t) => t.id === typeId)?.name || typeId;
+            const sortedMissions = [...missions].sort((a, b) => a - b);
+            return `${typeName}: [${sortedMissions.join(", ")}]`;
+          })
+          .join("; ");
+        return `${tankName}: ${typeDetails}`;
+      })
+      .join("\n");
+
+    await submitOrder({
+      email: values.email,
+      discordTag: values.discordTag,
+      service: 'campaign-missions-1.0',
+      message: values.additionalInfo,
+      page: 'Campaign Missions 1.0',
+      orderDetails: {
+          campaign: "1.0",
+          missionsSelected: `${totalMissions} missions`,
+          missionsDetails: formattedMissions,
+          originalPrice: `$${priceDetails.original}`,
+          discount: priceDetails.discount > 0 ? `-$${priceDetails.discount}` : 'None',
+          totalPrice: `$${priceDetails.total}`,
+      },
+    })
   }
 
   return (
@@ -1183,12 +1206,21 @@ export default function Campaign1Page() {
                       type="submit"
                       className="w-full h-12 text-base"
                       size="lg"
-                      disabled={totalMissions === 0}
+                      disabled={totalMissions === 0 || isSubmitting}
                     >
-                      {totalMissions > 0
-                        ? `Submit Order - $${priceDetails.total}`
-                        : "Select Missions in Calculator First"}
-                      <ChevronRight className="ml-2 h-5 w-5" />
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Sending Order...
+                        </>
+                      ) : (
+                        <>
+                          {totalMissions > 0
+                            ? `Submit Order - $${priceDetails.total}`
+                            : "Select Missions in Calculator First"}
+                          <ChevronRight className="ml-2 h-5 w-5" />
+                        </>
+                      )}
                     </Button>
 
                     <p className="text-xs text-center text-muted-foreground">

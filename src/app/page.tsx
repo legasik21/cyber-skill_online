@@ -1,9 +1,10 @@
 "use client"
 
+import { useState } from "react"
 import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Input } from "@/components/ui/Input"
-import { Shield, Target, Zap, Trophy, ChevronRight, Star, ChevronsUp, BookOpen, Swords, Medal, Users } from "lucide-react"
+import { Shield, Target, Zap, Trophy, ChevronRight, Star, ChevronsUp, BookOpen, Swords, Medal, Users, Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -12,6 +13,8 @@ import Link from "next/link"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import HeroBackground from "@/components/HeroBackground"
+import { useRouter } from "next/navigation"
+import ReviewsSlider from "@/components/ReviewsSlider"
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -21,6 +24,9 @@ const formSchema = z.object({
 })
 
 export default function Home() {
+  const router = useRouter()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -31,9 +37,33 @@ export default function Home() {
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
-    alert("Order request sent! We will contact you shortly.")
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true)
+    try {
+      const response = await fetch('/api/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...values,
+          page: 'Home Page - Contact Form',
+        }),
+      })
+
+      const data = await response.json()
+      
+      if (data.redirect) {
+        router.push(data.redirect)
+      } else if (data.success) {
+        router.push('/order/success')
+      } else {
+        router.push('/order/error')
+      }
+    } catch (error) {
+      console.error('Order submission error:', error)
+      router.push('/order/error?reason=server')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const services = [
@@ -156,21 +186,26 @@ export default function Home() {
             >
               Professional World of Tanks boosting services. Raise your WN8, get 3 Marks of Excellence, and complete campaign missions effortlessly.
             </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="flex gap-4"
-            >
-              <Button size="lg" className="text-lg px-8" asChild>
-                <Link href="#services">
-                  Our Services <ChevronRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" className="text-lg px-8">
-                Chat Assistant
-              </Button>
-            </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-4 sm:px-0"
+              >
+                <Button size="lg" className="text-lg px-8 w-full sm:w-auto" asChild>
+                  <Link href="#services">
+                    Our Services <ChevronRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="text-lg px-8 w-full sm:w-auto"
+                  onClick={() => typeof window !== 'undefined' && window.dispatchEvent(new CustomEvent('open-chat-widget'))}
+                >
+                  Chat Assistant
+                </Button>
+              </motion.div>
           </div>
         </div>
       </section>
@@ -401,7 +436,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="pt-4">
+              <div className="pt-4 flex justify-center md:justify-start">
                 <Button size="lg" variant="outline" asChild>
                   <Link href="/guarantee">
                     Read Full Guarantee Policy
@@ -446,93 +481,8 @@ export default function Home() {
             <p className="text-muted-foreground text-lg">Trusted by thousands of World of Tanks players worldwide</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="border-border/50 bg-card/50">
-              <CardHeader>
-                <div className="flex items-center mb-4">
-                  <div className="flex text-primary">
-                    <Star className="h-5 w-5 fill-current" />
-                    <Star className="h-5 w-5 fill-current" />
-                    <Star className="h-5 w-5 fill-current" />
-                    <Star className="h-5 w-5 fill-current" />
-                    <Star className="h-5 w-5 fill-current" />
-                  </div>
-                </div>
-                <CardTitle className="text-lg">Amazing Service!</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  "Got my 3 marks on the Object 430U in just 3 days! The boosters are incredibly skilled and kept me updated throughout. Highly recommend CyberSkill!"
-                </p>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-3">
-                    <span className="text-primary font-bold">DK</span>
-                  </div>
-                  <div>
-                    <p className="font-semibold">DarkKnight87</p>
-                    <p className="text-xs text-muted-foreground">Nov 25, 2025</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border/50 bg-card/50">
-              <CardHeader>
-                <div className="flex items-center mb-4">
-                  <div className="flex text-primary">
-                    <Star className="h-5 w-5 fill-current" />
-                    <Star className="h-5 w-5 fill-current" />
-                    <Star className="h-5 w-5 fill-current" />
-                    <Star className="h-5 w-5 fill-current" />
-                    <Star className="h-5 w-5 fill-current" />
-                  </div>
-                </div>
-                <CardTitle className="text-lg">Professional Team</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  "Finally completed the Obj. 279e missions thanks to CyberSkill. The team was professional, fast, and secure. Worth every penny!"
-                </p>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-3">
-                    <span className="text-primary font-bold">TM</span>
-                  </div>
-                  <div>
-                    <p className="font-semibold">TankMaster99</p>
-                    <p className="text-xs text-muted-foreground">Nov 20, 2025</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border/50 bg-card/50">
-              <CardHeader>
-                <div className="flex items-center mb-4">
-                  <div className="flex text-primary">
-                    <Star className="h-5 w-5 fill-current" />
-                    <Star className="h-5 w-5 fill-current" />
-                    <Star className="h-5 w-5 fill-current" />
-                    <Star className="h-5 w-5 fill-current" />
-                    <Star className="h-5 w-5 fill-current" />
-                  </div>
-                </div>
-                <CardTitle className="text-lg">Exceeded Expectations</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  "My WN8 went from 1200 to 2000 in two weeks! The boosters played better than I expected and taught me some tricks too. Definitely using again."
-                </p>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-3">
-                    <span className="text-primary font-bold">AC</span>
-                  </div>
-                  <div>
-                    <p className="font-semibold">ArmoredCrusader</p>
-                    <p className="text-xs text-muted-foreground">Nov 18, 2025</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="px-4">
+             <ReviewsSlider />
           </div>
 
           {/* Trust Indicators */}
@@ -629,8 +579,15 @@ export default function Home() {
                   />
                 </div>
 
-                <Button type="submit" className="w-full" size="lg">
-                  Submit Request
+                <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    'Submit Request'
+                  )}
                 </Button>
               </form>
             </CardContent>

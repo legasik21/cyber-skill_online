@@ -35,6 +35,13 @@ export default function ChatWidget() {
     }
   }, [isOpen, conversationId]);
 
+  // Listen for external open commands
+  useEffect(() => {
+    const handleOpenChat = () => setIsOpen(true);
+    window.addEventListener('open-chat-widget', handleOpenChat);
+    return () => window.removeEventListener('open-chat-widget', handleOpenChat);
+  }, []);
+
   const handleInitialize = async () => {
     try {
       const convId = await createConversation();

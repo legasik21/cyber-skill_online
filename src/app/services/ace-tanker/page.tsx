@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Input } from "@/components/ui/Input"
-import { Medal, Shield, ChevronRight, Check, ArrowLeft, Calculator, Video, Crosshair, Disc } from "lucide-react"
+import { Medal, Shield, ChevronRight, Check, ArrowLeft, Calculator, Video, Crosshair, Disc, Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -12,6 +12,7 @@ import { motion } from "framer-motion"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Link from "next/link"
+import { useOrderSubmit } from "@/hooks/useOrderSubmit"
 
 // Pricing based on Tier
 const TIER_PRICING = {
@@ -40,6 +41,7 @@ const orderFormSchema = z.object({
 })
 
 export default function AceTankerPage() {
+  const { submitOrder, isSubmitting } = useOrderSubmit()
   const [tankTier, setTankTier] = useState<keyof typeof TIER_PRICING>("9_10")
   const [getReplays, setGetReplays] = useState<boolean>(false)
   const [isSpg, setIsSpg] = useState<boolean>(false)
@@ -88,16 +90,25 @@ export default function AceTankerPage() {
     setFinalPrice(adjustedBase + replaysExtra)
   }, [tankTier, getReplays, isSpg])
 
-  function onSubmit(values: z.infer<typeof orderFormSchema>) {
-    const orderData = {
-      ...values,
-      basePrice,
-      spgCharge,
-      replaysCharge,
-      finalPrice,
-    }
-    console.log(orderData)
-    alert(`Order submitted!\n\nService: Ace Tanker\nTank: ${values.tankName} (${TIER_LABELS[values.tankTier]})\nSPG: ${values.isSpg ? 'Yes (+100%)' : 'No'}\nReplays: ${values.getReplays ? 'Yes (+20%)' : 'No'}\nTotal: $${finalPrice.toFixed(2)}\n\nWe will contact you within 30 minutes.`)
+  async function onSubmit(values: z.infer<typeof orderFormSchema>) {
+    await submitOrder({
+      email: values.email,
+      discordTag: values.discordTag,
+      service: 'ace-tanker',
+      message: values.additionalInfo,
+      page: 'Ace Tanker Service',
+      orderDetails: {
+          tankName: values.tankName,
+          tier: TIER_LABELS[tankTier],
+          isSpg: isSpg ? 'Yes (+100%)' : 'No',
+          getReplays: getReplays ? 'Yes (+20%)' : 'No',
+          server: values.server,
+          basePrice: `$${basePrice.toFixed(2)}`,
+          spgFee: isSpg ? `$${spgCharge.toFixed(2)}` : 'None',
+          replaysFee: getReplays ? `$${replaysCharge.toFixed(2)}` : 'None',
+          totalPrice: `$${finalPrice.toFixed(2)}`,
+      },
+    })
   }
 
   return (
@@ -386,9 +397,18 @@ export default function AceTankerPage() {
                         </div>
 
                         {/* Submit Button */}
-                        <Button type="submit" className="w-full h-12 text-base" size="lg">
-                          Submit Order - ${finalPrice.toFixed(2)}
-                          <ChevronRight className="ml-2 h-5 w-5" />
+                        <Button type="submit" className="w-full h-12 text-base" size="lg" disabled={isSubmitting}>
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                              Sending Order...
+                            </>
+                          ) : (
+                            <>
+                              Submit Order - ${finalPrice.toFixed(2)}
+                              <ChevronRight className="ml-2 h-5 w-5" />
+                            </>
+                          )}
                         </Button>
 
                         <p className="text-xs text-center text-muted-foreground">

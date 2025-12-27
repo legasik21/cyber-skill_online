@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Input } from "@/components/ui/Input"
-import { Zap, Shield, ChevronRight, Check, ArrowLeft, Calculator, Percent, BookOpen } from "lucide-react"
+import { Zap, Shield, ChevronRight, Check, ArrowLeft, Calculator, Percent, BookOpen, Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -12,6 +12,7 @@ import { motion } from "framer-motion"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Link from "next/link"
+import { useOrderSubmit } from "@/hooks/useOrderSubmit"
 
 // Pricing per 10,000 XP based on WN8 tier
 const EXP_PRICING = {
@@ -35,6 +36,7 @@ const orderFormSchema = z.object({
 })
 
 export default function ExpFarmPage() {
+  const { submitOrder, isSubmitting } = useOrderSubmit()
   const [expAmount, setExpAmount] = useState<number | "">(50) // Default 50k
   const [selectedWN8Tier, setSelectedWN8Tier] = useState<keyof typeof EXP_PRICING>("under-2500")
   const [cannotUseXPBoosters, setCannotUseXPBoosters] = useState<boolean>(false)
@@ -100,16 +102,23 @@ export default function ExpFarmPage() {
     setFinalPrice(final)
   }, [expAmount, selectedWN8Tier, cannotUseXPBoosters])
 
-  function onSubmit(values: z.infer<typeof orderFormSchema>) {
-    const orderData = {
-      ...values,
-      basePrice,
-      discount,
-      xpBoostersCharge,
-      finalPrice,
-    }
-    console.log(orderData)
-    alert(`Order submitted!\n\nWN8 Tier: ${WN8_TIER_LABELS[values.wn8Tier]}\nXP Boosters: ${values.cannotUseXPBoosters ? 'Dont use XP boosters (+30%)' : 'Will use them'}\nAmount: ${values.expAmount}k XP\nTotal: $${finalPrice.toFixed(2)}\n\nWe will contact you within 30 minutes.`)
+  async function onSubmit(values: z.infer<typeof orderFormSchema>) {
+    await submitOrder({
+      email: values.email,
+      discordTag: values.discordTag,
+      service: 'exp-farm',
+      message: values.additionalInfo,
+      page: 'Experience (XP) Farming',
+      orderDetails: {
+          wn8Tier: WN8_TIER_LABELS[values.wn8Tier],
+          xpBoosters: values.cannotUseXPBoosters ? 'No XP Boosters (+30%)' : 'Use Boosters',
+          amount: `${values.expAmount}k XP`,
+          server: values.server,
+          basePrice: `$${basePrice.toFixed(2)}`,
+          discount: discount > 0 ? `${discount}%` : 'None',
+          totalPrice: `$${finalPrice.toFixed(2)}`,
+      },
+    })
   }
 
   return (
@@ -405,9 +414,18 @@ export default function ExpFarmPage() {
                         </div>
 
                         {/* Submit Button */}
-                        <Button type="submit" className="w-full h-12 text-base" size="lg">
-                          Submit Order - ${finalPrice.toFixed(2)}
-                          <ChevronRight className="ml-2 h-5 w-5" />
+                        <Button type="submit" className="w-full h-12 text-base" size="lg" disabled={isSubmitting}>
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                              Sending Order...
+                            </>
+                          ) : (
+                            <>
+                              Submit Order - ${finalPrice.toFixed(2)}
+                              <ChevronRight className="ml-2 h-5 w-5" />
+                            </>
+                          )}
                         </Button>
 
                         <p className="text-xs text-center text-muted-foreground">

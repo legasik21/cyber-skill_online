@@ -4,13 +4,14 @@ import { useState, useEffect, useMemo } from "react"
 import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Input } from "@/components/ui/Input"
-import { Swords, Shield, ChevronRight, Check, ArrowLeft, Calculator, Crown, Trophy, Coins, ArrowRight } from "lucide-react"
+import { Swords, Shield, ChevronRight, Check, ArrowLeft, Calculator, Crown, Trophy, Coins, ArrowRight, Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Link from "next/link"
+import { useOrderSubmit } from "@/hooks/useOrderSubmit"
 
 // Points-based ranking system
 const MIN_POINTS = 0;
@@ -82,6 +83,7 @@ const orderFormSchema = z.object({
 });
 
 export default function OnslaughtPage() {
+  const { submitOrder, isSubmitting } = useOrderSubmit()
   const [currentPoints, setCurrentPoints] = useState<number>(0)
   const [targetPoints, setTargetPoints] = useState<number>(2000)
   const [playWithBooster, setPlayWithBooster] = useState<boolean>(false)
@@ -155,17 +157,28 @@ export default function OnslaughtPage() {
   const currentRank = getRankFromPoints(currentPoints);
   const targetRank = getRankFromPoints(targetPoints);
 
-  function onSubmit(values: z.infer<typeof orderFormSchema>) {
-    const orderData = {
-      ...values,
-      ...priceDetails,
-      currentRank,
-      targetRank,
-    }
-    console.log(orderData)
-    const silverLabel = SILVER_OPTIONS.find(o => o.id === values.silverOption)?.label;
-    
-    alert(`Order submitted!\n\nRating Boost: ${values.currentPoints} pts (${currentRank}) ➤ ${values.targetPoints} pts (${targetRank})\nPlay with Booster: ${values.platoon ? 'Yes (+40%)' : 'No'}\nComplete 30 Missions: ${values.completeMissions ? 'Yes (+$40)' : 'No'}\nSilver Farm: ${silverLabel}\nTotal: $${priceDetails.total.toFixed(2)}\n\nWe will contact you within 30 minutes.`)
+  async function onSubmit(values: z.infer<typeof orderFormSchema>) {
+    const silverLabel = SILVER_OPTIONS.find(o => o.id === values.silverOption)?.label || 'None'
+
+    await submitOrder({
+      email: values.email,
+      discordTag: values.discordTag,
+      service: 'onslaught',
+      message: values.additionalInfo,
+      page: 'Onslaught Boosting',
+      orderDetails: {
+          ratingBoost: `${values.currentPoints} pts (${currentRank}) ➤ ${values.targetPoints} pts (${targetRank})`,
+          playWithBooster: values.platoon ? 'Yes (+40%)' : 'No',
+          missionCompletion: values.completeMissions ? 'Yes (+$40)' : 'No',
+          silverFarm: silverLabel,
+          server: values.server,
+          basePrice: `$${priceDetails.basePrice.toFixed(2)}`,
+          boosterCharge: priceDetails.boosterCharge > 0 ? `$${priceDetails.boosterCharge.toFixed(2)}` : 'None',
+          silverCharge: priceDetails.silverCharge > 0 ? `$${priceDetails.silverCharge.toFixed(2)}` : 'None',
+          missionsCharge: priceDetails.missionsCharge > 0 ? `$${priceDetails.missionsCharge.toFixed(2)}` : 'None',
+          totalPrice: `$${priceDetails.total.toFixed(2)}`,
+      },
+    })
   }
 
   return (
@@ -614,9 +627,18 @@ export default function OnslaughtPage() {
                         </div>
 
                         {/* Submit Button */}
-                        <Button type="submit" className="w-full h-12 text-base" size="lg">
-                          Submit Order - ${priceDetails.total.toFixed(2)}
-                          <ChevronRight className="ml-2 h-5 w-5" />
+                        <Button type="submit" className="w-full h-12 text-base" size="lg" disabled={isSubmitting}>
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                              Sending Order...
+                            </>
+                          ) : (
+                            <>
+                              Submit Order - ${priceDetails.total.toFixed(2)}
+                              <ChevronRight className="ml-2 h-5 w-5" />
+                            </>
+                          )}
                         </Button>
 
                         <p className="text-xs text-center text-muted-foreground">

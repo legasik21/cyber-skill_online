@@ -18,12 +18,14 @@ import {
   Target,
   TrendingUp,
   X,
+  Loader2,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useOrderSubmit } from "@/hooks/useOrderSubmit"
 
 const TANK_DIFFICULTIES = [
   { id: "easy", name: "Easy", multiplier: 0 },
@@ -85,6 +87,7 @@ function calculateBasePrice(from: number, to: number): number {
 }
 
 export default function MarkOfExcellencePage() {
+  const { submitOrder, isSubmitting } = useOrderSubmit()
   const [fromProgress, setFromProgress] = useState(1);
   const [toProgress, setToProgress] = useState(95);
   const [difficulty, setDifficulty] = useState<string>("easy");
@@ -157,21 +160,23 @@ export default function MarkOfExcellencePage() {
   const selectedVehicle = SPECIAL_VEHICLES.find((v) => v.id === specialVehicle);
   const selectedSilver = SILVER_OPTIONS.find((s) => s.id === silverOption);
 
-  function onSubmit(values: z.infer<typeof orderFormSchema>) {
-    const orderData = {
-      ...values,
-      service: "Mark of Excellence",
-      fromProgress,
-      toProgress,
-      difficulty,
-      specialVehicle,
-      silverOption,
-      priceDetails,
-    };
-    console.log(orderData);
-    alert(
-      `Order submitted!\n\nService: Mark of Excellence\nProgress: ${fromProgress}% → ${toProgress}%\nTotal: $${priceDetails.total}\n\nWe will contact you within 30 minutes.`
-    );
+  async function onSubmit(values: z.infer<typeof orderFormSchema>) {
+    await submitOrder({
+      email: values.email,
+      discordTag: values.discordTag,
+      service: 'mark-of-excellence',
+      message: values.additionalInfo,
+      page: 'Mark of Excellence',
+      orderDetails: {
+          progress: `${fromProgress}% → ${toProgress}%`,
+          difficulty: difficulty ? TANK_DIFFICULTIES.find(d => d.id === difficulty)?.name : 'None',
+          specialVehicle: specialVehicle ? SPECIAL_VEHICLES.find(v => v.id === specialVehicle)?.name : 'None',
+          silverOption: silverOption ? SILVER_OPTIONS.find(s => s.id === silverOption)?.name : 'None',
+          server: values.server,
+          basePrice: `$${priceDetails.base.toFixed(2)}`,
+          totalPrice: `$${priceDetails.total.toFixed(2)}`,
+      },
+    })
   }
 
   return (
@@ -804,10 +809,18 @@ export default function MarkOfExcellencePage() {
                       className="w-full"
                       disabled={
                         (!specialVehicle && !difficulty) ||
-                        priceDetails.total === 0
+                        priceDetails.total === 0 || 
+                        isSubmitting
                       }
                     >
-                      Place Order
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Sending Order...
+                        </>
+                      ) : (
+                        "Place Order"
+                      )}
                     </Button>
                   </form>
                 </CardContent>

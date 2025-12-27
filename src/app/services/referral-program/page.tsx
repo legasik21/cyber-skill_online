@@ -4,13 +4,14 @@ import { useState } from "react"
 import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Input } from "@/components/ui/Input"
-import { Users, Shield, ChevronRight, Check, ArrowLeft, Gift, Trophy, Zap } from "lucide-react"
+import { Users, Shield, ChevronRight, Check, ArrowLeft, Gift, Trophy, Zap, Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Link from "next/link"
+import { useOrderSubmit } from "@/hooks/useOrderSubmit"
 
 const orderFormSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -22,6 +23,7 @@ const orderFormSchema = z.object({
 const SERVICE_PRICE = 100
 
 export default function ReferralProgramServicePage() {
+  const { submitOrder, isSubmitting } = useOrderSubmit()
   const form = useForm<z.infer<typeof orderFormSchema>>({
     resolver: zodResolver(orderFormSchema),
     defaultValues: {
@@ -32,15 +34,19 @@ export default function ReferralProgramServicePage() {
     },
   })
 
-  function onSubmit(values: z.infer<typeof orderFormSchema>) {
-    const orderData = {
-      ...values,
-      service: "Referral Program",
-      price: SERVICE_PRICE,
-    }
-    
-    console.log(orderData)
-    alert(`Order submitted!\n\nService: Referral Program\nTotal: $${SERVICE_PRICE}\n\nWe will contact you within 30 minutes.`)
+  async function onSubmit(values: z.infer<typeof orderFormSchema>) {
+    await submitOrder({
+      email: values.email,
+      discordTag: values.discordTag,
+      service: 'referral-program',
+      message: values.additionalInfo,
+      page: 'Referral Program Service',
+      orderDetails: {
+          server: values.server,
+          price: `$${SERVICE_PRICE}`,
+          totalPrice: `$${SERVICE_PRICE}`,
+      },
+    })
   }
 
   const rewards = [
@@ -277,9 +283,19 @@ export default function ReferralProgramServicePage() {
                       type="submit" 
                       className="w-full h-12 text-base" 
                       size="lg"
+                      disabled={isSubmitting}
                     >
-                      Submit Order - ${SERVICE_PRICE}
-                      <ChevronRight className="ml-2 h-5 w-5" />
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Sending Order...
+                        </>
+                      ) : (
+                        <>
+                          Submit Order - ${SERVICE_PRICE}
+                          <ChevronRight className="ml-2 h-5 w-5" />
+                        </>
+                      )}
                     </Button>
 
                     <p className="text-xs text-center text-muted-foreground">

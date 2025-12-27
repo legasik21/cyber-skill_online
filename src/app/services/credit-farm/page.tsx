@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Input } from "@/components/ui/Input"
-import { Coins, Shield, ChevronRight, Check, ArrowLeft, Calculator, Percent } from "lucide-react"
+import { Coins, Shield, ChevronRight, Check, ArrowLeft, Calculator, Percent, Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -12,6 +12,7 @@ import { motion } from "framer-motion"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Link from "next/link"
+import { useOrderSubmit } from "@/hooks/useOrderSubmit"
 
 // Service types
 type ServiceType = "credits" | "bonds"
@@ -57,6 +58,7 @@ const orderFormSchema = z.object({
 })
 
 export default function CreditFarmPage() {
+  const { submitOrder, isSubmitting } = useOrderSubmit()
   const [serviceType, setServiceType] = useState<ServiceType>("credits")
   const [amount, setAmount] = useState<number | "">(1)
   const [selectedTier, setSelectedTier] = useState<string>("under-2500")
@@ -147,23 +149,28 @@ export default function CreditFarmPage() {
     setFinalPrice(final)
   }, [amount, selectedTier, cannotUseSilverBoosters, serviceType])
 
-  function onSubmit(values: z.infer<typeof orderFormSchema>) {
-    const orderData = {
-      ...values,
-      basePrice,
-      discount,
-      silverBoostersCharge,
-      finalPrice,
-    }
-    console.log(orderData)
-    
-    const serviceLabel = serviceType === "credits" ? "Credits" : "Bonds"
-    const amountLabel = serviceType === "credits" ? `${values.amount}M credits` : `${values.amount} bonds`
+  async function onSubmit(values: z.infer<typeof orderFormSchema>) {
     const tierLabel = serviceType === "credits" 
-      ? WN8_TIER_LABELS[values.tier as keyof typeof WN8_TIER_LABELS]
-      : BONDS_WN8_LABELS[values.tier as keyof typeof BONDS_WN8_LABELS]
+      ? WN8_TIER_LABELS[selectedTier as keyof typeof WN8_TIER_LABELS]
+      : BONDS_WN8_LABELS[selectedTier as keyof typeof BONDS_WN8_LABELS]
     
-    alert(`Order submitted!\n\nService: ${serviceLabel}\nTier: ${tierLabel}\nSilver Boosters: ${values.cannotUseSilverBoosters ? 'Dont use Silver boosters (+30%)' : 'Will use them'}\nAmount: ${amountLabel}\nTotal: $${finalPrice.toFixed(2)}\n\nWe will contact you within 30 minutes.`)
+    await submitOrder({
+      email: values.email,
+      discordTag: values.discordTag,
+      service: 'credits',
+      message: values.additionalInfo,
+      page: 'Credit and Bonds Farming Service',
+      orderDetails: {
+        serviceType: serviceType === "credits" ? "Credits" : "Bonds",
+        tier: tierLabel,
+        amount: serviceType === "credits" ? `${amount}M` : `${amount} bonds`,
+        server: values.server,
+        silverBoosters: cannotUseSilverBoosters ? 'No Silver Boosters (+30%)' : 'Use Boosters',
+        basePrice: `$${basePrice.toFixed(2)}`,
+        discount: discount > 0 ? `${discount}%` : 'None',
+        totalPrice: `$${finalPrice.toFixed(2)}`,
+      },
+    })
   }
 
   return (
@@ -565,9 +572,18 @@ export default function CreditFarmPage() {
                         </div>
 
                         {/* Submit Button */}
-                        <Button type="submit" className="w-full h-12 text-base" size="lg">
-                          Submit Order - ${finalPrice.toFixed(2)}
-                          <ChevronRight className="ml-2 h-5 w-5" />
+                        <Button type="submit" className="w-full h-12 text-base" size="lg" disabled={isSubmitting}>
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                              Sending Order...
+                            </>
+                          ) : (
+                            <>
+                              Submit Order - ${finalPrice.toFixed(2)}
+                              <ChevronRight className="ml-2 h-5 w-5" />
+                            </>
+                          )}
                         </Button>
 
                         <p className="text-xs text-center text-muted-foreground">

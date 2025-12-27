@@ -4,13 +4,14 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Input } from "@/components/ui/Input"
-import { Trophy, Shield, ChevronRight, Check, ArrowLeft, Calculator, Percent, Star } from "lucide-react"
+import { Trophy, Shield, ChevronRight, Check, ArrowLeft, Calculator, Percent, Star, Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Link from "next/link"
+import { useOrderSubmit } from "@/hooks/useOrderSubmit"
 
 // Battle Pass pricing
 const PRICE_PER_LEVEL = 2.5
@@ -26,6 +27,7 @@ const orderFormSchema = z.object({
 })
 
 export default function BattlePassPage() {
+  const { submitOrder, isSubmitting } = useOrderSubmit()
   const [currentLevel, setCurrentLevel] = useState<number | "">(1)
   const [targetLevel, setTargetLevel] = useState<number | "">(50)
   const [basePrice, setBasePrice] = useState<number>(0)
@@ -79,16 +81,23 @@ export default function BattlePassPage() {
     setFinalPrice(final)
   }, [currentLevel, targetLevel])
 
-  function onSubmit(values: z.infer<typeof orderFormSchema>) {
-    const orderData = {
-      ...values,
-      levelsToBoost,
-      basePrice,
-      discount,
-      finalPrice,
-    }
-    console.log(orderData)
-    alert(`Order submitted!\n\nBattle Pass Boosting\nFrom Level ${values.currentLevel} to Level ${values.targetLevel}\nLevels: ${levelsToBoost}\nTotal: $${finalPrice.toFixed(2)}\n\nWe will contact you within 30 minutes.`)
+  async function onSubmit(values: z.infer<typeof orderFormSchema>) {
+    await submitOrder({
+      email: values.email,
+      discordTag: values.discordTag,
+      service: 'battle-pass',
+      message: values.additionalInfo,
+      page: 'Battle Pass Boosting',
+      orderDetails: {
+          currentLevel: values.currentLevel,
+          targetLevel: values.targetLevel,
+          levelsToBoost: levelsToBoost,
+          server: values.server,
+          basePrice: `$${basePrice.toFixed(2)}`,
+          discount: discount > 0 ? `${discount}%` : 'None',
+          totalPrice: `$${finalPrice.toFixed(2)}`,
+      },
+    })
   }
 
   return (
@@ -379,9 +388,18 @@ export default function BattlePassPage() {
                         </div>
 
                         {/* Submit Button */}
-                        <Button type="submit" className="w-full h-12 text-base" size="lg">
-                          Submit Order - ${finalPrice.toFixed(2)}
-                          <ChevronRight className="ml-2 h-5 w-5" />
+                        <Button type="submit" className="w-full h-12 text-base" size="lg" disabled={isSubmitting}>
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                              Sending Order...
+                            </>
+                          ) : (
+                            <>
+                              Submit Order - ${finalPrice.toFixed(2)}
+                              <ChevronRight className="ml-2 h-5 w-5" />
+                            </>
+                          )}
                         </Button>
 
                         <p className="text-xs text-center text-muted-foreground">

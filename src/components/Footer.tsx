@@ -107,9 +107,7 @@ export default function Footer() {
         {/* Copyright */}
         <div className="mt-12 pt-8 border-t border-border/50">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} CyberSkill. All rights reserved.
-            </p>
+              © 2017-{new Date().getFullYear()} CyberSkill. All rights reserved.
             <p className="text-xs text-muted-foreground">
               Not affiliated with Wargaming. World of Tanks is a trademark of Wargaming.net.
             </p>

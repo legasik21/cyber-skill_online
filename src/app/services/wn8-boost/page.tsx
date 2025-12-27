@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Input } from "@/components/ui/Input"
-import { Target, Shield, ChevronRight, Check, ArrowLeft, Calculator, Percent } from "lucide-react"
+import { Target, Shield, ChevronRight, Check, ArrowLeft, Calculator, Percent, Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -12,6 +12,7 @@ import { motion } from "framer-motion"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Link from "next/link"
+import { useOrderSubmit } from "@/hooks/useOrderSubmit"
 
 // Service types
 type ServiceType = "wn8" | "winrate" | "damage"
@@ -50,6 +51,7 @@ const orderFormSchema = z.object({
 })
 
 export default function WN8BoostPage() {
+  const { submitOrder, isSubmitting } = useOrderSubmit()
   const [serviceType, setServiceType] = useState<ServiceType>("wn8")
   const [numberOfBattles, setNumberOfBattles] = useState<number | "">(20)
   const [selectedTier, setSelectedTier] = useState<string>("2500-3000")
@@ -138,17 +140,25 @@ export default function WN8BoostPage() {
     setFinalPrice(final)
   }, [numberOfBattles, selectedTier, playSPG, getReplays, serviceType])
 
-  function onSubmit(values: z.infer<typeof orderFormSchema>) {
-    const orderData = {
-      ...values,
-      playSPG,
-      getReplays,
-      basePrice,
-      discount,
-      finalPrice,
-    }
-    console.log(orderData)
-    alert(`Order submitted!\n\nService Type: ${serviceType.toUpperCase()}\nTier: ${values.tier}\nBattles: ${values.numberOfBattles}\nPlay SPG: ${playSPG ? 'Yes (+100%)' : 'No'}\nGet Replays: ${getReplays ? 'Yes (+10%)' : 'No'}\nTotal: $${finalPrice.toFixed(2)}\n\nWe will contact you within 30 minutes.`)
+  async function onSubmit(values: z.infer<typeof orderFormSchema>) {
+    await submitOrder({
+      email: values.email,
+      discordTag: values.discordTag,
+      service: 'wn8',
+      message: values.additionalInfo,
+      page: 'WN8, Winrate, High Damage Service',
+      orderDetails: {
+        serviceType: serviceType.toUpperCase(),
+        tier: selectedTier,
+        battles: numberOfBattles,
+        server: values.server,
+        playSPG: playSPG ? 'Yes (+100%)' : 'No',
+        getReplays: getReplays ? 'Yes (+10%)' : 'No',
+        basePrice: `$${basePrice.toFixed(2)}`,
+        discount: discount > 0 ? `${discount}%` : 'None',
+        totalPrice: `$${finalPrice.toFixed(2)}`,
+      },
+    })
   }
 
   return (
@@ -573,9 +583,18 @@ export default function WN8BoostPage() {
                         </div>
 
                         {/* Submit Button */}
-                        <Button type="submit" className="w-full h-12 text-base" size="lg">
-                          Submit Order - ${finalPrice.toFixed(2)}
-                          <ChevronRight className="ml-2 h-5 w-5" />
+                        <Button type="submit" className="w-full h-12 text-base" size="lg" disabled={isSubmitting}>
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                              Sending Order...
+                            </>
+                          ) : (
+                            <>
+                              Submit Order - ${finalPrice.toFixed(2)}
+                              <ChevronRight className="ml-2 h-5 w-5" />
+                            </>
+                          )}
                         </Button>
 
                         <p className="text-xs text-center text-muted-foreground">
