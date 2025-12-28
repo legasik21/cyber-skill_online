@@ -163,7 +163,7 @@ export default function AdminChatPage() {
       </header>
 
       <div className={styles.mainContent}>
-        <aside className={styles.sidebar}>
+        <aside className={`${styles.sidebar} ${activeConversation ? styles.sidebarHidden : ''}`}>
           <ConversationList
             conversations={conversations}
             activeConversationId={activeConversation}

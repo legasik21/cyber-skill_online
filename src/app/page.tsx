@@ -127,7 +127,7 @@ export default function Home() {
       title: "Battle Pass",
       description: "Complete all 50 Battle Pass levels and unlock exclusive rewards.",
       icon: <Trophy className="h-10 w-10 text-primary" />,
-      price: "From $50",
+      price: "From $10",
       link: "/services/battle-pass",
     },
     {

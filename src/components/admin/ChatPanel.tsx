@@ -63,6 +63,12 @@ export default function ChatPanel({
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerInfo}>
+          <button onClick={onClose} className={styles.backButton} aria-label="Back to conversations">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
           <h3>Conversation</h3>
           <div className={styles.statusIndicator}>
             <span className={`${styles.statusDot} ${isConnected ? styles.connected : ''}`} />

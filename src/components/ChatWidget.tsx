@@ -1,16 +1,21 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import { useChat } from '@/hooks/useChat';
 import { Message } from '@/lib/db';
 import styles from './ChatWidget.module.css';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function ChatWidget() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [conversationId, setConversationId] = useState<string>();
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Don't render on admin pages
+  const isAdminPage = pathname?.startsWith('/admin');
 
   const {
     messages,
@@ -41,6 +46,11 @@ export default function ChatWidget() {
     window.addEventListener('open-chat-widget', handleOpenChat);
     return () => window.removeEventListener('open-chat-widget', handleOpenChat);
   }, []);
+
+  // Don't render on admin pages
+  if (isAdminPage) {
+    return null;
+  }
 
   const handleInitialize = async () => {
     try {

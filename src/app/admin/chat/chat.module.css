@@ -1,22 +1,30 @@
 .adminContainer {
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh; /* Use dynamic viewport height for mobile */
   display: flex;
   flex-direction: column;
   background: #050505;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 32px;
+  padding: 16px 24px;
   background: #0f0f11;
   border-bottom: 1px solid #27272a;
+  flex-shrink: 0;
 }
 
 .header h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   color: #ededed;
   background: linear-gradient(135deg, #ff4d00 0%, #ff6b2c 100%);
@@ -28,7 +36,7 @@
 .userInfo {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
   color: #a1a1aa;
   font-size: 14px;
 }
@@ -54,6 +62,7 @@
   flex: 1;
   display: flex;
   overflow: hidden;
+  min-height: 0; /* Important for flex children overflow */
 }
 
 .sidebar {
@@ -61,6 +70,7 @@
   background: #0f0f11;
   border-right: 1px solid #27272a;
   overflow-y: auto;
+  flex-shrink: 0;
 }
 
 .chatArea {
@@ -68,6 +78,8 @@
   display: flex;
   flex-direction: column;
   background: #0a0a0b;
+  min-height: 0; /* Important for flex children overflow */
+  overflow: hidden;
 }
 
 .emptyState {
@@ -132,22 +144,79 @@
 
 /* Responsive */
 @media (max-width: 900px) {
+  .adminContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  .header {
+    padding: 12px 16px;
+  }
+
+  .header h1 {
+    font-size: 18px;
+  }
+
+  .userInfo {
+    gap: 10px;
+    font-size: 12px;
+  }
+
+  .userInfo > span {
+    display: none; /* Hide email on mobile */
+  }
+
+  .logoutButton {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+
   .mainContent {
     flex-direction: column;
+    flex: 1;
+    overflow: hidden;
   }
 
   .sidebar {
     width: 100%;
-    max-height: 40vh;
+    flex: 1;
+    max-height: none;
     border-right: none;
     border-bottom: 1px solid #27272a;
+    overflow-y: auto;
   }
 
+  /* When chat is active, hide sidebar on mobile */
+  .sidebarHidden {
+    display: none;
+  }
+
+  .chatArea {
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* When no chat is active, show placeholder takes full remaining space */
+  .emptyState {
+    flex: 1;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
   .header {
-    padding: 16px 20px;
+    padding: 10px 12px;
   }
 
   .header h1 {
-    font-size: 20px;
+    font-size: 16px;
+  }
+
+  .logoutButton {
+    padding: 6px 12px;
+    font-size: 11px;
   }
 }
