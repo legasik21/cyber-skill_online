@@ -25,6 +25,7 @@ interface UseChatReturn {
   isLoading: boolean;
   error: string | null;
   isClosed: boolean;
+  isManagerTyping: boolean;
   sendMessage: (body: string) => Promise<void>;
   createConversation: () => Promise<string>;
   resetConversation: () => void;
@@ -38,6 +39,8 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isClosed, setIsClosed] = useState(false);
+  const [isManagerTyping, setIsManagerTyping] = useState(false);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const ablyClientRef = useRef<Ably.Realtime | null>(null);
   const channelRef = useRef<Ably.RealtimeChannel | null>(null);
@@ -114,6 +117,22 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       // Subscribe to conversation_closed event
       channel.subscribe('conversation_closed', () => {
         setIsClosed(true);
+      });
+
+      // Subscribe to manager typing indicator
+      channel.subscribe('manager_typing', (message: Ably.InboundMessage) => {
+        const isTyping = message.data?.isTyping ?? false;
+        setIsManagerTyping(isTyping);
+        
+        // Auto-clear typing indicator after 5 seconds if no update received
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current);
+        }
+        if (isTyping) {
+          typingTimeoutRef.current = setTimeout(() => {
+            setIsManagerTyping(false);
+          }, 5000);
+        }
       });
 
     } catch (err) {
@@ -253,6 +272,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const resetConversation = useCallback(() => {
     setMessages([]);
     setIsClosed(false);
+    setIsManagerTyping(false);
     setError(null);
     // Cleanup existing connection
     if (channelRef.current) {
@@ -260,6 +280,9 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     }
     if (ablyClientRef.current) {
       ablyClientRef.current.close();
+    }
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
     }
   }, []);
 
@@ -269,6 +292,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     isLoading,
     error,
     isClosed,
+    isManagerTyping,
     sendMessage,
     createConversation,
     resetConversation,

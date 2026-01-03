@@ -12,7 +12,9 @@ export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [conversationId, setConversationId] = useState<string>();
   const [inputValue, setInputValue] = useState('');
+  const [hasShownWelcome, setHasShownWelcome] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const welcomeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Don't render on admin pages
   const isAdminPage = pathname?.startsWith('/admin');
@@ -23,15 +25,16 @@ export default function ChatWidget() {
     isLoading,
     error,
     isClosed,
+    isManagerTyping,
     sendMessage,
     createConversation,
     resetConversation,
   } = useChat({ conversationId });
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to bottom when new messages arrive or typing indicator shows
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, isManagerTyping]);
 
   // Initialize conversation when widget opens
   useEffect(() => {
@@ -56,10 +59,26 @@ export default function ChatWidget() {
     try {
       const convId = await createConversation();
       setConversationId(convId);
+      
+      // Show automated welcome message after 2 seconds (only once per session)
+      if (!hasShownWelcome) {
+        welcomeTimeoutRef.current = setTimeout(() => {
+          setHasShownWelcome(true);
+        }, 2000);
+      }
     } catch (err) {
       console.error('Failed to initialize chat:', err);
     }
   };
+
+  // Cleanup welcome timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (welcomeTimeoutRef.current) {
+        clearTimeout(welcomeTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,15 +180,41 @@ export default function ChatWidget() {
                 <div className={styles.spinner} />
                 <p>Loading chat...</p>
               </div>
-            ) : messages.length === 0 ? (
+            ) : messages.length === 0 && !hasShownWelcome ? (
               <div className={styles.emptyState}>
                 <p>👋 Welcome! How can we help you today?</p>
               </div>
             ) : (
               <>
+                {/* Automated Welcome Message */}
+                {hasShownWelcome && messages.length === 0 && (
+                  <div className={`${styles.messageBubble} ${styles.agentMessage} ${styles.welcomeMessage}`}>
+                    <div className={styles.messageHeader}>
+                      <span className={styles.messageSender}>Support</span>
+                      <span className={styles.messageTime}>just now</span>
+                    </div>
+                    <div className={styles.messageBody}>
+                      Hello! Welcome to CyberSkill. We&apos;re here to help you dominate World of Tanks. Whether it&apos;s stat boosting, tank research, or marks of excellence — just let us know what you need, and our manager will guide you!
+                    </div>
+                  </div>
+                )}
                 {messages.map((message) => (
                   <MessageBubble key={message.id} message={message} />
                 ))}
+                
+                {/* Manager Typing Indicator */}
+                {isManagerTyping && (
+                  <div className={`${styles.messageBubble} ${styles.agentMessage}`}>
+                    <div className={styles.messageHeader}>
+                      <span className={styles.messageSender}>Support</span>
+                    </div>
+                    <div className={`${styles.messageBody} ${styles.typingIndicator}`}>
+                      <span className={styles.typingDot}></span>
+                      <span className={styles.typingDot}></span>
+                      <span className={styles.typingDot}></span>
+                    </div>
+                  </div>
+                )}
                 <div ref={messagesEndRef} />
               </>
             )}

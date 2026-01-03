@@ -10,6 +10,7 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
   const [isDesktopServicesOpen, setIsDesktopServicesOpen] = useState(false)
+  const [isMobileServicesOpen, setIsMobileServicesOpen] = useState(false)
 
   const services = [
     { id: "wn8-boost", label: "WN8, Winrate, High Damage", href: "/services/wn8-boost" },
@@ -175,58 +176,65 @@ export default function Header() {
                 </Link>
               ))}
               
-              {/* Services Submenu */}
-              <div className="px-2">
-                <div className="text-foreground font-medium mb-2 pl-2">Services</div>
-                <div className="pl-4 space-y-1 bg-secondary/10 rounded-lg py-2">
-                  {services.map((service) => {
-                     if (service.children) {
-                       return (
-                         <div key={service.id}>
-                           <button
-                             onClick={(e) => toggleSubmenu(service.id, e)}
-                             className="w-full flex items-center justify-between text-sm text-muted-foreground hover:text-primary transition-colors py-2 px-2 rounded-md hover:bg-secondary/20"
-                           >
-                             {service.label}
-                             <ChevronDown className={`w-4 h-4 transition-transform ${openSubmenu === service.id ? 'rotate-180' : ''}`} />
-                           </button>
-                           {openSubmenu === service.id && (
-                             <div className="pl-4 space-y-1 border-l-2 border-primary/20 ml-2 mt-1">
-                               {service.children.map((child) => (
-                                 <Link
-                                   key={child.id}
-                                   href={child.href}
-                                   className="block text-sm text-muted-foreground hover:text-primary transition-colors py-2 px-2 rounded-md hover:bg-secondary/20"
-                                   onClick={() => setIsMenuOpen(false)}
-                                 >
-                                   {child.label}
-                                 </Link>
-                               ))}
-                             </div>
-                           )}
-                         </div>
-                       )
-                     }
+              {/* Services Dropdown - Collapsible on Mobile */}
+              {/* Services Dropdown - Collapsible on Mobile */}
+              <div>
+                <button
+                  onClick={() => setIsMobileServicesOpen(!isMobileServicesOpen)}
+                  className="w-full flex items-center justify-between text-foreground hover:text-primary transition-colors font-medium px-2 py-1"
+                  aria-expanded={isMobileServicesOpen}
+                >
+                  <span>Services</span>
+                  <ChevronDown className={`w-5 h-5 transition-transform duration-200 ${isMobileServicesOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {isMobileServicesOpen && (
+                  <div className="pl-4 space-y-1 bg-secondary/10 rounded-lg py-2 mt-2 mx-2">
+                    {services.map((service) => {
+                       if (service.children) {
+                         return (
+                           <div key={service.id}>
+                             <button
+                               onClick={(e) => toggleSubmenu(service.id, e)}
+                               className="w-full flex items-center justify-between text-sm text-muted-foreground hover:text-primary transition-colors py-2 px-2 rounded-md hover:bg-secondary/20"
+                             >
+                               {service.label}
+                               <ChevronDown className={`w-4 h-4 transition-transform ${openSubmenu === service.id ? 'rotate-180' : ''}`} />
+                             </button>
+                             {openSubmenu === service.id && (
+                               <div className="pl-4 space-y-1 border-l-2 border-primary/20 ml-2 mt-1">
+                                 {service.children.map((child) => (
+                                   <Link
+                                     key={child.id}
+                                     href={child.href}
+                                     className="block text-sm text-muted-foreground hover:text-primary transition-colors py-2 px-2 rounded-md hover:bg-secondary/20"
+                                     onClick={() => setIsMenuOpen(false)}
+                                   >
+                                     {child.label}
+                                   </Link>
+                                 ))}
+                               </div>
+                             )}
+                           </div>
+                         )
+                       }
 
-                    return (
-                      <Link
-                        key={service.id}
-                        href={service.href}
-                        className="block text-sm text-muted-foreground hover:text-primary transition-colors py-2 px-2 rounded-md hover:bg-secondary/20"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        {service.label}
-                      </Link>
-                    )
-                  })}
-                </div>
+                      return (
+                        <Link
+                          key={service.id}
+                          href={service.href}
+                          className="block text-sm text-muted-foreground hover:text-primary transition-colors py-2 px-2 rounded-md hover:bg-secondary/20"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          {service.label}
+                        </Link>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
               
-              <Button size="sm" className="w-full" asChild>
-                <Link href="/#services" onClick={() => setIsMenuOpen(false)}>
-                  Get Started
-                </Link>
-              </Button>
+
             </div>
           </div>
         )}

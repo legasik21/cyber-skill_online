@@ -779,8 +779,8 @@ export default function Campaign1Page() {
                             </button>
                           </div>
 
-                          {/* Mission Grid */}
-                          <div className="overflow-x-auto">
+                          {/* Mission Grid - Desktop */}
+                          <div className="hidden md:block overflow-x-auto">
                             <table className="w-full border-collapse text-xs">
                               <thead>
                                 <tr>
@@ -865,6 +865,74 @@ export default function Campaign1Page() {
                                 })}
                               </tbody>
                             </table>
+                          </div>
+
+                          {/* Mission Grid - Mobile (3 rows x 5 missions per section) */}
+                          <div className="md:hidden space-y-4">
+                            {MISSION_TYPES.map((type) => {
+                              const isFullType = isTypeFullSelected(
+                                tank.id,
+                                type.id
+                              );
+                              return (
+                                <div key={type.id} className="border border-border/50 rounded-lg p-3 bg-secondary/10">
+                                  {/* Section Header */}
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className="font-medium text-sm">{type.name}</span>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        selectAllType(tank.id, type.id)
+                                      }
+                                      className={`text-[10px] px-2 py-1 rounded border ${
+                                        isFullType
+                                          ? "bg-green-500/20 text-green-500 border-green-500/50"
+                                          : "bg-secondary hover:bg-secondary/80 text-muted-foreground border-border"
+                                      }`}
+                                    >
+                                      {isFullType ? "15% OFF" : "Select All"}
+                                    </button>
+                                  </div>
+                                  {/* Mission Grid: 3 rows x 5 columns */}
+                                  <div className="grid grid-cols-5 gap-1">
+                                    {range1to15().map((num) => {
+                                      const isSelected = isMissionSelected(
+                                        tank.id,
+                                        type.id,
+                                        num
+                                      );
+                                      const price = getMissionPrice(
+                                        tank.id,
+                                        type.id,
+                                        num
+                                      );
+
+                                      return (
+                                        <button
+                                          key={num}
+                                          type="button"
+                                          onClick={() =>
+                                            toggleMission(
+                                              tank.id,
+                                              type.id,
+                                              num
+                                            )
+                                          }
+                                          className={`h-10 rounded text-xs font-medium transition-all flex flex-col items-center justify-center ${
+                                            isSelected
+                                              ? "bg-primary text-primary-foreground"
+                                              : "bg-secondary/50 hover:bg-primary/20 text-foreground"
+                                          }`}
+                                        >
+                                          <span className="text-[10px] opacity-60">#{num}</span>
+                                          <span>${price}</span>
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              );
+                            })}
                           </div>
                         </CardContent>
                       </Card>
