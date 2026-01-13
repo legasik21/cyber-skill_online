@@ -185,7 +185,7 @@ export default function OnslaughtPage() {
     <>
       <Header />
       <div className="min-h-screen bg-background text-foreground overflow-x-hidden pt-20">
-        
+
         {/* Hero Section */}
         <section className="relative py-16 overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-background to-background opacity-50" />
@@ -201,9 +201,14 @@ export default function OnslaughtPage() {
                   Onslaught Boosting
                 </h1>
               </div>
-              <p className="text-lg text-muted-foreground mb-6">
-                Climb the ranks in Onslaught mode 7v7 battles to earn exclusive rewards and the Hurricane tank.
+              <p className="text-lg text-muted-foreground mb-4">
+                Climb the ranks in Onslaught mode 7v7 battles to earn exclusive rewards and unlock the powerful 114 SP2 tank at Gold rank.
               </p>
+              <div className="flex flex-wrap gap-2 mb-6">
+                <span className="bg-primary/20 text-primary text-xs px-3 py-1 rounded-full">Year of the Dragon</span>
+                <span className="bg-amber-500/20 text-amber-400 text-xs px-3 py-1 rounded-full">Ashbringer Tank</span>
+                <span className="bg-blue-500/20 text-blue-400 text-xs px-3 py-1 rounded-full">Rex Draconis Style</span>
+              </div>
               <Button 
                 size="lg" 
                 className="text-lg px-8"
@@ -213,6 +218,50 @@ export default function OnslaughtPage() {
                 Calculate Rating Boost
                 <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* Season Info Cards */}
+        <section className="py-8 bg-secondary/10">
+          <div className="container mx-auto px-4">
+            <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-4">
+              <Card className="border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-card">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Trophy className="h-5 w-5 text-amber-500" />
+                    Annual Reward
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm font-semibold">Ashbringer</p>
+                  <p className="text-xs text-muted-foreground">Tier X Polish Heavy with 3D Style. Collect 9+ Onslaught Colors!</p>
+                </CardContent>
+              </Card>
+              <Card className="border-red-500/30 bg-gradient-to-br from-red-500/10 to-card">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Crown className="h-5 w-5 text-red-500" />
+                    Gold Rank Reward
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm font-semibold">114 SP2</p>
+                  <p className="text-xs text-muted-foreground">Tier X Chinese TD available for purchase at Gold rank!</p>
+                </CardContent>
+              </Card>
+              <Card className="border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-card">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Swords className="h-5 w-5 text-blue-500" />
+                    Rental Tanks
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm font-semibold">Ho-Ri 3, Super Conqueror, K-91</p>
+                  <p className="text-xs text-muted-foreground">Free Tier X rentals with garage slots!</p>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
@@ -655,6 +704,137 @@ export default function OnslaughtPage() {
           </div>
         </section>
 
+        {/* Season Rewards Section */}
+        <section className="py-16 bg-gradient-to-b from-red-900/10 to-background">
+          <div className="container mx-auto px-4">
+            <div className="max-w-5xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold mb-4">🐉 Season of the Crimson Dragon Rewards</h2>
+                <p className="text-muted-foreground">Exclusive rewards for each rank tier</p>
+              </div>
+
+              {/* Rank Rewards Grid */}
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                <Card className="border-gray-500/30 bg-card/50">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg text-gray-400">Iron Rank</CardTitle>
+                    <CardDescription>0 - 499 points</CardDescription>
+                  </CardHeader>
+                  <CardContent className="text-sm space-y-1">
+                    <p>• Iron Dragon decal</p>
+                    <p>• Basic Dog Tag Background</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-amber-700/30 bg-card/50">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg text-amber-600">Bronze Rank</CardTitle>
+                    <CardDescription>500 - 999 points</CardDescription>
+                  </CardHeader>
+                  <CardContent className="text-sm space-y-1">
+                    <p>• Bronze Dragon decal</p>
+                    <p>• Rex Draconis (Crimson) camo</p>
+                    <p>• 500 Bonds</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-gray-300/30 bg-card/50">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg text-gray-300">Silver Rank</CardTitle>
+                    <CardDescription>1000 - 1499 points</CardDescription>
+                  </CardHeader>
+                  <CardContent className="text-sm space-y-1">
+                    <p>• Silver Dragon decal</p>
+                    <p>• "Supernova" stripe</p>
+                    <p>• 1,000 Bonds</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-yellow-500/30 bg-card/50">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg text-yellow-500">Gold Rank</CardTitle>
+                    <CardDescription>1500 - 1999 points</CardDescription>
+                  </CardHeader>
+                  <CardContent className="text-sm space-y-1">
+                    <p>• Gold Dragon decal & emblem</p>
+                    <p>• "Burning Oath" badge</p>
+                    <p>• <span className="text-yellow-500 font-semibold">114 SP2 purchase access</span></p>
+                    <p>• 2,000 Bonds</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-purple-500/30 bg-card/50">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg text-purple-400">Champion Rank</CardTitle>
+                    <CardDescription>2000 - 2999 points</CardDescription>
+                  </CardHeader>
+                  <CardContent className="text-sm space-y-1">
+                    <p>• Full Rex Draconis (Crimson) 2D style</p>
+                    <p>• "Crown of Flame" badge</p>
+                    <p>• Improved Equipment pieces</p>
+                    <p>• 3,500 Bonds</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-red-500/50 bg-gradient-to-br from-red-500/10 to-card">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg text-red-400">Legend Rank</CardTitle>
+                    <CardDescription>4000+ points</CardDescription>
+                  </CardHeader>
+                  <CardContent className="text-sm space-y-1">
+                    <p>• <span className="text-red-400 font-semibold">"Trial by Fire" medal</span></p>
+                    <p>• Complete Rex Draconis set</p>
+                    <p>• T3 Improved Equipment</p>
+                    <p>• 5,000+ Bonds</p>
+                    <p>• Legend Dog Tag Background</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Annual Reward - Ashbringer */}
+              <Card className="border-2 border-amber-500/50 bg-gradient-to-br from-amber-500/10 to-card">
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <Trophy className="h-8 w-8 text-amber-500" />
+                    <div>
+                      <CardTitle className="text-2xl">Annual Reward: Ashbringer</CardTitle>
+                      <CardDescription>Collect Onslaught Colors throughout the Year of the Dragon</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <h4 className="font-semibold mb-3 text-amber-400">Ashbringer Tank</h4>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Tier X Polish Heavy Tank (60TP replica) with a unique progressive 3D style and a crew with 3 extra perks trained.
+                      </p>
+                      <ul className="text-sm space-y-1">
+                        <li>• 9 Colors: Silver Dragon 3D Style</li>
+                        <li>• 12 Colors: Gold Dragon 3D Style</li>
+                        <li>• 15 Colors: Champion 3D Style</li>
+                        <li>• 18 Colors: Legend 3D Style</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-3 text-amber-400">Weekly Missions (30 Total)</h4>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Complete missions for progressive rewards:
+                      </p>
+                      <ul className="text-sm space-y-1">
+                        <li>• WoT Premium Account days</li>
+                        <li>• Bonds & Credits</li>
+                        <li>• Equipment directives</li>
+                        <li>• 5, 15, 25, 30 mission milestones for big prizes</li>
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
         {/* Features Section */}
         <section className="py-16">
           <div className="container mx-auto px-4">
@@ -669,7 +849,7 @@ export default function OnslaughtPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold mb-1">Exclusive Rewards</h3>
-                    <p className="text-sm text-muted-foreground">Get the customized styles, bonds, and access to the Hurricane tank.</p>
+                    <p className="text-sm text-muted-foreground">Get the Rex Draconis style, bonds, and access to the 114 SP2 tank.</p>
                   </div>
                 </div>
 

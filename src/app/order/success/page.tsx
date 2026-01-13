@@ -7,10 +7,17 @@ import Link from "next/link"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import { motion } from "framer-motion"
+import Script from "next/script";
 
 export default function OrderSuccessPage() {
   return (
     <>
+      {/* Event snippet for Submit lead form (1) conversion page */}
+      <Script id="google-ads-conversion" strategy="afterInteractive">
+        {`
+          gtag('event', 'conversion', {'send_to': 'AW-17868439825/XuKBCO-NleIbEJGCq8hC'});
+        `}
+      </Script>
       <Header />
       <div className="min-h-screen bg-background text-foreground pt-20">
         <div className="container mx-auto px-4 py-20">

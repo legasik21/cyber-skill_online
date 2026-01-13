@@ -115,11 +115,24 @@ export default function BattlePassPage() {
                 Back to Home
               </Link>
               <div className="flex items-center gap-3 mb-4">
-                <Trophy className="h-10 w-10 text-primary" />
+                <Trophy className="h-10 w-10 text-cyan-400" />
                 <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
                   Battle Pass Boosting
                 </h1>
               </div>
+              
+              {/* Current Event Banner */}
+              <div className="bg-gradient-to-r from-cyan-500/20 to-cyan-600/10 border border-cyan-500/30 rounded-lg p-4 mb-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-2xl">🤖</span>
+                  <span className="text-cyan-400 font-bold">Current Event: Battle Pass Special - RoboCop</span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Recruit RoboCop and unlock the stunning <strong className="text-foreground">OCP Peacekeeper Tank</strong>! 
+                  Get crew members Anne Lewis, Leon Nash, and Emil Antonowsky.
+                </p>
+              </div>
+              
               <p className="text-lg text-muted-foreground mb-6">
                 Complete your Battle Pass and unlock all 50 levels of exclusive rewards with our professional boosting service
               </p>

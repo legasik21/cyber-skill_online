@@ -221,18 +221,18 @@ export default function Home() {
           {/* Two Featured Events Side-by-Side */}
           <div className="grid lg:grid-cols-2 gap-8 mb-12">
             
-            {/* Featured Event - Holiday Ops 2026 */}
-            <Card className="h-full border-2 border-primary/50 bg-gradient-to-br from-primary/10 to-card overflow-hidden flex flex-col">
+            {/* Onslaught Event - Left Side */}
+            <Card className="h-full border-2 border-red-500/50 bg-gradient-to-br from-red-500/10 to-card overflow-hidden flex flex-col">
               <div className="relative flex-grow">
-                <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-4 py-1 text-sm font-bold rounded-bl-lg z-10">
-                  ACTIVE NOW
+                <div className="absolute top-0 right-0 bg-red-500 text-white px-4 py-1 text-sm font-bold rounded-bl-lg z-10">
+                  NEW SEASON
                 </div>
                 <CardHeader>
                     <div className="flex items-start justify-between">
                     <div>
-                        <CardTitle className="text-2xl mb-2">🎄 Holiday Ops 2026</CardTitle>
+                        <CardTitle className="text-2xl mb-2">🐉 Onslaught: Crimson Dragon</CardTitle>
                         <CardDescription>
-                        Festive bonuses and special rewards! Celebrate the holidays.
+                        7v7 competitive battles. Fight for the Ashbringer!
                         </CardDescription>
                     </div>
                     </div>
@@ -240,35 +240,35 @@ export default function Home() {
                 <CardContent>
                     <div className="space-y-6">
                     <div>
-                        <h4 className="font-semibold mb-3 text-primary">Event Details</h4>
+                        <h4 className="font-semibold mb-3 text-red-400">Event Details</h4>
                         <ul className="space-y-2 text-sm">
                         <li className="flex items-center">
                             <span className="mr-2">📅</span>
-                            <span>Duration: 5 Dec - 12 Jan</span>
+                            <span>Duration: Jan 14 - Feb 22, 2026</span>
                         </li>
                         <li className="flex items-center">
                             <span className="mr-2">🏆</span>
-                            <span>Rewards: Premium Tanks, Credits</span>
+                            <span>Rewards: 114 SP2, Bonds, Styles</span>
                         </li>
                         <li className="flex items-center">
-                            <span className="mr-2">⭐</span>
-                            <span>Special: Holiday Styles & Crew</span>
+                            <span className="mr-2">🎖️</span>
+                            <span>Annual: Ashbringer Tank (9+ Colors)</span>
                         </li>
                         </ul>
                     </div>
                     <div>
-                        <h4 className="font-semibold mb-3 text-primary">Boost Services</h4>
+                        <h4 className="font-semibold mb-3 text-red-400">Boost Services</h4>
                         <div className="space-y-3">
                         <div className="bg-card/50 p-3 rounded-lg border border-border/50">
                             <div className="flex justify-between items-center mb-1">
-                            <span className="font-medium">Full Completion</span>
-                            <span className="text-primary font-bold">$80+</span>
+                            <span className="font-medium">Rating Boost</span>
+                            <span className="text-red-400 font-bold">From $3/100pts</span>
                             </div>
-                            <p className="text-xs text-muted-foreground">All decorations and rewards</p>
+                            <p className="text-xs text-muted-foreground">Climb to Legend rank</p>
                         </div>
-                        <Button className="w-full mt-2" size="lg" asChild>
-                            <Link href="/events">
-                            Learn More
+                        <Button className="w-full mt-2 bg-red-600 hover:bg-red-700" size="lg" asChild>
+                            <Link href="/services/onslaught">
+                            Order Onslaught Boost
                             </Link>
                         </Button>
                         </div>
@@ -278,18 +278,18 @@ export default function Home() {
               </div>
             </Card>
 
-            {/* Battle Pass Event */}
-            <Card className="h-full border-2 border-primary/50 bg-gradient-to-br from-primary/10 to-card overflow-hidden flex flex-col">
+            {/* Battle Pass: RoboCop - Right Side */}
+            <Card className="h-full border-2 border-cyan-500/50 bg-gradient-to-br from-cyan-500/10 to-card overflow-hidden flex flex-col">
               <div className="relative flex-grow">
-                <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-4 py-1 text-sm font-bold rounded-bl-lg z-10">
+                <div className="absolute top-0 right-0 bg-cyan-500 text-white px-4 py-1 text-sm font-bold rounded-bl-lg z-10">
                   ACTIVE NOW
                 </div>
                 <CardHeader>
                     <div className="flex items-start justify-between">
                     <div>
-                        <CardTitle className="text-2xl mb-2">🎖️ Battle Pass: Holiday Havoc</CardTitle>
+                        <CardTitle className="text-2xl mb-2">🤖 Battle Pass: RoboCop</CardTitle>
                         <CardDescription>
-                        Complete challenges and unlock exclusive Battle Pass rewards.
+                        Recruit RoboCop! Get the stunning OCP Peacekeeper tank.
                         </CardDescription>
                     </div>
                     </div>
@@ -297,33 +297,33 @@ export default function Home() {
                 <CardContent>
                     <div className="space-y-6">
                     <div>
-                        <h4 className="font-semibold mb-3 text-primary">Event Details</h4>
+                        <h4 className="font-semibold mb-3 text-cyan-400">Event Details</h4>
                         <ul className="space-y-2 text-sm">
                         <li className="flex items-center">
                             <span className="mr-2">📅</span>
-                            <span>Duration: 19 Dec - 12 Jan</span>
+                            <span>Duration: Jan 13 - Feb 2026</span>
                         </li>
                         <li className="flex items-center">
                             <span className="mr-2">🏆</span>
-                            <span>Rewards: Tanks, Bonds, Credits</span>
+                            <span>Main Reward: OCP Peacekeeper Tank</span>
                         </li>
                         <li className="flex items-center">
-                            <span className="mr-2">⚡</span>
-                            <span>Levels: 50 Progressive Stages</span>
+                            <span className="mr-2">👥</span>
+                            <span>Crew: RoboCop, Anne Lewis, Leon Nash</span>
                         </li>
                         </ul>
                     </div>
                     <div>
-                        <h4 className="font-semibold mb-3 text-primary">Boost Services</h4>
+                        <h4 className="font-semibold mb-3 text-cyan-400">Boost Services</h4>
                         <div className="space-y-3">
                         <div className="bg-card/50 p-3 rounded-lg border border-border/50">
                             <div className="flex justify-between items-center mb-1">
                             <span className="font-medium">Level Boost</span>
-                            <span className="text-primary font-bold">$2.5/lvl</span>
+                            <span className="text-cyan-400 font-bold">$2.5/lvl</span>
                             </div>
                             <p className="text-xs text-muted-foreground">Fast progression</p>
                         </div>
-                        <Button className="w-full mt-2" size="lg" asChild>
+                        <Button className="w-full mt-2 bg-cyan-600 hover:bg-cyan-700" size="lg" asChild>
                             <Link href="/services/battle-pass">
                             Order Battle Pass Boost
                             </Link>
@@ -337,19 +337,42 @@ export default function Home() {
 
           </div>
 
-          {/* Other Events Grid */}
-          <div className="grid md:grid-cols-3 gap-6">
+          {/* Past Events Grid */}
+          <div className="grid md:grid-cols-2 gap-6">
             <Card className="border-border/50 bg-card/50 opacity-75">
               <CardHeader>
                 <div className="text-sm text-muted-foreground mb-2">PAST EVENT</div>
-                <CardTitle className="text-xl">🎯 Frontline Event</CardTitle>
-                <CardDescription>Epic 30v30 battles with exclusive rewards</CardDescription>
+                <CardTitle className="text-xl">🎄 Holiday Ops 2026</CardTitle>
+                <CardDescription>Festive bonuses and special rewards</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-sm space-y-2">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Ended:</span>
-                    <span className="font-medium">Dec 15, 2025</span>
+                    <span className="font-medium">Jan 12, 2026</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Status:</span>
+                    <span className="font-medium text-muted-foreground">Completed</span>
+                  </div>
+                </div>
+                <Button variant="outline" className="w-full mt-4" disabled>
+                  Event Ended
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border/50 bg-card/50 opacity-75">
+              <CardHeader>
+                <div className="text-sm text-muted-foreground mb-2">PAST EVENT</div>
+                <CardTitle className="text-xl">🎖️ Battle Pass: Holiday Havoc</CardTitle>
+                <CardDescription>Complete challenges and unlock exclusive rewards</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-sm space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Ended:</span>
+                    <span className="font-medium">Jan 12, 2026</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Status:</span>

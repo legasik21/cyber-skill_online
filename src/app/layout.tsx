@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import ChatWidget from "@/components/ChatWidget";
+import EventBanner from "@/components/EventBanner";
 import { GoogleAnalytics } from "@next/third-parties/google";
 
 const geistSans = Geist({
@@ -54,6 +55,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <GoogleAnalytics gaId="G-ZTPTXGLVQ4" />
+        <EventBanner />
         {children}
         <ChatWidget />
       </body>
