@@ -57,28 +57,50 @@ git pull origin main
 
 ## Step 4: Rebuild & Restart Docker (On Server)
 
-Option A: **Quick Restart** (if only code changes, no new dependencies):
+⚠️ **IMPORTANT**: Next.js requires `NEXT_PUBLIC_*` variables at BUILD time, not just runtime!
+
+**Full Rebuild with Build Args** (recommended):
 
 ```bash
-docker compose restart
+# Navigate to project folder
+cd ~/cyber-skill_online
+
+# Pull latest code
+git pull origin main
+
+# Build with NEXT_PUBLIC_* variables from .env file
+docker build --network=host \
+  --build-arg NEXT_PUBLIC_SUPABASE_URL="$(grep NEXT_PUBLIC_SUPABASE_URL .env | cut -d '=' -f2)" \
+  --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="$(grep NEXT_PUBLIC_SUPABASE_ANON_KEY .env | cut -d '=' -f2)" \
+  --build-arg NEXT_PUBLIC_ABLY_KEY="$(grep NEXT_PUBLIC_ABLY_KEY .env | cut -d '=' -f2)" \
+  --build-arg NEXT_PUBLIC_SITE_URL="$(grep NEXT_PUBLIC_SITE_URL .env | cut -d '=' -f2)" \
+  -t cyber-skill .
+
+# Stop old container and start new one
+docker stop cyber-skill && docker rm cyber-skill && \
+docker run -d \
+  --name cyber-skill \
+  --restart always \
+  --network n8n_default \
+  --env-file .env \
+  --label "traefik.enable=true" \
+  --label "traefik.http.routers.cyberskill.rule=Host(\`cyberskill.pro\`)" \
+  --label "traefik.http.routers.cyberskill.entrypoints=websecure" \
+  --label "traefik.http.routers.cyberskill.tls=true" \
+  --label "traefik.http.routers.cyberskill.tls.certresolver=mytlschallenge" \
+  --label "traefik.http.services.cyberskill.loadbalancer.server.port=3000" \
+  cyber-skill
 ```
 
-Option B: **Full Rebuild** (recommended for safety):
+**Force Fresh Build** (if having cache issues):
 
 ```bash
-# Stop all containers
-docker compose down
-
-# Rebuild and start with latest code
-docker compose up -d --build
-```
-
-Option C: **Force Fresh Build** (if having cache issues):
-
-```bash
-docker compose down
-docker compose build --no-cache
-docker compose up -d
+docker build --network=host --no-cache \
+  --build-arg NEXT_PUBLIC_SUPABASE_URL="$(grep NEXT_PUBLIC_SUPABASE_URL .env | cut -d '=' -f2)" \
+  --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="$(grep NEXT_PUBLIC_SUPABASE_ANON_KEY .env | cut -d '=' -f2)" \
+  --build-arg NEXT_PUBLIC_ABLY_KEY="$(grep NEXT_PUBLIC_ABLY_KEY .env | cut -d '=' -f2)" \
+  --build-arg NEXT_PUBLIC_SITE_URL="$(grep NEXT_PUBLIC_SITE_URL .env | cut -d '=' -f2)" \
+  -t cyber-skill .
 ```
 
 ---
