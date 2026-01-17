@@ -32,10 +32,10 @@ export default function Footer() {
   ]
 
   const serviceLinks = [
-    { label: "WN8, Winrate, High Damage", href: "#services" },
-    { label: "Credit and Bonds Farming", href: "#services" },
-    { label: "Campaign Missions", href: "#services" },
-    { label: "Mark of Excellence", href: "#services" },
+    { label: "WN8, Winrate, High Damage", href: "/services/wn8-boost" },
+    { label: "Credit and Bonds Farming", href: "/services/credit-farm" },
+    { label: "Campaign Missions", href: "/services/campaign-missions" },
+    { label: "Mark of Excellence", href: "/services/mark-of-excellence" },
   ]
 
   return (

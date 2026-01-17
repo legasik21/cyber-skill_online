@@ -84,7 +84,7 @@ docker run -d \
   --network n8n_default \
   --env-file .env \
   --label "traefik.enable=true" \
-  --label "traefik.http.routers.cyberskill.rule=Host(\`cyberskill.pro\`)" \
+  --label "traefik.http.routers.cyberskill.rule=Host(\`cyberskill.pro\`) || Host(\`cyberskill.online\`)" \
   --label "traefik.http.routers.cyberskill.entrypoints=websecure" \
   --label "traefik.http.routers.cyberskill.tls=true" \
   --label "traefik.http.routers.cyberskill.tls.certresolver=mytlschallenge" \
@@ -136,10 +136,28 @@ git push origin main
 ### On Server:
 
 ```bash
-cd /path/to/your/project
-git pull origin main
-docker compose down
-docker compose up -d --build
+# 1-liner to update and redeploy
+cd ~/cyber-skill_online && \
+git pull origin main && \
+docker build --network=host \
+  --build-arg NEXT_PUBLIC_SUPABASE_URL="$(grep NEXT_PUBLIC_SUPABASE_URL .env | cut -d '=' -f2)" \
+  --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="$(grep NEXT_PUBLIC_SUPABASE_ANON_KEY .env | cut -d '=' -f2)" \
+  --build-arg NEXT_PUBLIC_ABLY_KEY="$(grep NEXT_PUBLIC_ABLY_KEY .env | cut -d '=' -f2)" \
+  --build-arg NEXT_PUBLIC_SITE_URL="$(grep NEXT_PUBLIC_SITE_URL .env | cut -d '=' -f2)" \
+  -t cyber-skill . && \
+docker stop cyber-skill && docker rm cyber-skill && \
+docker run -d \
+  --name cyber-skill \
+  --restart always \
+  --network n8n_default \
+  --env-file .env \
+  --label "traefik.enable=true" \
+  --label "traefik.http.routers.cyberskill.rule=Host(\`cyberskill.pro\`) || Host(\`cyberskill.online\`)" \
+  --label "traefik.http.routers.cyberskill.entrypoints=websecure" \
+  --label "traefik.http.routers.cyberskill.tls=true" \
+  --label "traefik.http.routers.cyberskill.tls.certresolver=mytlschallenge" \
+  --label "traefik.http.services.cyberskill.loadbalancer.server.port=3000" \
+  cyber-skill
 ```
 
 ---
@@ -154,13 +172,13 @@ docker compose up -d --build
 
 ### Docker build errors?
 
-- Check logs: `docker compose logs`
-- Try no-cache build: `docker compose build --no-cache`
+- Check logs: `docker logs cyber-skill`
+- Try no-cache build: add `--no-cache` to build command
 
 ### Container won't start?
 
 - Check what's using the port: `lsof -i :3000`
-- Kill stuck containers: `docker compose down --remove-orphans`
+- Kill stuck containers: `docker rm -f cyber-skill`
 
 ---
 
@@ -175,4 +193,4 @@ If you updated `.env.local` locally, remember:
    # or
    vim /path/to/your/project/.env.local
    ```
-3. Then restart Docker: `docker compose restart`
+3. Then rebuild and restart Docker (follow Step 4)
