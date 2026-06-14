@@ -5,6 +5,8 @@ import "./globals.css";
 import ChatWidget from "@/components/ChatWidget";
 import EventBanner from "@/components/EventBanner";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { SITE_URL, SITE_NAME, organizationJsonLd, websiteJsonLd } from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,16 +18,37 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const HOME_TITLE = "CyberSkill — Professional World of Tanks Boosting Services";
+const HOME_DESCRIPTION =
+  "Professional World of Tanks boosting by top-0.1% players. Raise your WN8, farm credits, complete campaign missions and earn Marks of Excellence — fast, secure and guaranteed.";
+
 export const metadata: Metadata = {
-  title: "CyberSkill - Professional World of Tanks Boosting Services",
-  description: "Professional WoT boosting services. Raise your WN8, get 3 Marks of Excellence, and complete campaign missions effortlessly.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: HOME_TITLE,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: HOME_DESCRIPTION,
+  applicationName: SITE_NAME,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    locale: "en_US",
+    url: "/",
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
+  },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
 };
 
 export default function RootLayout({
@@ -54,6 +77,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
+        <JsonLd data={organizationJsonLd()} />
+        <JsonLd data={websiteJsonLd()} />
         <GoogleAnalytics gaId="G-ZTPTXGLVQ4" />
         <EventBanner />
         {children}

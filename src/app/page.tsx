@@ -15,6 +15,8 @@ import Footer from "@/components/Footer"
 import HeroBackground from "@/components/HeroBackground"
 import { useRouter } from "next/navigation"
 import ReviewsSlider from "@/components/ReviewsSlider"
+import { JsonLd } from "@/components/JsonLd"
+import { boostingReviewsJsonLd } from "@/lib/seo"
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -159,6 +161,7 @@ export default function Home() {
 
   return (
     <>
+      <JsonLd data={boostingReviewsJsonLd()} />
       <Header />
       <div className="min-h-screen bg-background text-foreground overflow-x-hidden pt-20">
       
@@ -175,7 +178,7 @@ export default function Home() {
               transition={{ duration: 0.5 }}
             >
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight">
-                Dominate the Battlefield with <span className="text-primary">CyberSkill</span>
+                WoT Boosting Service by <span className="text-primary">CyberSkill</span>
               </h1>
             </motion.div>
             <motion.p

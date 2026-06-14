@@ -6,6 +6,12 @@ import { Trophy, Target, Shield, ChevronRight, ArrowRight } from "lucide-react"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Link from "next/link"
+import { JsonLd } from "@/components/JsonLd"
+import { serviceJsonLd, breadcrumbJsonLd } from "@/lib/seo"
+
+const PATH = "/services/campaign-missions"
+const SERVICE_DESCRIPTION =
+  "Complete the toughest World of Tanks campaign missions — Obj. 260, Obj. 279(e) and Black Rock — with expert boosters and unlock elite reward tanks."
 
 const CAMPAIGNS = [
   {
@@ -31,6 +37,14 @@ const CAMPAIGNS = [
 export default function CampaignMissionsPage() {
   return (
     <>
+      <JsonLd data={serviceJsonLd({ name: "Campaign Missions Boost", description: SERVICE_DESCRIPTION, path: PATH })} />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Services", path: "/#services" },
+          { name: "Campaign Missions", path: PATH },
+        ])}
+      />
       <Header />
       <div className="min-h-screen bg-background text-foreground overflow-x-hidden pt-20">
         

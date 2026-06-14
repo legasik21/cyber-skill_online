@@ -29,6 +29,7 @@ export default function Footer() {
     { label: "Privacy Policy", href: "/privacy" },
     { label: "Cookie Policy", href: "/cookies" },
     { label: "Guarantee", href: "/guarantee" },
+    { label: "Referral Rewards", href: "/referral" },
   ]
 
   const serviceLinks = [
@@ -36,6 +37,12 @@ export default function Footer() {
     { label: "Credit and Bonds Farming", href: "/services/credit-farm" },
     { label: "Campaign Missions", href: "/services/campaign-missions" },
     { label: "Mark of Excellence", href: "/services/mark-of-excellence" },
+    { label: "Onslaught", href: "/services/onslaught" },
+    { label: "Tier Leveling", href: "/services/tier-leveling" },
+    { label: "Exp Farm", href: "/services/exp-farm" },
+    { label: "Ace Tanker", href: "/services/ace-tanker" },
+    { label: "Battle Pass", href: "/services/battle-pass" },
+    { label: "Referral Program", href: "/services/referral-program" },
   ]
 
   return (
