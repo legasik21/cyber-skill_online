@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# heavy local source clip for the hero video — only the optimized
+# derivatives (hero-bg.mp4 / hero-bg.webm / hero-poster.webp) are committed
+/public/cyberskill_bg_hero.mp4

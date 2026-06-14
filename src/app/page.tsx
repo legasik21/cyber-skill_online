@@ -13,6 +13,7 @@ import Link from "next/link"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import HeroBackground from "@/components/HeroBackground"
+import HeroVideoBackground from "@/components/HeroVideoBackground"
 import { useRouter } from "next/navigation"
 import ReviewsSlider from "@/components/ReviewsSlider"
 import { JsonLd } from "@/components/JsonLd"
@@ -167,6 +168,7 @@ export default function Home() {
       
       {/* Hero Section */}
       <section className="relative py-20 lg:py-32 overflow-hidden">
+        <HeroVideoBackground />
         {/* Animated Background */}
         <HeroBackground />
         
