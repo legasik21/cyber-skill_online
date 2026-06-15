@@ -164,14 +164,21 @@ export default function Home() {
     <>
       <JsonLd data={boostingReviewsJsonLd()} />
       <Header />
-      <div className="min-h-screen bg-background text-foreground overflow-x-hidden pt-20">
+      <div className="min-h-screen bg-background text-foreground overflow-x-hidden pt-36 md:pt-32">
       
       {/* Hero Section */}
       <section className="relative py-20 lg:py-32 overflow-hidden">
         <HeroVideoBackground />
         {/* Animated Background */}
         <HeroBackground />
-        
+
+        {/* Darkening overlay for text readability — sits above the video/grid/orbs
+            (z-0) and below the hero content (z-10) */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 z-[5] pointer-events-none bg-gradient-to-b from-background/70 via-background/40 to-background"
+        />
+
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex flex-col items-center text-center space-y-8">
             <motion.div
