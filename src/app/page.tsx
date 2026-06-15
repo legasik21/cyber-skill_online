@@ -164,7 +164,7 @@ export default function Home() {
     <>
       <JsonLd data={boostingReviewsJsonLd()} />
       <Header />
-      <div className="min-h-screen bg-background text-foreground overflow-x-hidden pt-36 md:pt-32">
+      <div className="min-h-screen bg-background text-foreground overflow-x-hidden pt-[136px] md:pt-28">
       
       {/* Hero Section */}
       <section className="relative py-20 lg:py-32 overflow-hidden">
@@ -176,7 +176,7 @@ export default function Home() {
             (z-0) and below the hero content (z-10) */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 z-[5] pointer-events-none bg-gradient-to-b from-background/70 via-background/40 to-background"
+          className="absolute inset-0 z-[5] pointer-events-none bg-gradient-to-b from-[#0a0a0b]/70 via-[#0a0a0b]/40 to-[#0a0a0b]"
         />
 
         <div className="container mx-auto px-4 relative z-10">
