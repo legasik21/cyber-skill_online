@@ -19,6 +19,7 @@ const PATHS = [
   "/services/exp-farm",
   "/services/ace-tanker",
   "/services/battle-pass",
+  "/services/arcade-cabinet",
   "/services/referral-program",
   "/cookies",
   "/privacy",

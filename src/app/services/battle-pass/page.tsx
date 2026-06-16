@@ -124,12 +124,11 @@ export default function BattlePassPage() {
               {/* Current Event Banner */}
               <div className="bg-gradient-to-r from-cyan-500/20 to-cyan-600/10 border border-cyan-500/30 rounded-lg p-4 mb-6">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-2xl">🤖</span>
-                  <span className="text-cyan-400 font-bold">Current Event: Battle Pass Special - RoboCop</span>
+                  <span className="text-2xl">🏜️</span>
+                  <span className="text-cyan-400 font-bold">Current Event: Battle Pass Season XX — Searching the Sands</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Recruit RoboCop and unlock the stunning <strong className="text-foreground">OCP Peacekeeper Tank</strong>! 
-                  Get crew members Anne Lewis, Leon Nash, and Emil Antonowsky.
+                  Push through three desert-themed chapters and claim the exclusive <strong className="text-foreground">KB-52 (Tier IX)</strong> with your Tokens. Season XX runs June 3 – September 2, 2026.
                 </p>
               </div>
               
