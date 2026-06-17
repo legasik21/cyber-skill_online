@@ -103,8 +103,8 @@ export default function GuaranteePage() {
                   </ul>
                   <div className="mt-8 pt-6 border-t border-border/50">
                      <p className="text-sm text-muted-foreground mb-2">For questions about refunds, please contact us:</p>
-                     <a href="mailto:cyberskill@gmail.com" className="flex items-center gap-2 text-primary hover:underline font-medium">
-                       <Mail className="h-4 w-4" /> cyberskill@gmail.com
+                     <a href="mailto:cyberskillwot@gmail.com" className="flex items-center gap-2 text-primary hover:underline font-medium">
+                       <Mail className="h-4 w-4" /> cyberskillwot@gmail.com
                      </a>
                   </div>
                 </CardContent>

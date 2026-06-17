@@ -93,7 +93,7 @@ export default function PrivacyPage() {
             <section>
               <h2 className="text-2xl font-semibold mb-4">9. Contact Us</h2>
               <p className="text-muted-foreground">
-                If you have questions about this Privacy Policy, please contact us at privacy@cyberskill.com.
+                If you have questions about this Privacy Policy, please contact us at cyberskillwot@gmail.com.
               </p>
             </section>
 

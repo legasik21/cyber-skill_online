@@ -265,6 +265,10 @@ export default function ExpFarmPage() {
                         <div className="space-y-1 text-xs text-muted-foreground">
                           <div className="flex items-center gap-2">
                             <Check className="h-3 w-3 text-primary" />
+                            <span>100k-249k XP: <strong className="text-foreground">10% OFF</strong></span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Check className="h-3 w-3 text-primary" />
                             <span>250k-499k XP: <strong className="text-foreground">15% OFF</strong></span>
                           </div>
                           <div className="flex items-center gap-2">

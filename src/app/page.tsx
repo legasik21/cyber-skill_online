@@ -177,7 +177,7 @@ export default function Home() {
       title: "Mark of Excellence",
       description: "Get 3 marks on your favorite tanks. Top 1% performance.",
       icon: <Star className="h-10 w-10 text-primary" />,
-      price: "From $20",
+      price: "From $0.30/point",
       link: "/services/mark-of-excellence",
     },
     {
@@ -205,7 +205,7 @@ export default function Home() {
       title: "Ace Tanker",
       description: "Get the Ace Tanker mastery badge on your vehicles.",
       icon: <Medal className="h-10 w-10 text-primary" />,
-      price: "From $10",
+      price: "From $15",
       link: "/services/ace-tanker",
     },
     {
