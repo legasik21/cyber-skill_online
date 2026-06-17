@@ -12,58 +12,19 @@ import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Link from "next/link"
 import { useOrderSubmit } from "@/hooks/useOrderSubmit"
-
-// Points-based ranking system
-const MIN_POINTS = 0;
-const MAX_POINTS = 4500;
-
-// Rank stages based on points
-const POINTS_STAGES = [
-  { id: "iron", label: "Iron", minPoints: 0, maxPoints: 499 },
-  { id: "bronze", label: "Bronze", minPoints: 500, maxPoints: 999 },
-  { id: "silver", label: "Silver", minPoints: 1000, maxPoints: 1499 },
-  { id: "gold", label: "Gold", minPoints: 1500, maxPoints: 1999 },
-  { id: "champion", label: "Champion", minPoints: 2000, maxPoints: 2999 },
-  { id: "possible-legend", label: "Possible Legend", minPoints: 3000, maxPoints: 3999 },
-  { id: "legend", label: "Legend", minPoints: 4000, maxPoints: 4500 },
-] as const;
-
-// Price per 100 points for each rank tier
-const PRICE_PER_100_POINTS = [
-  { minPoints: 0, maxPoints: 999, rate: 3 },      // Iron/Bronze
-  { minPoints: 1000, maxPoints: 1499, rate: 4 },  // Silver
-  { minPoints: 1500, maxPoints: 1999, rate: 6 },  // Gold
-  { minPoints: 2000, maxPoints: 2999, rate: 10 }, // Champion
-  { minPoints: 3000, maxPoints: 3999, rate: 15 }, // Possible Legend
-  { minPoints: 4000, maxPoints: 4500, rate: 20 }, // Legend
-] as const;
-
-// Helper function to calculate price for points range
-function calculatePointsPrice(fromPoints: number, toPoints: number): number {
-  if (fromPoints >= toPoints) return 0;
-  
-  let price = 0;
-  for (const tier of PRICE_PER_100_POINTS) {
-    const tierStart = Math.max(fromPoints, tier.minPoints);
-    const tierEnd = Math.min(toPoints, tier.maxPoints + 1);
-    if (tierStart < tierEnd) {
-      price += ((tierEnd - tierStart) / 100) * tier.rate;
-    }
-  }
-  return Math.round(price * 100) / 100;
-}
+import {
+  MIN_POINTS,
+  MAX_POINTS,
+  POINTS_STAGES,
+  SILVER_OPTIONS,
+  priceOnslaught,
+} from "@/lib/pricing/onslaught"
 
 // Helper function to get rank label from points
 function getRankFromPoints(points: number): string {
   const stage = POINTS_STAGES.find(s => points >= s.minPoints && points <= s.maxPoints);
   return stage?.label || "Iron";
 }
-
-const SILVER_OPTIONS = [
-  { id: "none", label: "None", price: 0 },
-  { id: "10m", label: "10M Credits", price: 45.86 },
-  { id: "20m", label: "20M Credits", price: 81.13 },
-] as const
 
 const orderFormSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -116,19 +77,20 @@ export default function OnslaughtPage() {
 
   // Price calculation
   const priceDetails = useMemo(() => {
-    const basePrice = calculatePointsPrice(currentPoints, targetPoints);
-    const boosterCharge = playWithBooster ? basePrice * 0.40 : 0;
-    const selectedSilver = SILVER_OPTIONS.find(o => o.id === silverOption);
-    const silverCharge = selectedSilver ? selectedSilver.price : 0;
-    const missionsCharge = completeMissions ? 40 : 0;
-    const total = basePrice + boosterCharge + silverCharge + missionsCharge;
+    const { base, boosterCharge, silverCharge, missionsCharge, total } = priceOnslaught({
+      currentPoints,
+      targetPoints,
+      playWithBooster,
+      silverOption,
+      completeMissions,
+    });
 
     return {
-      basePrice: Math.round(basePrice * 100) / 100,
-      boosterCharge: Math.round(boosterCharge * 100) / 100,
+      basePrice: base,
+      boosterCharge,
       silverCharge,
       missionsCharge,
-      total: Math.round(total * 100) / 100,
+      total,
     };
   }, [currentPoints, targetPoints, playWithBooster, silverOption, completeMissions]);
 

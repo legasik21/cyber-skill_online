@@ -13,38 +13,16 @@ import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Link from "next/link"
 import { useOrderSubmit } from "@/hooks/useOrderSubmit"
+import {
+  CREDIT_PRICING,
+  WN8_TIER_LABELS,
+  BONDS_WN8_MODIFIERS,
+  BONDS_WN8_LABELS,
+  priceCreditFarm,
+} from "@/lib/pricing/credit-farm"
 
 // Service types
 type ServiceType = "credits" | "bonds"
-
-// Pricing per credit million based on WN8 tier
-const CREDIT_PRICING = {
-  "under-2500": 4.5,    // $4.5 per million for Under 2500 WN8
-  "over-2500": 6.0,     // $6 per million for More than 2500 WN8
-}
-
-const WN8_TIER_LABELS = {
-  "under-2500": "Under 2500 WN8",
-  "over-2500": "More than 2500 WN8",
-}
-
-// Bonds pricing per 100 bonds
-const BONDS_BASE_PRICE = 7.0 // $7 per 100 bonds
-
-// Bonds WN8 modifiers
-const BONDS_WN8_MODIFIERS = {
-  "2000": 0,      // 2000 WN8 - standard price (0% modifier)
-  "2500-3000": 50,  // +50%
-  "3000-4000": 100, // +100%
-  "4000+": 150,     // +150%
-}
-
-const BONDS_WN8_LABELS = {
-  "2000": "2000 WN8",
-  "2500-3000": "2500-3000 WN8",
-  "3000-4000": "3000-4000 WN8",
-  "4000+": "4000+ WN8",
-}
 
 const orderFormSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -85,68 +63,18 @@ export default function CreditFarmPage() {
   // Calculate pricing whenever amount, tier, service type, or silver boosters changes
   useEffect(() => {
     const amountValue = amount === "" ? 0 : amount
-    
-    if (serviceType === "credits" && amountValue < 1) {
-      setBasePrice(0)
-      setDiscount(0)
-      setSilverBoostersCharge(0)
-      setFinalPrice(0)
-      return
-    }
-    
-    if (serviceType === "bonds" && amountValue < 100) {
-      setBasePrice(0)
-      setDiscount(0)
-      setSilverBoostersCharge(0)
-      setFinalPrice(0)
-      return
-    }
 
-    let base = 0
-    let discountPercent = 0
-    
-    if (serviceType === "credits") {
-      // Credits pricing
-      const pricePerMillion = CREDIT_PRICING[selectedTier as keyof typeof CREDIT_PRICING] || 0
-      base = amountValue * pricePerMillion
-      
-      // Volume discounts for credits
-      if (amountValue >= 70) {
-        discountPercent = 20
-      } else if (amountValue >= 40) {
-        discountPercent = 15
-      } else if (amountValue >= 20) {
-        discountPercent = 10
-      }
-    } else if (serviceType === "bonds") {
-      // Bonds pricing - amount is in 100s
-      const bondsHundreds = Math.floor(amountValue / 100)
-      let pricePerHundred = BONDS_BASE_PRICE
-      
-      // Apply WN8 modifier
-      const modifier = BONDS_WN8_MODIFIERS[selectedTier as keyof typeof BONDS_WN8_MODIFIERS] || 0
-      pricePerHundred = pricePerHundred * (1 + modifier / 100)
-      
-      base = bondsHundreds * pricePerHundred
-      
-      // No volume discounts for bonds
-    }
-    
-    const discountAmount = base * (discountPercent / 100)
-    const afterDiscount = base - discountAmount
-    
-    // Calculate silver boosters charge (only for credits)
-    let silverCharge = 0
-    if (serviceType === "credits" && cannotUseSilverBoosters) {
-      silverCharge = afterDiscount * 0.30 // 30% additional charge
-    }
-    
-    const final = afterDiscount + silverCharge
-    
+    const { base, discountPercent, silverCharge, total } = priceCreditFarm({
+      serviceType,
+      tier: selectedTier,
+      amount: amountValue,
+      cannotUseSilverBoosters,
+    })
+
     setBasePrice(base)
     setDiscount(discountPercent)
     setSilverBoostersCharge(silverCharge)
-    setFinalPrice(final)
+    setFinalPrice(total)
   }, [amount, selectedTier, cannotUseSilverBoosters, serviceType])
 
   async function onSubmit(values: z.infer<typeof orderFormSchema>) {

@@ -13,17 +13,7 @@ import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Link from "next/link"
 import { useOrderSubmit } from "@/hooks/useOrderSubmit"
-
-// Pricing per 10,000 XP based on WN8 tier
-const EXP_PRICING = {
-  "under-2500": 3.0,    // $3 per 10k XP for Under 2500 WN8
-  "over-2500": 4.5,     // $4.5 per 10k XP for More than 2500 WN8
-}
-
-const WN8_TIER_LABELS = {
-  "under-2500": "Under 2500 WN8",
-  "over-2500": "More than 2500 WN8",
-}
+import { EXP_PRICING, WN8_TIER_LABELS, priceExpFarm } from "@/lib/pricing/exp-farm"
 
 const orderFormSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -70,36 +60,16 @@ export default function ExpFarmPage() {
       return
     }
 
-    const pricePer10k = EXP_PRICING[selectedWN8Tier]
-    // amount is in thousands (e.g. 50 = 50,000 XP)
-    // Pricing is per 10k, so we divide amount by 10
-    const unitsOf10k = amount / 10
-    const base = unitsOf10k * pricePer10k
-    
-    let discountPercent = 0
-    if (amount >= 500) { // 500k XP
-      discountPercent = 20
-    } else if (amount >= 250) { // 250k XP
-      discountPercent = 15
-    } else if (amount >= 100) { // 100k XP
-      discountPercent = 10
-    }
-    
-    const discountAmount = base * (discountPercent / 100)
-    const afterDiscount = base - discountAmount
-    
-    // Calculate XP boosters charge
-    let boostersCharge = 0
-    if (cannotUseXPBoosters) {
-      boostersCharge = afterDiscount * 0.30 // 30% additional charge
-    }
-    
-    const final = afterDiscount + boostersCharge
-    
+    const { base, discountPercent, xpBoostersCharge: boostersCharge, total } = priceExpFarm({
+      expAmount: amount,
+      wn8Tier: selectedWN8Tier,
+      cannotUseXPBoosters,
+    })
+
     setBasePrice(base)
     setDiscount(discountPercent)
     setXpBoostersCharge(boostersCharge)
-    setFinalPrice(final)
+    setFinalPrice(total)
   }, [expAmount, selectedWN8Tier, cannotUseXPBoosters])
 
   async function onSubmit(values: z.infer<typeof orderFormSchema>) {

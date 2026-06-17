@@ -12,29 +12,7 @@ import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Link from "next/link"
 import { useOrderSubmit } from "@/hooks/useOrderSubmit"
-
-// Price for each tier (cumulative from tier 1)
-const TIER_PRICES: Record<number, number> = {
-  1: 0,
-  2: 1,
-  3: 2,
-  4: 3,
-  5: 10,
-  6: 13,
-  7: 17,
-  8: 20,
-  9: 23,
-  10: 27,
-  11: 64,
-}
-
-const NO_BOOSTERS_EXTRA_PERCENT = 0.30 // 30% extra for no boosters
-
-const SILVER_OPTIONS = [
-  { id: "none", label: "No Silver", price: 0 },
-  { id: "10m", label: "10,000,000 Silver", price: 45 },
-  { id: "20m", label: "20,000,000 Silver", price: 85 },
-]
+import { SILVER_OPTIONS, priceTierLeveling } from "@/lib/pricing/tier-leveling"
 
 const orderFormSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -44,15 +22,6 @@ const orderFormSchema = z.object({
   silverFarm: z.string(),
   additionalInfo: z.string().optional(),
 })
-
-// Calculate price for leveling from one tier to another
-function calculateTierPrice(fromTier: number, toTier: number): number {
-  let total = 0
-  for (let tier = fromTier + 1; tier <= toTier; tier++) {
-    total += TIER_PRICES[tier] || 0
-  }
-  return total
-}
 
 export default function TierLevelingPage() {
   const { submitOrder, isSubmitting } = useOrderSubmit()
@@ -74,31 +43,24 @@ export default function TierLevelingPage() {
     },
   })
 
-  // Calculate prices
+  // Calculate prices via the shared deterministic pricing module
   const priceDetails = useMemo(() => {
-    const basePrice = calculateTierPrice(fromTier, toTier)
-    
-    // Surcharges
-    const noBoostersCharge = dontUseBoosters ? (basePrice * NO_BOOSTERS_EXTRA_PERCENT) : 0
-    const spgCharge = isSPG ? (basePrice * 0.30) : 0
-    
-    const tierLevelingTotal = basePrice + noBoostersCharge + spgCharge
-
-    // Silver Farm
-    const silverOption = SILVER_OPTIONS.find(opt => opt.id === selectedSilverIds)
-    const silverCost = silverOption ? silverOption.price : 0
-
-    // Final Total
-    const finalTotal = tierLevelingTotal + silverCost
+    const { base, noBoostersCharge, spgCharge, silverCost, total } = priceTierLeveling({
+      fromTier,
+      toTier,
+      isSPG,
+      dontUseBoosters,
+      selectedSilverIds,
+    })
 
     return {
-      base: basePrice,
+      base,
       noBoostersSurcharge: noBoostersCharge,
       spgSurcharge: spgCharge,
       silverPrice: silverCost,
-      total: finalTotal
+      total,
     }
-  }, [fromTier, toTier, dontUseBoosters, selectedSilverIds])
+  }, [fromTier, toTier, isSPG, dontUseBoosters, selectedSilverIds])
 
   // Safe handlers for tier selection
   const handleFromChange = (val: number) => {

@@ -31,28 +31,16 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Link from "next/link";
 import { useOrderSubmit } from "@/hooks/useOrderSubmit"
+import {
+  TANKS_2_0 as TANKS,
+  MISSION_TYPES_2_0 as MISSION_TYPES,
+  MISSIONS_PER_TYPE,
+  priceCampaignMissions,
+  getMissionPrice as getMissionPriceForCampaign,
+  type SelectedMissions,
+} from "@/lib/pricing/campaign-missions";
 
-const TANKS = [
-  { id: "excalibur", name: "Excalibur" },
-  { id: "chimera", name: "Chimera" },
-  { id: "object-279e", name: "Object 279 (e)" },
-];
-
-const MISSION_TYPES = [
-  { id: "union", name: "Union" },
-  { id: "bloc", name: "Bloc" },
-  { id: "alliance", name: "Alliance" },
-  { id: "coalition", name: "Coalition" },
-];
-
-const MISSIONS_PER_TYPE = 15 as const;
-
-// Type for selected missions: { tankId: { missionType: number[] } }
-type SelectedMissions = {
-  [tankId: string]: {
-    [missionType: string]: number[];
-  };
-};
+const CAMPAIGN_ID = "2.0" as const;
 
 const orderFormSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -61,42 +49,9 @@ const orderFormSchema = z.object({
   additionalInfo: z.string().optional(),
 });
 
-const MISSION_PRICES: Record<string, Record<string, (n: number) => number>> = {
-  excalibur: {
-    union: (n) =>
-      n === 1 ? 3 : n === 2 ? 5 : n === 3 ? 4 : n === 4 ? 3 : n === 5 ? 5 : n === 6 ? 4 : n === 7 ? 5 : n === 8 ? 3 : n <= 10 ? 4 : n === 11 ? 5 : n === 12 ? 8 : n === 13 ? 3 : n === 14 ? 5 : 8,
-    bloc: (n) =>
-      n === 1 ? 4 : n === 2 ? 5 : n === 3 ? 6 : n === 4 ? 4 : n === 5 ? 3 : n === 6 ? 5 : n === 7 ? 9 : n === 8 ? 6 : n <= 11 ? 4 : n === 12 ? 8 : n === 13 ? 5 : n === 14 ? 8 : 10,
-    alliance: (n) =>
-      n === 1 ? 4 : n === 2 ? 3 : n === 3 ? 4 : n === 4 ? 3 : n === 5 ? 4 : n <= 7 ? 3 : n === 8 ? 4 : n <= 10 ? 3 : n === 11 ? 5 : n === 12 ? 6 : n <= 14 ? 5 : 8,
-    coalition: (n) =>
-      n <= 2 ? 3 : n === 3 ? 4 : n <= 5 ? 3 : n <= 7 ? 4 : n <= 9 ? 3 : n <= 11 ? 5 : n === 12 ? 2 : n <= 14 ? 3 : 9,
-  },
-  chimera: {
-    union: (n) =>
-      n === 1 ? 2 : n === 2 ? 4 : n === 3 ? 3 : n <= 5 ? 5 : n === 6 ? 9 : n === 7 ? 4 : n === 8 ? 10 : n === 9 ? 5 : n === 10 ? 3 : n <= 12 ? 6 : n <= 14 ? 10 : 16,
-    bloc: (n) =>
-      n === 1 ? 6 : n === 2 ? 8 : n <= 4 ? 3 : n === 5 ? 7 : n === 6 ? 5 : n === 7 ? 8 : n === 8 ? 10 : n === 9 ? 5 : n === 10 ? 7 : n === 11 ? 9 : n === 12 ? 4 : n === 13 ? 11 : n === 14 ? 8 : 18,
-    alliance: (n) =>
-      n === 1 ? 8 : n <= 3 ? 4 : n === 4 ? 8 : n === 5 ? 10 : n === 6 ? 5 : n === 7 ? 3 : n <= 9 ? 8 : n === 10 ? 6 : n === 11 ? 5 : n === 12 ? 9 : n === 13 ? 5 : n === 14 ? 4 : 14,
-    coalition: (n) =>
-      n === 1 ? 4 : n === 2 ? 5 : n === 3 ? 3 : n === 4 ? 4 : n === 5 ? 9 : n === 6 ? 4 : n === 7 ? 8 : n === 8 ? 3 : n === 9 ? 4 : n === 10 ? 6 : n === 11 ? 8 : n <= 13 ? 7 : n === 14 ? 15 : 17,
-  },
-  "object-279e": {
-    union: (n) =>
-      n <= 2 ? 8 : n === 3 ? 6 : n === 4 ? 7 : n === 5 ? 6 : n === 6 ? 8 : n === 7 ? 20 : n === 8 ? 5 : n === 9 ? 4 : n === 10 ? 5 : n === 11 ? 6 : n === 12 ? 4 : n === 13 ? 12 : n === 14 ? 7 : 16,
-    bloc: (n) =>
-      n === 1 ? 5 : n === 2 ? 8 : n <= 6 ? 5 : n === 7 ? 9 : n === 8 ? 3 : n === 9 ? 7 : n === 10 ? 8 : n === 11 ? 4 : n === 12 ? 6 : n === 13 ? 10 : n === 14 ? 4 : 16,
-    alliance: (n) =>
-      n <= 2 ? 4 : n === 3 ? 10 : n <= 6 ? 5 : n === 7 ? 8 : n === 8 ? 18 : n === 9 ? 8 : n === 10 ? 7 : n === 11 ? 5 : n === 12 ? 6 : n === 13 ? 12 : n === 14 ? 6 : 16,
-    coalition: (n) =>
-      n === 1 ? 9 : n === 2 ? 4 : n === 3 ? 6 : n === 4 ? 18 : n === 5 ? 6 : n === 6 ? 5 : n === 7 ? 6 : n === 8 ? 16 : n === 9 ? 7 : n <= 13 ? 6 : n === 14 ? 8 : 16,
-  },
-};
-
 // Calculate price for a mission
 function getMissionPrice(tankId: string, typeId: string, missionNumber: number): number {
-  return MISSION_PRICES[tankId]?.[typeId]?.(missionNumber) ?? 15;
+  return getMissionPriceForCampaign(CAMPAIGN_ID, tankId, typeId, missionNumber);
 }
 
 export default function Campaign2Page() {
