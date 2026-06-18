@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { createSupabaseClient } from '@/lib/db';
+import { useState, useEffect, useCallback } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 import ConversationList from '@/components/admin/ConversationList';
 import ChatPanel from '@/components/admin/ChatPanel';
 import styles from './chat.module.css';
@@ -21,69 +21,21 @@ interface Conversation {
 }
 
 export default function AdminChatPage() {
-  const [user, setUser] = useState<any>(null);
+  const { data: session, status } = useSession();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversation, setActiveConversation] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check authentication
-  useEffect(() => {
-    const supabase = createSupabaseClient();
-    
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        setUser(session.user);
-      } else {
-        // Redirect to login
-        window.location.href = '/admin/login';
-      }
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  // Load conversations
-  useEffect(() => {
-    if (!user?.id) return;
-
-    loadConversations();
-    
-    // Refresh every 30 seconds
-    const interval = setInterval(loadConversations, 30000);
-    return () => clearInterval(interval);
-  }, [user?.id]);
-
-  const loadConversations = async () => {
+  const loadConversations = useCallback(async () => {
     try {
       setIsLoading(true);
-      
-      // Get current session for access token
-      const supabase = createSupabaseClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session?.access_token) {
-        console.error('No access token available');
-        return;
-      }
-      
-      const response = await fetch('/api/admin/chat/conversations', {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-      });
-      
+      // Admin API is authenticated by the NextAuth session cookie.
+      const response = await fetch('/api/admin/chat/conversations');
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         console.error('Failed to load conversations:', response.status, errorData);
         throw new Error(errorData.error || `Failed to load conversations (${response.status})`);
       }
-
       const data = await response.json();
       setConversations(data.conversations);
     } catch (error) {
@@ -91,7 +43,22 @@ export default function AdminChatPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  // Middleware already guards /admin/*; this is a belt-and-suspenders redirect.
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      window.location.href = '/admin/login';
+    }
+  }, [status]);
+
+  // Load conversations once authenticated, then poll every 30s.
+  useEffect(() => {
+    if (status !== 'authenticated') return;
+    loadConversations();
+    const interval = setInterval(loadConversations, 30000);
+    return () => clearInterval(interval);
+  }, [status, loadConversations]);
 
   const handleSelectConversation = (conversationId: string) => {
     setActiveConversation(conversationId);
@@ -99,21 +66,9 @@ export default function AdminChatPage() {
 
   const handleCloseConversation = async (conversationId: string) => {
     try {
-      // Get auth token
-      const supabase = createSupabaseClient();
-      const { data: { session } } = await supabase.auth.getSession();
-
-      if (!session?.access_token) {
-        console.error('No access token');
-        return;
-      }
-
       const response = await fetch('/api/admin/chat/close', {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ conversation_id: conversationId }),
       });
 
@@ -121,10 +76,7 @@ export default function AdminChatPage() {
         throw new Error('Failed to close conversation');
       }
 
-      // Refresh conversations
       await loadConversations();
-      
-      // Close panel if this conversation was active
       if (activeConversation === conversationId) {
         setActiveConversation(null);
       }
@@ -134,7 +86,7 @@ export default function AdminChatPage() {
     }
   };
 
-  if (!user) {
+  if (status === 'loading' || !session?.user) {
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.spinner} />
@@ -143,6 +95,8 @@ export default function AdminChatPage() {
     );
   }
 
+  const user = session.user;
+
   return (
     <div className={styles.adminContainer}>
       <header className={styles.header}>
@@ -150,11 +104,7 @@ export default function AdminChatPage() {
         <div className={styles.userInfo}>
           <span>{user.email}</span>
           <button
-            onClick={async () => {
-              const supabase = createSupabaseClient();
-              await supabase.auth.signOut();
-              window.location.href = '/admin/login';
-            }}
+            onClick={() => signOut({ callbackUrl: '/admin/login' })}
             className={styles.logoutButton}
           >
             Logout

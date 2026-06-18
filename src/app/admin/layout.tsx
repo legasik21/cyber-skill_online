@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { pageMetadata } from "@/lib/seo";
+import AdminProviders from "./providers";
 
 // Admin area must never be indexed.
 export const metadata: Metadata = pageMetadata({
@@ -11,5 +12,5 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default function Layout({ children }: { children: ReactNode }) {
-  return children;
+  return <AdminProviders>{children}</AdminProviders>;
 }

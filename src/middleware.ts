@@ -1,17 +1,18 @@
+import NextAuth from 'next-auth';
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
+import { authConfig } from '@/auth.config';
 
-export function middleware(request: NextRequest) {
-  const response = NextResponse.next();
-  
-  // Check if visitor_id cookie exists
-  const visitorId = request.cookies.get('visitor_id')?.value;
-  
-  // Generate and set visitor_id if it doesn't exist
-  if (!visitorId) {
-    const newVisitorId = uuidv4();
-    response.cookies.set('visitor_id', newVisitorId, {
+// Edge-safe NextAuth instance (decodes the JWT session; no Node-only providers).
+const { auth } = NextAuth(authConfig);
+
+export default auth((req) => {
+  const { nextUrl } = req;
+  const res = NextResponse.next();
+
+  // Ensure every visitor has a stable, httpOnly visitor_id cookie.
+  if (!req.cookies.get('visitor_id')?.value) {
+    res.cookies.set('visitor_id', uuidv4(), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
@@ -19,19 +20,23 @@ export function middleware(request: NextRequest) {
       path: '/',
     });
   }
-  
-  return response;
-}
 
-// Apply middleware to all routes except static files and api routes
+  // Gate the admin dashboard + admin API. The login page and /api/auth/* stay public.
+  const path = nextUrl.pathname;
+  const isAdminPage = path.startsWith('/admin') && path !== '/admin/login';
+  const isAdminApi = path.startsWith('/api/admin');
+
+  if ((isAdminPage || isAdminApi) && !req.auth) {
+    if (isAdminApi) {
+      return NextResponse.json({ error: 'Unauthorized - Please log in' }, { status: 401 });
+    }
+    return NextResponse.redirect(new URL('/admin/login', nextUrl));
+  }
+
+  return res;
+});
+
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    '/((?!_next/static|_next/image|favicon.ico).*)',
-  ],
+  // Run on everything except NextAuth's own endpoints and static assets.
+  matcher: ['/((?!api/auth|_next/static|_next/image|favicon.ico).*)'],
 };
