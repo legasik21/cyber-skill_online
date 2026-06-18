@@ -44,6 +44,33 @@ function isModelUnavailableError(err: unknown): boolean {
 }
 
 /**
+ * Deterministic safety net: if the model already computed a valid price via a tool
+ * but failed to produce a final text answer (looped out, or returned empty after a
+ * tool call), synthesize the quote from the tool result instead of escalating.
+ * The number still comes ONLY from the tool (i.e. the shared pricing module) — the
+ * model never computes it.
+ */
+function quoteFromToolCalls(toolCalls: ToolCallRecord[]): string | null {
+  for (let i = toolCalls.length - 1; i >= 0; i--) {
+    const call = toolCalls[i]
+    const r = call?.result as Record<string, unknown> | null
+    if (!r || typeof r !== "object" || "error" in r) continue
+    const total = (r as { total?: unknown }).total
+    if (typeof total !== "number") continue
+    if (call.name === "price_campaign") {
+      const interp = typeof r.interpretation === "string" ? r.interpretation : ""
+      const route = typeof r.route === "string" ? r.route : "/services/campaign-missions"
+      const honors = typeof r.honorsNote === "string" ? ` ${r.honorsNote}` : ""
+      return `${interp ? `${interp} → ` : ""}That's $${total} — want me to set you up? Order here: ${route}.${honors}`
+    }
+    if (call.name === "calculate_price") {
+      return `That's $${total} — want me to set you up?`
+    }
+  }
+  return null
+}
+
+/**
  * Run the assistant over the conversation history. Returns the reply text and
  * whether the assistant escalated. SDK errors are allowed to throw — the caller
  * (the chat route) catches them so an AI failure never breaks the send.
@@ -120,7 +147,12 @@ export async function runAssistant(history: ChatTurn[]): Promise<AssistantResult
     const calls = response.functionCalls
     if (!calls || calls.length === 0) {
       const reply = (response.text ?? "").trim()
-      if (!reply) return { reply: FALLBACK_REPLY, escalated: true, toolCalls }
+      if (!reply) {
+        // No text and no tool call. If we already priced something, quote it.
+        const fromTools = quoteFromToolCalls(toolCalls)
+        if (fromTools) return { reply: fromTools, escalated, toolCalls }
+        return { reply: FALLBACK_REPLY, escalated: true, toolCalls }
+      }
       return { reply, escalated, toolCalls }
     }
 
@@ -174,6 +206,9 @@ export async function runAssistant(history: ChatTurn[]): Promise<AssistantResult
     contents.push({ role: "user", parts: responseParts })
   }
 
-  // Exhausted the loop without a final text answer.
+  // Exhausted the loop without a final text answer. If the model already computed a
+  // valid price via a tool, quote it deterministically instead of escalating.
+  const fromTools = quoteFromToolCalls(toolCalls)
+  if (fromTools) return { reply: fromTools, escalated, toolCalls }
   return { reply: FALLBACK_REPLY, escalated: true, toolCalls }
 }
