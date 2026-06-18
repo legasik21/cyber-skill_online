@@ -136,10 +136,9 @@ export const SERVICE_CATALOG: Record<ServiceId, ServiceDescriptor> = {
     pricingType: "composite",
     fromPriceUSD: 5,
     params: [
-      { name: "campaignId", type: "enum", required: true, options: ["1.0", "2.0", "3.0"], description: "Which campaign: 1.0 (Obj. 260), 2.0 (Obj. 279e), 3.0 (Black Rock)." },
-      { name: "selectedMissions", type: "object", required: true, description: 'Map of { [tankId]: { [missionType]: number[] } } listing selected mission numbers (1-15) per tank per type. Use get_service_pricing to fetch the valid tanks/types per campaign.' },
+      { name: "missions", type: "object", required: true, description: 'Use the price_campaign tool (NOT calculate_price). Pass a flat list of { tank, class, mission }, e.g. [{ "tank": "Object 260", "class": "ht", "mission": 15 }, { "tank": "Object 260", "class": "mt", "mission": 9 }]. The campaign (1.0/2.0/3.0) is inferred from the reward tank. class: 1.0 lt/mt/ht/td/spg, 2.0 union/bloc/alliance/coalition, 3.0 vanguard/ambush/assistance. mission is 1-15 or "all".' },
     ],
-    note: "Per-mission pricing. Selecting all 15 of one type = -15%; selecting all types for a tank = -25% (the two are mutually exclusive — the full-tank 25% replaces the per-type 15%). Honors / 'second task' (+50%/mission) is handled manually, not by the calculator.",
+    note: "Use the price_campaign tool. Reward tanks → campaign: 1.0 Stug IV / T-28 Concept / T-55A / Object 260; 2.0 Excalibur / Chimera / Object 279 (e); 3.0 Windhund / Dravec / Black Rock. Per-mission pricing; all 15 of one branch = -15%; all branches of a tank = -25% (mutually exclusive). Honors / 'second task' (+50%/mission) is confirmed by a manager, not the calculator.",
   },
   "wn8-boost": {
     id: "wn8-boost",
