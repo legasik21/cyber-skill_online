@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 import { deleteConversationsOlderThan, insertAdminAction } from '@/lib/db';
 
 export const runtime = 'nodejs';
@@ -9,9 +10,16 @@ export const runtime = 'nodejs';
  */
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
     const cronSecret = process.env.CRON_SECRET;
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    // Never run the bulk delete without a configured secret — fail closed.
+    if (!cronSecret) {
+      console.error('[Cleanup] CRON_SECRET is not set; refusing to run');
+      return NextResponse.json({ error: 'Server misconfiguration' }, { status: 500 });
+    }
+    // Constant-time comparison of the bearer token.
+    const provided = Buffer.from(request.headers.get('authorization') ?? '');
+    const expected = Buffer.from(`Bearer ${cronSecret}`);
+    if (provided.length !== expected.length || !timingSafeEqual(provided, expected)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

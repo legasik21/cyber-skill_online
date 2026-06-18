@@ -15,8 +15,13 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1', 10);
-    const limit = parseInt(searchParams.get('limit') || '50', 10);
+    const rawPage = parseInt(searchParams.get('page') || '1', 10);
+    const rawLimit = parseInt(searchParams.get('limit') || '50', 10);
+    if (Number.isNaN(rawPage) || Number.isNaN(rawLimit) || rawPage < 1 || rawLimit < 1) {
+      return NextResponse.json({ error: 'Invalid pagination params' }, { status: 400 });
+    }
+    const page = rawPage;
+    const limit = Math.min(rawLimit, 100); // hard cap to bound the query/response
     const status = searchParams.get('status') || 'all';
     const offset = (page - 1) * limit;
 

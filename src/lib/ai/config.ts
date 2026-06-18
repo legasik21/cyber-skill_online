@@ -18,7 +18,7 @@ export const AI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash"
  * model-not-found / availability error (see runAssistant). Override via
  * GEMINI_FALLBACK_MODEL.
  */
-export const AI_FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL || "gemini-3.5-flash"
+export const AI_FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL || "gemini-2.0-flash"
 
 /** Fixed UUID identifying the AI as the conversation's agent / owner. */
 export const AI_AGENT_ID = "11111111-1111-4111-8111-111111111111"

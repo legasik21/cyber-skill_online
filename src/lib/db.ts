@@ -57,12 +57,19 @@ function createPool(): Pool {
   if (!connectionString) {
     throw new Error('Missing DATABASE_URL environment variable');
   }
-  return new Pool({
+  const p = new Pool({
     connectionString,
     max: 10,
     idleTimeoutMillis: 30_000,
     connectionTimeoutMillis: 10_000,
   });
+  // node-postgres emits 'error' on idle clients (DB restart / network drop).
+  // Without a listener Node treats it as an uncaught exception and crashes the
+  // whole server — log it and let the pool recycle the connection instead.
+  p.on('error', (err) => {
+    console.error('[db] idle client error:', err);
+  });
+  return p;
 }
 
 export const pool: Pool = global.__cyberskillPgPool ?? (global.__cyberskillPgPool = createPool());
@@ -81,6 +88,7 @@ export async function createConversation(visitorId: string): Promise<Conversatio
     `INSERT INTO conversations (visitor_id, status) VALUES ($1, 'new') RETURNING *`,
     [visitorId],
   );
+  if (!rows[0]) throw new Error('INSERT conversations returned no row');
   return rows[0];
 }
 
@@ -184,6 +192,7 @@ export async function insertMessage(input: {
      VALUES ($1, $2, $3, $4) RETURNING *`,
     [input.conversation_id, input.sender_type, input.sender_id, input.body],
   );
+  if (!rows[0]) throw new Error('INSERT messages returned no row');
   return rows[0];
 }
 
