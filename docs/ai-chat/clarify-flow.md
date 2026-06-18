@@ -39,7 +39,7 @@ not from the model's general knowledge.
    each param's `description`. Optional params (e.g. silver add-ons, "don't use my boosters")
    are offered, not demanded.
 4. **Restate canonically.** Before pricing, echo the resolved interpretation in plain words,
-   e.g. *"So: 100M credits, WN8 under 2500, using your own Silver Boosters — correct?"*
+   e.g. *"So: 100M credits, our driver playing at under-2500 WN8 on your account, using your own Silver Boosters — correct?"*
 5. **Compute.** Call `calculate_price(serviceId, params)`.
 6. **Quote + CTA.** State the exact total in USD (and the relevant breakdown line items if
    helpful), then nudge to order with the service's `route`
@@ -51,7 +51,7 @@ not from the model's general knowledge.
 
 Required params the assistant must resolve before pricing (full schema lives in `catalog.ts`):
 
-- **credit-farm** — `serviceType` (credits|bonds), `tier`, `amount`; optional `cannotUseSilverBoosters` (credits only).
+- **credit-farm** — `serviceType` (credits|bonds), `tier`, `amount`; optional `cannotUseSilverBoosters` (credits only). NOTE: `tier` is the WN8 **our driver plays at on the customer's account** (sets price + the account's stats footprint), NOT the customer's own WN8. Ask: *"What WN8 should our driver play at on your account — under 2500 or over 2500? (this affects the price and how your account stats look)."*
 - **referral-program** — none (flat **$100**); just confirm and CTA.
 - **battle-pass** — `currentLevel`, `targetLevel` (1-50).
 - **ace-tanker** — `tankTier`; optional `isSpg`, `getReplays`.
@@ -60,7 +60,7 @@ Required params the assistant must resolve before pricing (full schema lives in 
 - **wn8-boost** — `serviceType` (wn8|winrate|damage), `tier`, `numberOfBattles` (≥20); optional `playSPG` (only meaningful for wn8 2500-3000/3000-4000 & winrate 60%), `getReplays`.
 - **onslaught** — `currentPoints` (0-4400), `targetPoints` (100-4500); optional `playWithBooster`, `silverOption`, `completeMissions`.
 - **mark-of-excellence** — `fromProgress` (1-94), `toProgress` (2-95); optional `difficulty`, `specialVehicle` (replaces difficulty), `silverOption`.
-- **exp-farm** — `expAmount` (thousands, ≥10), `wn8Tier`; optional `cannotUseXPBoosters`.
+- **exp-farm** — `expAmount` (thousands, ≥10), `wn8Tier`; optional `cannotUseXPBoosters`. NOTE: `wn8Tier` is the WN8 **our driver plays at on the customer's account** while farming (NOT the customer's own WN8) — ask it the same way as credit-farm.
 - **arcade-cabinet** — *deferred*: route the customer to credit-farm / exp-farm (pending owner decision).
 
 ## Guardrails (full hardening in Phase 3C / AgentShield)

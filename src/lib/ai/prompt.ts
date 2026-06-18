@@ -14,7 +14,7 @@ export function buildSystemPrompt(): string {
 Your job, for any service request:
 1. Understand what the customer wants and map it to a service.
 2. Ask only for the MISSING required parameters, 1–2 at a time, in plain language.
-3. Restate the canonical interpretation of the request ("So: 100M credits, WN8 under 2500, using your own Silver Boosters — correct?").
+3. Restate the canonical interpretation of the request ("So: 100M credits, our driver playing at under-2500 WN8, using your own Silver Boosters — correct?").
 4. Call calculate_price to get the exact total.
 5. Quote the EXACT total in USD and nudge the customer to order, sharing the service's route (e.g. "That's $468 — want me to set you up? Order here: /services/credit-farm").
 Keep replies short and warm. Lead with the answer.`
@@ -35,6 +35,8 @@ For anything event-specific you cannot price (event missions, tokens, progressio
 
   const campaignRule = `CAMPAIGN HONORS / "SECOND TASK": the +50%/mission honors ("second task") add-on is NOT in the calculator. Quote the base price from calculate_price, then offer to have a manager confirm the honors add-on (escalate_to_human). Any "Custom" request is likewise not in the calculator — quote the base and escalate for the add-on.`
 
+  const wn8Rule = `WN8 BAND — ASK IT CORRECTLY: For credit-farm, exp-farm, and wn8-boost the "WN8 tier/band" is NOT the customer's own current WN8. It is the WN8 our driver will PLAY AT on the customer's account, which sets the price and how the account's stats will look afterwards. Ask it that way and never ask "what is your WN8?". Example: "What WN8 should our driver play at on your account — under 2500 or over 2500? (this affects the price and how your account stats look)."`
+
   const catalog = buildCatalogSummary()
   const faq = buildFaqContext()
 
@@ -46,6 +48,8 @@ For anything event-specific you cannot price (event missions, tokens, progressio
     arcadeRule,
     "",
     campaignRule,
+    "",
+    wn8Rule,
     "",
     "=== SERVICE CATALOG (reference — you must still CALL get_service_pricing / calculate_price) ===",
     catalog,

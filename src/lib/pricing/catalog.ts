@@ -78,7 +78,7 @@ export const SERVICE_CATALOG: Record<ServiceId, ServiceDescriptor> = {
     fromPriceUSD: 4.5,
     params: [
       { name: "serviceType", type: "enum", required: true, options: ["credits", "bonds"], description: "Credits or bonds — selects an entirely different pricing branch." },
-      { name: "tier", type: "enum", required: true, options: [...Object.keys(CREDIT_PRICING), ...Object.keys(BONDS_WN8_MODIFIERS)], description: "For credits: WN8 package tier (under-2500 / over-2500). For bonds: WN8 tier (2000 / 2500-3000 / 3000-4000 / 4000+)." },
+      { name: "tier", type: "enum", required: true, options: [...Object.keys(CREDIT_PRICING), ...Object.keys(BONDS_WN8_MODIFIERS)], description: "The WN8 our driver plays at on YOUR account while farming — this sets the price and how your account's stats will look afterwards. It is NOT your current WN8. Credits: under-2500 / over-2500. Bonds: 2000 / 2500-3000 / 3000-4000 / 4000+." },
       { name: "amount", type: "number", required: true, min: 1, description: "Credits: millions (min 1M). Bonds: number of bonds (min 100, priced per whole 100)." },
       { name: "cannotUseSilverBoosters", type: "boolean", required: false, description: "Credits only: if we cannot use your own Silver Boosters the price is +30%." },
     ],
@@ -148,7 +148,7 @@ export const SERVICE_CATALOG: Record<ServiceId, ServiceDescriptor> = {
     pricingType: "calculator",
     params: [
       { name: "serviceType", type: "enum", required: true, options: ["wn8", "winrate", "damage"], description: "Which boost: wn8, winrate, or damage. Selects the pricing table." },
-      { name: "tier", type: "enum", required: true, options: [...Object.keys(WN8_PRICING), ...Object.keys(WINRATE_PRICING), ...Object.keys(DAMAGE_PRICING)], description: "Target band. wn8: 2500-3000/3000-4000/4000+. winrate: 60%/65%/70%. damage: 4000+/4500+/5000+." },
+      { name: "tier", type: "enum", required: true, options: [...Object.keys(WN8_PRICING), ...Object.keys(WINRATE_PRICING), ...Object.keys(DAMAGE_PRICING)], description: "The target performance band our driver plays at on YOUR account to deliver this boost — the result we produce, not your current stats. wn8: 2500-3000/3000-4000/4000+. winrate: 60%/65%/70%. damage: 4000+/4500+/5000+." },
       { name: "numberOfBattles", type: "number", required: true, min: MIN_BATTLES, description: `Number of battles (minimum ${MIN_BATTLES}).` },
       { name: "playSPG", type: "boolean", required: false, description: "Play on SPG? +100%. Only applies to wn8 tiers 2500-3000 & 3000-4000 and winrate 60%." },
       { name: "getReplays", type: "boolean", required: false, description: "Get the replays? +10% of the post-discount total." },
@@ -193,7 +193,7 @@ export const SERVICE_CATALOG: Record<ServiceId, ServiceDescriptor> = {
     fromPriceUSD: 3,
     params: [
       { name: "expAmount", type: "number", required: true, min: 10, description: "XP amount in thousands (e.g. 50 = 50,000 XP; minimum 10)." },
-      { name: "wn8Tier", type: "enum", required: true, options: Object.keys(EXP_PRICING), description: "WN8 efficiency tier (under-2500 / over-2500)." },
+      { name: "wn8Tier", type: "enum", required: true, options: Object.keys(EXP_PRICING), description: "The WN8 our driver plays at on YOUR account while farming XP — this sets the per-10k rate and your account's stats footprint. It is NOT your current WN8: under-2500 / over-2500." },
       { name: "cannotUseXPBoosters", type: "boolean", required: false, description: "Don't use your XP Boosters? +30% on the post-discount amount." },
     ],
     note: "Priced per 10k XP. Volume discount: 100k+ 10%, 250k+ 15%, 500k+ 20%.",
