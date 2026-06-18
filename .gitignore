@@ -47,3 +47,6 @@ next-env.d.ts
 
 # DB backups (generated)
 backups/
+
+# .env.example is a committed template (the .env* rule above would otherwise exclude it)
+!.env.example
