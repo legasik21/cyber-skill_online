@@ -20,6 +20,16 @@ CREATE INDEX IF NOT EXISTS idx_conversations_status ON conversations(status);
 CREATE INDEX IF NOT EXISTS idx_conversations_last_message ON conversations(last_message_at DESC);
 CREATE INDEX IF NOT EXISTS idx_conversations_assigned ON conversations(assigned_agent_id) WHERE assigned_agent_id IS NOT NULL;
 
+-- Per-conversation AI state (added 2026-06; idempotent ALTERs so re-applying is safe).
+--   ai_paused             — when true, the /api/chat/send AI path SKIPS the model entirely.
+--   pause_reason          — why the AI is paused: 'human' (admin takeover) | 'off-topic' | 'cap'.
+--   ai_answer_count       — turns the AI assistant has answered (drives the per-conversation handoff cap).
+--   consecutive_off_topic — run of consecutive off-topic visitor messages (reset to 0 by any on-topic msg).
+ALTER TABLE conversations ADD COLUMN IF NOT EXISTS ai_paused BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE conversations ADD COLUMN IF NOT EXISTS pause_reason TEXT;
+ALTER TABLE conversations ADD COLUMN IF NOT EXISTS ai_answer_count INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE conversations ADD COLUMN IF NOT EXISTS consecutive_off_topic INTEGER NOT NULL DEFAULT 0;
+
 -- Messages ------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS messages (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

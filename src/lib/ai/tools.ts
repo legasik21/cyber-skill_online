@@ -12,9 +12,25 @@ import {
 } from "@/lib/pricing/catalog"
 import { priceCampaignMissions } from "@/lib/pricing/campaign-missions"
 import { normalizeCampaignMissions } from "@/lib/pricing/campaign-input"
+import { sendChatOrderNotification } from "@/lib/telegram"
 import { FAQ, FAQ_TOPICS, type FaqTopic } from "@/data/faq"
 
 const SERVICE_IDS = Object.keys(SERVICE_CATALOG) as ServiceId[]
+
+/** Contact platforms we accept for an in-chat order (Discord preferred). */
+export const ORDER_CONTACT_PLATFORMS = ["discord", "telegram", "whatsapp"] as const
+export type OrderContactPlatform = (typeof ORDER_CONTACT_PLATFORMS)[number]
+
+/**
+ * Per-call context threaded from runAssistant into runTool. submit_order needs the
+ * conversation id (for the order record) and the LAST price computed by a pricing
+ * tool this turn — the authoritative number always comes from the pricing module,
+ * never from the model.
+ */
+export type ToolContext = {
+  conversationId?: string
+  lastQuote?: { total: number; currency: string; route: string } | null
+}
 
 // Gemini function declarations. Pass as `tools: [{ functionDeclarations: GEMINI_FUNCTION_DECLARATIONS }]`.
 //
@@ -107,6 +123,37 @@ export const GEMINI_FUNCTION_DECLARATIONS: FunctionDeclaration[] = [
     },
   },
   {
+    name: "submit_order",
+    description:
+      "Place the customer's order. REQUIRED FIRST: in THIS SAME turn, (re)compute the exact price by calling calculate_price (or price_campaign) for the agreed service + options, so the order carries a module-computed price — you never supply a number yourself. Then collect ONE contact handle: ask for a Discord username FIRST; if they have no Discord, accept a Telegram @handle or a WhatsApp number. Do NOT ask for email, phone, real name, or anything else. Confirm a one-line order summary with the customer, then call this ONCE. It posts the order to our orders desk and a manager reaches out on that platform. NEVER call this without a contact handle. If you have not priced the order in this turn, submit_order returns an error asking you to price first.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        service: {
+          type: Type.STRING,
+          description:
+            'What the customer is ordering, e.g. "Credit Farm", "Campaign Missions — Object 260", "WN8 Boost".',
+        },
+        summary: {
+          type: Type.STRING,
+          description:
+            'One-line summary of the exact request incl. options, e.g. "100M credits, driver under 2500 WN8, customer\'s own boosters".',
+        },
+        contactPlatform: {
+          type: Type.STRING,
+          enum: [...ORDER_CONTACT_PLATFORMS],
+          description: "The single contact platform the customer chose: discord (preferred), telegram, or whatsapp.",
+        },
+        contactHandle: {
+          type: Type.STRING,
+          description:
+            "The customer's handle on that platform: a Discord username, a Telegram @handle, or a WhatsApp number. Required — never empty.",
+        },
+      },
+      required: ["service", "summary", "contactPlatform", "contactHandle"],
+    },
+  },
+  {
     name: "answer_faq",
     description:
       "Call this for ANY policy / safety / account / refund / payment / delivery / privacy / eligibility question. Returns the top matching grounded FAQ entries. Answer the customer ONLY from these entries; if they don't cover the question, call escalate_to_human.",
@@ -165,7 +212,11 @@ function scoreFaqEntry(query: string, topic: FaqTopic | undefined, e: (typeof FA
  * Dispatch a tool call. block.input is already a parsed object.
  * Always resolves (never throws) — errors are returned as { error }.
  */
-export async function runTool(name: string, input: Record<string, unknown>): Promise<unknown> {
+export async function runTool(
+  name: string,
+  input: Record<string, unknown>,
+  ctx?: ToolContext,
+): Promise<unknown> {
   switch (name) {
     case "get_service_pricing": {
       const serviceId = input?.serviceId
@@ -213,6 +264,75 @@ export async function runTool(name: string, input: Record<string, unknown>): Pro
               honorsNote: `Base price shown. Honors / "second task" on ${honors} mission(s) adds +50% per honored mission — a manager will confirm that add-on.`,
             }
           : {}),
+      }
+    }
+
+    case "submit_order": {
+      // Collect ONLY a service+options summary and ONE contact handle. The price is
+      // taken from the module-computed quote (ctx.lastQuote), never from the model.
+      const service = typeof input?.service === "string" ? input.service.trim() : ""
+      const summary = typeof input?.summary === "string" ? input.summary.trim() : ""
+      const platformRaw = String(input?.contactPlatform ?? "").trim().toLowerCase()
+      const contactHandle =
+        typeof input?.contactHandle === "string" ? input.contactHandle.trim() : ""
+
+      if (!contactHandle) {
+        return {
+          error:
+            "A contact handle is required. Ask the customer for a Discord username (or a Telegram @handle / WhatsApp number) before submitting.",
+        }
+      }
+      if (!service && !summary) {
+        return { error: "Describe the service and options before submitting the order." }
+      }
+      // Validate the platform instead of silently coercing it — a Telegram/WhatsApp
+      // handle must never be filed as "discord".
+      if (!(ORDER_CONTACT_PLATFORMS as readonly string[]).includes(platformRaw)) {
+        return {
+          error:
+            "Invalid contact platform. Confirm one of: discord, telegram, or whatsapp, then resubmit.",
+        }
+      }
+      const contactPlatform = platformRaw
+
+      // Price-integrity invariant: the order price comes ONLY from the module-computed
+      // quote (ctx.lastQuote). There is NO model-supplied fallback — if nothing was
+      // priced in this turn, refuse and make the model re-run the pricing tool first.
+      const q = ctx?.lastQuote
+      if (!q || typeof q.total !== "number") {
+        return {
+          error:
+            "No module-computed price is on record for this order. Call calculate_price (or price_campaign) for the exact service + options in this turn, then call submit_order again.",
+        }
+      }
+      const price = `$${q.total}${q.currency && q.currency !== "USD" ? ` ${q.currency}` : ""}`
+      const route = q.route ?? "/"
+      const conversationId = ctx?.conversationId ?? "unknown"
+
+      const submitted = await sendChatOrderNotification({
+        service: service || summary,
+        summary: summary || service,
+        price,
+        contactPlatform,
+        contactHandle,
+        conversationId,
+      })
+      if (!submitted) {
+        return {
+          error:
+            "Could not reach the orders desk right now. Tell the customer a team member will follow up shortly.",
+        }
+      }
+      return {
+        ok: true,
+        submitted: true,
+        service: service || summary,
+        summary,
+        price,
+        route,
+        contactPlatform,
+        contactHandle,
+        message: `Order received. A manager will reach out on ${contactPlatform} (${contactHandle}).`,
       }
     }
 

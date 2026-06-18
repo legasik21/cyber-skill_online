@@ -14,7 +14,15 @@ export interface Conversation {
   assigned_agent_id: string | null;
   created_at: string;
   last_message_at: string;
+  // Per-conversation AI state (see database/schema.sql).
+  ai_paused: boolean;
+  pause_reason: string | null;
+  ai_answer_count: number;
+  consecutive_off_topic: number;
 }
+
+/** Why the assistant is paused for a conversation. */
+export type PauseReason = 'human' | 'off-topic' | 'cap';
 
 export interface Message {
   id: string;
@@ -144,6 +152,73 @@ export async function updateConversation(
   return rows[0] ?? null;
 }
 
+/**
+ * Set per-conversation AI state. Any subset of fields may be provided; only the
+ * supplied ones are written. Used by the off-topic cutoff, the answer cap, and
+ * admin takeover/resume. Returns the updated row.
+ */
+export async function setConversationAiState(
+  id: string,
+  fields: {
+    ai_paused?: boolean;
+    pause_reason?: string | null;
+    ai_answer_count?: number;
+    consecutive_off_topic?: number;
+  },
+): Promise<Conversation | null> {
+  const sets: string[] = [];
+  const vals: unknown[] = [];
+  let i = 1;
+  if (fields.ai_paused !== undefined) {
+    sets.push(`ai_paused = $${i++}`);
+    vals.push(fields.ai_paused);
+  }
+  if (fields.pause_reason !== undefined) {
+    sets.push(`pause_reason = $${i++}`);
+    vals.push(fields.pause_reason);
+  }
+  if (fields.ai_answer_count !== undefined) {
+    sets.push(`ai_answer_count = $${i++}`);
+    vals.push(fields.ai_answer_count);
+  }
+  if (fields.consecutive_off_topic !== undefined) {
+    sets.push(`consecutive_off_topic = $${i++}`);
+    vals.push(fields.consecutive_off_topic);
+  }
+  if (sets.length === 0) return getConversationById(id);
+  vals.push(id);
+  const rows = await query<Conversation>(
+    `UPDATE conversations SET ${sets.join(', ')} WHERE id = $${i} RETURNING *`,
+    vals,
+  );
+  return rows[0] ?? null;
+}
+
+/** Atomically bump ai_answer_count by 1 and return the new value. */
+export async function incrementAiAnswerCount(id: string): Promise<number> {
+  const rows = await query<{ ai_answer_count: number }>(
+    `UPDATE conversations SET ai_answer_count = ai_answer_count + 1
+     WHERE id = $1 RETURNING ai_answer_count`,
+    [id],
+  );
+  return Number(rows[0]?.ai_answer_count ?? 0);
+}
+
+/** Atomically bump consecutive_off_topic by 1 and return the new value. */
+export async function incrementOffTopic(id: string): Promise<number> {
+  const rows = await query<{ consecutive_off_topic: number }>(
+    `UPDATE conversations SET consecutive_off_topic = consecutive_off_topic + 1
+     WHERE id = $1 RETURNING consecutive_off_topic`,
+    [id],
+  );
+  return Number(rows[0]?.consecutive_off_topic ?? 0);
+}
+
+/** Reset the off-topic run to 0 (called on any on-topic visitor message). */
+export async function resetOffTopic(id: string): Promise<void> {
+  await query(`UPDATE conversations SET consecutive_off_topic = 0 WHERE id = $1`, [id]);
+}
+
 export async function deleteConversationsOlderThan(cutoffIso: string): Promise<number> {
   const rows = await query<{ id: string }>(
     `DELETE FROM conversations WHERE last_message_at < $1 RETURNING id`,
@@ -209,6 +284,15 @@ export async function getMessages(conversationId: string): Promise<Message[]> {
 export async function getMessageById(id: string): Promise<Message | null> {
   const rows = await query<Message>(`SELECT * FROM messages WHERE id = $1`, [id]);
   return rows[0] ?? null;
+}
+
+/** Count of messages in a conversation (used to detect the genuine first message). */
+export async function getMessageCount(conversationId: string): Promise<number> {
+  const rows = await query<{ count: number }>(
+    `SELECT COUNT(*)::int AS count FROM messages WHERE conversation_id = $1`,
+    [conversationId],
+  );
+  return Number(rows[0]?.count ?? 0);
 }
 
 export async function getMessageHistory(

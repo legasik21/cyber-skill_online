@@ -26,10 +26,15 @@ export default function ChatWidget() {
     error,
     isClosed,
     isManagerTyping,
+    aiState,
     sendMessage,
     createConversation,
     resetConversation,
   } = useChat({ conversationId });
+
+  // A manager has taken over (AI paused with reason 'human'): show a small system
+  // note. The visitor's input stays fully enabled — they can keep chatting.
+  const managerTookOver = aiState.paused && aiState.reason === 'human';
 
   // Auto-scroll to bottom when new messages arrive or typing indicator shows
   useEffect(() => {
@@ -82,14 +87,17 @@ export default function ChatWidget() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!inputValue.trim() || !conversationId) return;
 
+    const text = inputValue.trim();
+    if (!text || !conversationId) return;
+
+    // Clear the input IMMEDIATELY (optimistic) so the textarea empties on send,
+    // not when the AI reply eventually arrives. Restore the text if the send fails.
+    setInputValue('');
     try {
-      await sendMessage(inputValue);
-      setInputValue('');
+      await sendMessage(text);
     } catch (err) {
-      // Error already handled in hook
+      setInputValue(text);
     }
   };
 
@@ -172,6 +180,25 @@ export default function ChatWidget() {
               </svg>
             </button>
           </div>
+
+          {/* Manager takeover system note — never disables the visitor input */}
+          {managerTookOver && !isClosed && (
+            <div
+              style={{
+                padding: '8px 14px',
+                background: 'rgba(56, 189, 248, 0.12)',
+                borderBottom: '1px solid rgba(56, 189, 248, 0.25)',
+                color: '#7dd3fc',
+                fontSize: '13px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <span aria-hidden>👤</span>
+              <span>A team member is now with you — feel free to keep typing.</span>
+            </div>
+          )}
 
           {/* Messages */}
           <div className={styles.messagesContainer}>

@@ -11,6 +11,7 @@ interface ChatPanelProps {
   adminId: string;
   onClose: () => void;
   onCloseConversation: (conversationId: string) => void;
+  onToggleAi: (conversationId: string, paused: boolean) => void;
 }
 
 export default function ChatPanel({
@@ -18,6 +19,7 @@ export default function ChatPanel({
   adminId,
   onClose,
   onCloseConversation,
+  onToggleAi,
 }: ChatPanelProps) {
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -27,12 +29,18 @@ export default function ChatPanel({
     isConnected,
     isLoading,
     error,
+    aiState,
     sendMessage,
   } = useChat({
     conversationId,
     isAdmin: true,
     adminId,
   });
+
+  // Live AI-paused state: initialized from the conversation on load and kept current
+  // by the `ai_state` SSE event (admin takeover/resume, off-topic cutoff, answer cap),
+  // so the button reflects autonomous pauses and other admins' actions in real time.
+  const aiPaused = aiState.paused;
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -76,6 +84,22 @@ export default function ChatPanel({
           </div>
         </div>
         <div className={styles.headerActions}>
+          <button
+            onClick={() => onToggleAi(conversationId, !aiPaused)}
+            className={styles.closeConvButton}
+            style={{
+              background: aiPaused ? 'rgba(34, 197, 94, 0.15)' : 'rgba(56, 189, 248, 0.15)',
+              color: aiPaused ? '#4ade80' : '#7dd3fc',
+              borderColor: aiPaused ? 'rgba(34, 197, 94, 0.4)' : 'rgba(56, 189, 248, 0.4)',
+            }}
+            title={
+              aiPaused
+                ? 'Resume the AI assistant for this conversation'
+                : 'Stop the AI and take over this conversation manually'
+            }
+          >
+            {aiPaused ? 'Resume AI' : 'Stop AI / Take over'}
+          </button>
           <button onClick={handleClose} className={styles.closeConvButton}>
             Close Conversation
           </button>

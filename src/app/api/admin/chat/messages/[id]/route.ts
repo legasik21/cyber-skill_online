@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth';
-import { getMessages } from '@/lib/db';
+import { getMessages, getConversationById } from '@/lib/db';
 
 export const runtime = 'nodejs';
 
@@ -18,9 +18,12 @@ export async function GET(
     }
 
     const { id: conversationId } = await params;
-    const messages = await getMessages(conversationId);
+    const [messages, conversation] = await Promise.all([
+      getMessages(conversationId),
+      getConversationById(conversationId),
+    ]);
 
-    return NextResponse.json({ messages });
+    return NextResponse.json({ messages, conversation });
   } catch (error) {
     console.error('Error in messages endpoint:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

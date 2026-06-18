@@ -13,7 +13,7 @@ import { pool, getMessageById } from '@/lib/db';
 
 const CHANNEL = 'chat_events';
 
-export type ChatEventType = 'message' | 'conversation_closed' | 'manager_typing';
+export type ChatEventType = 'message' | 'conversation_closed' | 'manager_typing' | 'ai_state';
 
 type Sender = (event: string, data: string) => void;
 
@@ -56,6 +56,9 @@ async function ensureListening(): Promise<void> {
 
   try {
     await hub.connecting;
+  } catch (err) {
+    console.error('[realtime] ensureListening: failed to establish LISTEN connection:', err);
+    throw err;
   } finally {
     hub.connecting = null;
   }
@@ -63,7 +66,14 @@ async function ensureListening(): Promise<void> {
 
 async function onNotify(payload: string | undefined): Promise<void> {
   if (!payload) return;
-  let evt: { conversationId: string; type: ChatEventType; messageId?: string; isTyping?: boolean };
+  let evt: {
+    conversationId: string;
+    type: ChatEventType;
+    messageId?: string;
+    isTyping?: boolean;
+    paused?: boolean;
+    reason?: string | null;
+  };
   try {
     evt = JSON.parse(payload);
   } catch {
@@ -87,6 +97,9 @@ async function onNotify(payload: string | undefined): Promise<void> {
   } else if (evt.type === 'manager_typing') {
     event = 'manager_typing';
     data = JSON.stringify({ isTyping: Boolean(evt.isTyping) });
+  } else if (evt.type === 'ai_state') {
+    event = 'ai_state';
+    data = JSON.stringify({ paused: Boolean(evt.paused), reason: evt.reason ?? null });
   } else {
     return;
   }
@@ -154,7 +167,16 @@ export function sseResponse(conversationId: string, signal: AbortSignal): Respon
 
       // Tell EventSource to retry quickly, then open the stream.
       safeEnqueue(`retry: 3000\n: connected\n\n`);
-      unsub = await subscribe(conversationId, send);
+      try {
+        unsub = await subscribe(conversationId, send);
+      } catch (err) {
+        // DB/LISTEN unavailable: emit a clean error event and tear down rather than
+        // leaving a rejected start promise / unhandled rejection.
+        console.error('[realtime] sseResponse: subscribe failed:', err);
+        safeEnqueue(`event: error\ndata: ${JSON.stringify({ error: 'stream_unavailable' })}\n\n`);
+        teardown();
+        return;
+      }
       heartbeat = setInterval(() => safeEnqueue(`: ping\n\n`), 20_000);
 
       if (signal.aborted) teardown();
@@ -193,4 +215,17 @@ export async function publishConversationClosed(conversationId: string): Promise
 
 export async function publishManagerTyping(conversationId: string, isTyping: boolean): Promise<void> {
   await notify({ conversationId, type: 'manager_typing', isTyping });
+}
+
+/**
+ * Broadcast an AI-state change (paused/resumed) to the visitor's stream so the
+ * widget can show a small system note ("A team member is now with you") without
+ * ever closing or disabling the visitor's input.
+ */
+export async function publishAiState(
+  conversationId: string,
+  paused: boolean,
+  reason: string | null,
+): Promise<void> {
+  await notify({ conversationId, type: 'ai_state', paused, reason });
 }

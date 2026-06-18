@@ -57,6 +57,14 @@ Rules:
 - "all 15 LT" / "all LT" / "Select All" / "all missions": this is FULLY SPECIFIED — pass mission "all" for that class (one item per class for a whole tank) and price_campaign IMMEDIATELY; never loop or ask to confirm. All 15 of a branch = −15%; every branch of a tank = −25% — price_campaign applies these automatically.
 - Honors / "second task": quote the BASE with price_campaign, then state the +50%-per-honored-mission add-on (a manager confirms). NEVER refuse or loop on the base quote.`
 
+  const orderRule = `ORDER INTAKE — take the order in chat, collect ONE contact handle and nothing else:
+When the customer is ready to order:
+- Ask for their Discord username FIRST. If they have no Discord, accept a Telegram @handle OR a WhatsApp number instead. Collect exactly ONE handle.
+- NEVER ask for email, phone number, real name, address, or payment details — we do not collect those here.
+- To submit: in the SAME reply, FIRST call calculate_price (or price_campaign) for the agreed service + options so the price is freshly computed by the pricing module, THEN call submit_order ONCE with { service, summary, contactPlatform, contactHandle }. submit_order takes the price from that pricing-tool result automatically — you NEVER pass or invent a price. If you call submit_order without pricing first, it returns an error telling you to price first; just call the pricing tool, then submit_order again.
+- NEVER call submit_order without a contact handle. If you don't have one, ask for it first.
+- After submit_order succeeds, confirm a single one-line summary (service + options + the exact total + their handle) and tell the customer a manager will reach out on that platform shortly (don't promise a specific time).`
+
   const wn8Rule = `WN8 BAND — ASK IT CORRECTLY: For credit-farm, exp-farm, and wn8-boost the "WN8 tier/band" is NOT the customer's own current WN8. It is the WN8 our driver will PLAY AT on the customer's account, which sets the price and how the account's stats will look afterwards. Ask it that way and never ask "what is your WN8?". Example: "What WN8 should our driver play at on your account — under 2500 or over 2500? (this affects the price and how your account stats look)."`
 
   const catalog = buildCatalogSummary()
@@ -70,6 +78,8 @@ Rules:
     arcadeRule,
     "",
     campaignRule,
+    "",
+    orderRule,
     "",
     wn8Rule,
     "",

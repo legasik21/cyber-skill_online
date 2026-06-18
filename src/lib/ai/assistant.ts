@@ -10,7 +10,7 @@ import {
 } from "@google/genai"
 import { AI_MODEL, AI_FALLBACK_MODEL } from "@/lib/ai/config"
 import { buildSystemPrompt } from "@/lib/ai/prompt"
-import { GEMINI_FUNCTION_DECLARATIONS, runTool } from "@/lib/ai/tools"
+import { GEMINI_FUNCTION_DECLARATIONS, runTool, type ToolContext } from "@/lib/ai/tools"
 
 export type ChatTurn = { sender_type: "visitor" | "agent"; body: string }
 /** Record of each tool the model invoked this turn — for observability + price-integrity checks. */
@@ -75,7 +75,10 @@ function quoteFromToolCalls(toolCalls: ToolCallRecord[]): string | null {
  * whether the assistant escalated. SDK errors are allowed to throw — the caller
  * (the chat route) catches them so an AI failure never breaks the send.
  */
-export async function runAssistant(history: ChatTurn[]): Promise<AssistantResult> {
+export async function runAssistant(
+  history: ChatTurn[],
+  ctx?: { conversationId?: string },
+): Promise<AssistantResult> {
   // Map history → Gemini contents; keep only the last MAX_TURNS turns.
   // visitor → user, agent → model. Skip turns that are empty after trimming.
   const recent = history.slice(-MAX_TURNS)
@@ -140,6 +143,8 @@ export async function runAssistant(history: ChatTurn[]): Promise<AssistantResult
 
   let escalated = false
   const toolCalls: ToolCallRecord[] = []
+  // Threaded into runTool; submit_order reads conversationId + the last computed quote.
+  const toolCtx: ToolContext = { conversationId: ctx?.conversationId, lastQuote: null }
 
   for (let i = 0; i < MAX_ITERATIONS; i++) {
     const response = await generate()
@@ -188,11 +193,33 @@ export async function runAssistant(history: ChatTurn[]): Promise<AssistantResult
           // Tolerate the model passing an object directly instead of a string.
           params = raw as Record<string, unknown>
         }
-        result = await runTool("calculate_price", { serviceId: args.serviceId, params })
+        result = await runTool("calculate_price", { serviceId: args.serviceId, params }, toolCtx)
         toolCalls.push({ name, input: { serviceId: args.serviceId, params }, result })
       } else {
-        result = await runTool(name, args as Record<string, unknown>)
+        result = await runTool(name, args as Record<string, unknown>, toolCtx)
         toolCalls.push({ name, input: args as Record<string, unknown>, result })
+      }
+
+      // Remember the last module-computed total so a later submit_order quotes the
+      // authoritative price (never a model-invented one).
+      const rr = result as Record<string, unknown> | null
+      if (
+        rr &&
+        typeof rr === "object" &&
+        !("error" in rr) &&
+        typeof (rr as { total?: unknown }).total === "number"
+      ) {
+        toolCtx.lastQuote = {
+          total: (rr as { total: number }).total,
+          currency:
+            typeof (rr as { currency?: unknown }).currency === "string"
+              ? (rr as { currency: string }).currency
+              : "USD",
+          route:
+            typeof (rr as { route?: unknown }).route === "string"
+              ? (rr as { route: string }).route
+              : "/",
+        }
       }
 
       responseParts.push({

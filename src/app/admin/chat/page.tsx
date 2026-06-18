@@ -13,6 +13,8 @@ interface Conversation {
   assigned_agent_id: string | null;
   created_at: string;
   last_message_at: string;
+  ai_paused?: boolean;
+  pause_reason?: string | null;
   last_message?: {
     body: string;
     sender_type: string;
@@ -86,6 +88,31 @@ export default function AdminChatPage() {
     }
   };
 
+  const handleToggleAi = async (conversationId: string, paused: boolean) => {
+    try {
+      const response = await fetch('/api/admin/chat/takeover', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conversation_id: conversationId, paused }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update AI state');
+      }
+      // Optimistically reflect the new state, then refresh from the server.
+      setConversations((prev) =>
+        prev.map((c) =>
+          c.id === conversationId
+            ? { ...c, ai_paused: paused, pause_reason: paused ? 'human' : null }
+            : c,
+        ),
+      );
+      await loadConversations();
+    } catch (error) {
+      console.error('Error toggling AI:', error);
+      alert('Failed to update AI state');
+    }
+  };
+
   if (status === 'loading' || !session?.user) {
     return (
       <div className={styles.loadingContainer}>
@@ -130,6 +157,7 @@ export default function AdminChatPage() {
               adminId={user.id}
               onClose={() => setActiveConversation(null)}
               onCloseConversation={handleCloseConversation}
+              onToggleAi={handleToggleAi}
             />
           ) : (
             <div className={styles.emptyState}>

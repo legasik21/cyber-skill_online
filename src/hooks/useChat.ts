@@ -7,6 +7,11 @@ interface UseChatOptions {
   adminId?: string;
 }
 
+interface AiState {
+  paused: boolean;
+  reason: string | null;
+}
+
 interface UseChatReturn {
   messages: Message[];
   isConnected: boolean;
@@ -14,6 +19,7 @@ interface UseChatReturn {
   error: string | null;
   isClosed: boolean;
   isManagerTyping: boolean;
+  aiState: AiState;
   sendMessage: (body: string) => Promise<void>;
   createConversation: () => Promise<string>;
   resetConversation: () => void;
@@ -33,6 +39,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const [error, setError] = useState<string | null>(null);
   const [isClosed, setIsClosed] = useState(false);
   const [isManagerTyping, setIsManagerTyping] = useState(false);
+  const [aiState, setAiState] = useState<AiState>({ paused: false, reason: null });
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
 
@@ -90,6 +97,16 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
           typingTimeoutRef.current = setTimeout(() => setIsManagerTyping(false), 5000);
         }
       });
+
+      es.addEventListener('ai_state', (event) => {
+        const e = event as MessageEvent;
+        try {
+          const d = JSON.parse(e.data);
+          setAiState({ paused: Boolean(d?.paused), reason: d?.reason ?? null });
+        } catch {
+          // ignore malformed event
+        }
+      });
     },
     [isAdmin],
   );
@@ -107,6 +124,12 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         }
         const data = await response.json();
         setMessages(data.messages || []);
+        if (data.conversation) {
+          setAiState({
+            paused: Boolean(data.conversation.ai_paused),
+            reason: data.conversation.pause_reason ?? null,
+          });
+        }
         setError(null);
       } catch (err) {
         console.error('Error loading messages:', err);
@@ -182,6 +205,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     setMessages([]);
     setIsClosed(false);
     setIsManagerTyping(false);
+    setAiState({ paused: false, reason: null });
     setError(null);
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
@@ -197,6 +221,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     error,
     isClosed,
     isManagerTyping,
+    aiState,
     sendMessage,
     createConversation,
     resetConversation,
