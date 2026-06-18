@@ -3,7 +3,7 @@
 // Pricing/FAQ come exclusively from the in-app source of truth (catalog.ts / faq.ts).
 // runTool NEVER throws out: bad inputs are returned as { error } so the model re-asks.
 
-import type Anthropic from "@anthropic-ai/sdk"
+import { Type, type FunctionDeclaration } from "@google/genai"
 import {
   SERVICE_CATALOG,
   type ServiceId,
@@ -14,17 +14,22 @@ import { FAQ, FAQ_TOPICS, type FaqTopic } from "@/data/faq"
 
 const SERVICE_IDS = Object.keys(SERVICE_CATALOG) as ServiceId[]
 
-export const TOOLS = [
+// Gemini function declarations. Pass as `tools: [{ functionDeclarations: GEMINI_FUNCTION_DECLARATIONS }]`.
+//
+// Schemas are the strict OpenAPI subset Gemini supports (Type.OBJECT/STRING/NUMBER/
+// BOOLEAN/ARRAY, `enum` on strings). Gemini does NOT cleanly support a free-form
+// object property, so calculate_price takes `paramsJson` — a STRING the model fills
+// with a JSON object — which the assistant loop JSON.parses before calling runTool.
+export const GEMINI_FUNCTION_DECLARATIONS: FunctionDeclaration[] = [
   {
     name: "get_service_pricing",
     description:
       "Call this BEFORE pricing to fetch a service's exact required parameters, their enums/bounds, and operator notes. Use it to learn what to ask the customer and to validate their inputs against the schema. Returns the ServiceDescriptor from the catalog.",
-    input_schema: {
-      type: "object" as const,
-      additionalProperties: false,
+    parameters: {
+      type: Type.OBJECT,
       properties: {
         serviceId: {
-          type: "string",
+          type: Type.STRING,
           enum: SERVICE_IDS,
           description: "The service to inspect.",
         },
@@ -36,38 +41,36 @@ export const TOOLS = [
     name: "calculate_price",
     description:
       "Call this to compute the EXACT USD price for a service once you have the required params. This is the ONLY source of prices — never compute, estimate, or invent a price yourself. Returns { serviceId, currency, total, breakdown }. If params are invalid it returns { error }; re-ask the customer rather than guessing.",
-    input_schema: {
-      type: "object" as const,
-      additionalProperties: false,
+    parameters: {
+      type: Type.OBJECT,
       properties: {
         serviceId: {
-          type: "string",
+          type: Type.STRING,
           enum: SERVICE_IDS,
           description: "The service to price.",
         },
-        params: {
-          type: "object",
+        paramsJson: {
+          type: Type.STRING,
           description:
-            "The resolved parameters for this service, matching its schema from get_service_pricing (keys, enums, bounds).",
+            'A JSON object string of the service params, e.g. {"serviceType":"credits","tier":"under-2500","amount":100}. Keys, enums and bounds must match the schema from get_service_pricing.',
         },
       },
-      required: ["serviceId", "params"],
+      required: ["serviceId", "paramsJson"],
     },
   },
   {
     name: "answer_faq",
     description:
       "Call this for ANY policy / safety / account / refund / payment / delivery / privacy / eligibility question. Returns the top matching grounded FAQ entries. Answer the customer ONLY from these entries; if they don't cover the question, call escalate_to_human.",
-    input_schema: {
-      type: "object" as const,
-      additionalProperties: false,
+    parameters: {
+      type: Type.OBJECT,
       properties: {
         query: {
-          type: "string",
+          type: Type.STRING,
           description: "The customer's question, in their own words.",
         },
         topic: {
-          type: "string",
+          type: Type.STRING,
           enum: FAQ_TOPICS,
           description: "Optional topic hint to bias retrieval.",
         },
@@ -79,19 +82,18 @@ export const TOOLS = [
     name: "escalate_to_human",
     description:
       "Call this when you cannot answer from the catalog or FAQ, when the customer asks for a human, for event-specific pricing you cannot compute (e.g. arcade-cabinet event missions/tokens), or for the campaign honors / 'second task' add-on. Hands the conversation to a team member.",
-    input_schema: {
-      type: "object" as const,
-      additionalProperties: false,
+    parameters: {
+      type: Type.OBJECT,
       properties: {
         reason: {
-          type: "string",
+          type: Type.STRING,
           description: "Why escalation is needed.",
         },
       },
       required: ["reason"],
     },
   },
-] satisfies Anthropic.Tool[]
+]
 
 function isKnownService(id: unknown): id is ServiceId {
   return typeof id === "string" && Object.prototype.hasOwnProperty.call(SERVICE_CATALOG, id)

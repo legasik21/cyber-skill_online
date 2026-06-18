@@ -8,7 +8,7 @@ import { AI_CHAT_ENABLED, AI_AGENT_ID, isAiConfigured } from '@/lib/ai/config';
 import { runAssistant, type ChatTurn } from '@/lib/ai/assistant';
 
 // Allow a bounded-but-sufficient window for the AI round-trips (tool loop +
-// Anthropic call). The serverless function would otherwise default to a shorter cap.
+// Gemini call). The serverless function would otherwise default to a shorter cap.
 export const maxDuration = 60;
 
 /**
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
       }).catch(err => console.error('Telegram notification error:', err));
     }
 
-    // Native Claude AI responder — fully guarded, off by default (AI_CHAT_ENABLED).
+    // Native Gemini AI responder — fully guarded, off by default (AI_CHAT_ENABLED).
     // Runs in its own try/catch so any AI failure never breaks the send: the
     // visitor message above is already saved + published.
     const shouldRespond =

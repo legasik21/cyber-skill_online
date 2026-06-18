@@ -1,14 +1,20 @@
-# Decision Record: Native Claude integration vs. OpenClaw
+# Decision Record: Native in-app integration vs. OpenClaw
 
-**Status:** Decided — native Claude integration.
-**Date:** 2026-06-17
+**Status:** Decided — native in-app integration. Provider: **Google Gemini** (owner directive).
+**Date:** 2026-06-17 (provider switched to Google Gemini 2026-06-18, per owner directive)
 
 ## Decision
 
-The CyberSkill WoT chat AI responder is built as a **native Claude integration**
-using the official `@anthropic-ai/sdk` and Claude's tool-use (function calling)
-over the website's own chat transport (Supabase + Ably). It is **off by default**,
-gated by the `AI_CHAT_ENABLED` environment flag.
+The CyberSkill WoT chat AI responder is built as a **native in-app integration**
+using the official Google Gemini SDK (`@google/genai`) and Gemini's function
+calling over the website's own chat transport (Supabase + Ably). It is **off by
+default**, gated by the `AI_CHAT_ENABLED` environment flag.
+
+The provider was originally Anthropic Claude; per owner directive it is now
+**Google Gemini**. The integration shape is unchanged — it is still a native,
+in-app, tool-calling responder. Only the model "brain" was swapped; the
+deterministic pricing engine, the system-prompt content, and the `runTool`
+executor are intact.
 
 ## Context
 
@@ -23,29 +29,47 @@ The responder must:
 These are **in-app tools the LLM must call**, over our own web chat — not a
 messaging-app or desktop surface.
 
-## Why native Claude (over OpenClaw)
+## Why native in-app tool-calling (over OpenClaw)
 
-- **Fit.** Claude tool-use maps directly onto our requirement: define the pricing
-  and FAQ functions as tools, let the model gather missing params and call
-  `calculate_price` / `answer_faq`, and run a short agentic loop server-side. The
-  deterministic pricing functions are the single source of truth; the model is
-  constrained to call them rather than invent numbers.
+- **Fit.** Provider function calling maps directly onto our requirement: define the
+  pricing and FAQ functions as tool declarations, let the model gather missing
+  params and call `calculate_price` / `answer_faq`, and run a short agentic loop
+  server-side. The deterministic pricing functions are the single source of truth;
+  the model is constrained to call them rather than invent numbers. This holds for
+  Gemini exactly as it did for Claude — the loop and tools are provider-agnostic.
 - **Transport.** We already own the chat transport (Supabase messages + Ably
   channels). We only need an LLM brain wired into the visitor-message POST seam —
   not an external messaging/automation runtime.
-- **OpenClaw mismatch.** OpenClaw is oriented toward messaging-app / computer-use
-  automation, and its auth/subscription model changed (now API-key based). It does
-  not cleanly fit an in-app, tool-calling web responder embedded in our Next.js API
-  routes. Adopting it would add an ill-fitting runtime for no functional gain.
+- **OpenClaw mismatch (still rejected, same reasons).** OpenClaw is oriented toward
+  messaging-app / computer-use automation, and its auth/subscription model changed
+  (now API-key based). It does not cleanly fit an in-app, tool-calling web responder
+  embedded in our Next.js API routes. Adopting it would add an ill-fitting runtime
+  for no functional gain. Switching the model provider to Gemini does not change
+  this — OpenClaw remains the wrong shape for this surface.
 
-The chosen path is the native fallback: in-app Claude tool-use via the official SDK.
+The chosen path is the native in-app integration: provider function calling via the
+official SDK (now Google Gemini's `@google/genai`).
 
 ## Model & gating
 
-- **Default model:** `claude-sonnet-4-6` (brief-specified default).
-- **Cost lever:** `claude-haiku-4-5` — set via `ANTHROPIC_MODEL` to trade some
-  capability for lower cost.
+- **Provider:** Google Gemini (owner directive).
+- **Default model:** `gemini-2.5-flash` — cheap and fully capable of the tool-calling
+  flow. Override via `GEMINI_MODEL`.
+- **Fallback model:** `gemini-3.5-flash` (owner-named) — set via `GEMINI_FALLBACK_MODEL`.
+  Used **only** when a `generateContent` call fails with a model-not-found /
+  availability error, not on ordinary refusals.
 - **Feature flag:** the entire responder is gated by `AI_CHAT_ENABLED` and is
-  **off by default**. When the flag is off (or no `ANTHROPIC_API_KEY` is set), the
-  chat behaves exactly as before — the responder is a no-op. The Anthropic client
-  is constructed lazily at request time, so the build never requires the key.
+  **off by default**. When the flag is off (or no `GEMINI_API_KEY` is set), the
+  chat behaves exactly as before — the responder is a no-op. The Gemini client is
+  constructed lazily at request time, so the build never requires the key.
+
+## Tool-calling shape (Gemini specifics)
+
+- Tools are passed as `tools: [{ functionDeclarations: [...] }]` with
+  `toolConfig.functionCallingConfig.mode = AUTO`.
+- Gemini schemas are the strict OpenAPI subset (`Type.OBJECT/STRING/NUMBER/
+  BOOLEAN/ARRAY`, `enum` on strings) and do not cleanly support a free-form object
+  property. So `calculate_price` declares `paramsJson` as a **STRING** the model
+  fills with a JSON object (e.g. `{"serviceType":"credits",...}`); the assistant
+  loop `JSON.parse`s it before calling `runTool`. `runTool`'s `{ serviceId, params }`
+  contract is unchanged (its unit tests stay green).

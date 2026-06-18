@@ -1,4 +1,4 @@
-// Deterministic tool-layer tests. runTool is pure (no Anthropic client / API key
+// Deterministic tool-layer tests. runTool is pure (no Gemini client / API key
 // required): it only dispatches into the catalog/FAQ source-of-truth and always
 // resolves (never throws) — bad inputs come back as { error }.
 
