@@ -13,7 +13,9 @@ import { buildSystemPrompt } from "@/lib/ai/prompt"
 import { GEMINI_FUNCTION_DECLARATIONS, runTool } from "@/lib/ai/tools"
 
 export type ChatTurn = { sender_type: "visitor" | "agent"; body: string }
-export type AssistantResult = { reply: string; escalated: boolean }
+/** Record of each tool the model invoked this turn — for observability + price-integrity checks. */
+export type ToolCallRecord = { name: string; input: Record<string, unknown>; result: unknown }
+export type AssistantResult = { reply: string; escalated: boolean; toolCalls: ToolCallRecord[] }
 
 const MAX_ITERATIONS = 6
 const MAX_TURNS = 30
@@ -66,7 +68,7 @@ export async function runAssistant(history: ChatTurn[]): Promise<AssistantResult
   }
 
   if (contents.length === 0) {
-    return { reply: FALLBACK_REPLY, escalated: false }
+    return { reply: FALLBACK_REPLY, escalated: false, toolCalls: [] }
   }
 
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
@@ -110,6 +112,7 @@ export async function runAssistant(history: ChatTurn[]): Promise<AssistantResult
   }
 
   let escalated = false
+  const toolCalls: ToolCallRecord[] = []
 
   for (let i = 0; i < MAX_ITERATIONS; i++) {
     const response = await generate()
@@ -117,8 +120,8 @@ export async function runAssistant(history: ChatTurn[]): Promise<AssistantResult
     const calls = response.functionCalls
     if (!calls || calls.length === 0) {
       const reply = (response.text ?? "").trim()
-      if (!reply) return { reply: FALLBACK_REPLY, escalated: true }
-      return { reply, escalated }
+      if (!reply) return { reply: FALLBACK_REPLY, escalated: true, toolCalls }
+      return { reply, escalated, toolCalls }
     }
 
     // Echo the model's tool-call turn back into the conversation, then answer each
@@ -154,8 +157,10 @@ export async function runAssistant(history: ChatTurn[]): Promise<AssistantResult
           params = raw as Record<string, unknown>
         }
         result = await runTool("calculate_price", { serviceId: args.serviceId, params })
+        toolCalls.push({ name, input: { serviceId: args.serviceId, params }, result })
       } else {
         result = await runTool(name, args as Record<string, unknown>)
+        toolCalls.push({ name, input: args as Record<string, unknown>, result })
       }
 
       responseParts.push({
@@ -170,5 +175,5 @@ export async function runAssistant(history: ChatTurn[]): Promise<AssistantResult
   }
 
   // Exhausted the loop without a final text answer.
-  return { reply: FALLBACK_REPLY, escalated: true }
+  return { reply: FALLBACK_REPLY, escalated: true, toolCalls }
 }
