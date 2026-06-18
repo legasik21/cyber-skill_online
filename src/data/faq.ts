@@ -153,6 +153,22 @@ export const FAQ: FaqEntry[] = [
     topic: "support",
     source: "homepage",
   },
+  {
+    id: "mission-class-glossary",
+    question: "What do mission codes like \"HT-15\" mean, and what are LT, MT, HT, TD, and SPG?",
+    answer:
+      "In World of Tanks campaign missions, the class abbreviations are: LT = Light Tank, MT = Medium Tank, HT = Heavy Tank, TD = Tank Destroyer, and SPG = artillery (self-propelled gun). A code like \"HT-15\" means the Heavy-branch mission #15. A mission is fully specified by its class, its number, and its reward tank — together those three things identify exactly which mission you mean.",
+    topic: "service-quality",
+    source: "homepage",
+  },
+  {
+    id: "campaign-branches-reward-tanks",
+    question: "How are the campaigns and their mission branches organized, and how does the reward tank identify the campaign?",
+    answer:
+      "Each Personal Missions campaign has its own set of mission branches. Campaign 1.0 uses the branches lt/mt/ht/td/spg; Campaign 2.0 uses union/bloc/alliance/coalition; Campaign 3.0 uses vanguard/ambush/assistance. The reward tank's name identifies both the branch (track) and the campaign: Campaign 1.0 awards the Stug IV, T-28 Concept, T-55A, and Object 260; Campaign 2.0 awards the Excalibur, Chimera, and Object 279 (e); Campaign 3.0 awards the Windhund, Dravec, and Black Rock. So if you tell us a reward tank, we already know which campaign and track you mean.",
+    topic: "service-quality",
+    source: "homepage",
+  },
 
   // --- Eligibility / risk ---
   {
