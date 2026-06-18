@@ -1,196 +1,86 @@
 ---
-description: How to deploy changes to production server
+description: How to deploy the self-hosted CyberSkill stack (app + Postgres) to production
 ---
 
-# 🚀 Deployment Guide - CyberSkill Website
+# 🚀 Deployment Guide — CyberSkill (self-hosted stack)
 
-## Overview
+The live chat runs on a fully self-hosted stack — **no external SaaS except Telegram** (outbound notifications):
 
-This guide explains how to update the live website after making local changes.
+- **App** — Next.js 15 (standalone) container, fronted by the existing **Traefik** edge proxy.
+- **Database** — self-hosted **PostgreSQL** container (`cyberskill-db`), on a private docker network, published only on `127.0.0.1:5432` (never public).
+- **Auth** — NextAuth v5 (Credentials provider) against the `admin_users` table.
+- **Realtime** — Server-Sent Events + Postgres `LISTEN/NOTIFY` (no Ably).
+
+Everything is wired through `docker-compose.yml` + `.env` (gitignored).
 
 ---
 
-## Step 1: Commit & Push to GitHub (Local Machine)
-
-Run these commands in your local project folder:
+## One-time setup (fresh server)
 
 ```bash
-# 1. Check what files have changed
-git status
-
-# 2. Add all changes to staging
-git add .
-
-# 3. Commit with a descriptive message
-git commit -m "Your description of changes here"
-
-# 4. Push to GitHub
-git push origin main
+cd /root/workspace/cyberskill
+cp .env.example .env            # fill: POSTGRES_PASSWORD, AUTH_SECRET, ADMIN_EMAIL/PASSWORD, …
+docker compose up -d --build    # builds the app image, starts db + app
 ```
 
-> 💡 **Tip**: Replace `main` with your branch name if different (e.g., `master`)
+`database/schema.sql` is applied automatically on first DB init (via `docker-entrypoint-initdb.d`).
+
+### Seed / rotate the first admin (idempotent)
+
+```bash
+set -a; . ./.env; set +a
+DATABASE_URL="postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@127.0.0.1:5432/$POSTGRES_DB" \
+  node scripts/seed-admin.mjs
+```
+
+Re-running rotates the password to the current `ADMIN_PASSWORD`; it never duplicates the account.
 
 ---
 
-## Step 2: SSH into Your Server
+## Deploying an update
 
 ```bash
-# Connect to your VPS/server
-ssh your-username@your-server-ip
+cd /root/workspace/cyberskill
+git pull origin <branch>
+docker compose up -d --build    # rebuilds app + recreates it; the db keeps running
+docker compose ps
+docker compose logs -f --tail=100 app
 ```
+
+> Only `NEXT_PUBLIC_SITE_URL` is a build-time arg now (compose passes it from `.env`).
+> `DATABASE_URL`, `AUTH_SECRET`, `NEXTAUTH_URL`, Telegram, etc. are all runtime env.
 
 ---
 
-## Step 3: Pull Latest Changes from GitHub (On Server)
-
-Navigate to your project folder on the server and pull the latest code:
+## Database operations
 
 ```bash
-# Navigate to project folder
-cd /path/to/your/project
-
-# Pull latest changes from GitHub
-git pull origin main
+./scripts/db-init.sh                                   # re-apply schema (idempotent)
+docker exec -it cyberskill-db psql -U cyberskill -d cyberskill   # manual psql
+./scripts/backup-db.sh                                 # pg_dump backup (keeps 14 days)
 ```
 
----
+Recommended daily backup cron (a user with docker access):
 
-## Step 4: Rebuild & Restart Docker (On Server)
-
-⚠️ **IMPORTANT**: Next.js requires `NEXT_PUBLIC_*` variables at BUILD time, not just runtime!
-
-**Full Rebuild with Build Args** (recommended):
-
-```bash
-# Navigate to project folder
-cd ~/cyber-skill_online
-
-# Pull latest code
-git pull origin main
-
-# Build with NEXT_PUBLIC_* variables from .env file
-docker build --network=host \
-  --build-arg NEXT_PUBLIC_SUPABASE_URL="$(grep NEXT_PUBLIC_SUPABASE_URL .env | cut -d '=' -f2)" \
-  --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="$(grep NEXT_PUBLIC_SUPABASE_ANON_KEY .env | cut -d '=' -f2)" \
-  --build-arg NEXT_PUBLIC_ABLY_KEY="$(grep NEXT_PUBLIC_ABLY_KEY .env | cut -d '=' -f2)" \
-  --build-arg NEXT_PUBLIC_SITE_URL="$(grep NEXT_PUBLIC_SITE_URL .env | cut -d '=' -f2)" \
-  -t cyber-skill .
-
-# Stop old container and start new one
-docker stop cyber-skill && docker rm cyber-skill && \
-docker run -d \
-  --name cyber-skill \
-  --restart always \
-  --network n8n_default \
-  --env-file .env \
-  --label "traefik.enable=true" \
-  --label "traefik.http.routers.cyberskill.rule=Host(\`cyberskill.pro\`) || Host(\`cyberskill.online\`)" \
-  --label "traefik.http.routers.cyberskill.entrypoints=websecure" \
-  --label "traefik.http.routers.cyberskill.tls=true" \
-  --label "traefik.http.routers.cyberskill.tls.certresolver=mytlschallenge" \
-  --label "traefik.http.services.cyberskill.loadbalancer.server.port=3000" \
-  cyber-skill
-```
-
-**Force Fresh Build** (if having cache issues):
-
-```bash
-docker build --network=host --no-cache \
-  --build-arg NEXT_PUBLIC_SUPABASE_URL="$(grep NEXT_PUBLIC_SUPABASE_URL .env | cut -d '=' -f2)" \
-  --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="$(grep NEXT_PUBLIC_SUPABASE_ANON_KEY .env | cut -d '=' -f2)" \
-  --build-arg NEXT_PUBLIC_ABLY_KEY="$(grep NEXT_PUBLIC_ABLY_KEY .env | cut -d '=' -f2)" \
-  --build-arg NEXT_PUBLIC_SITE_URL="$(grep NEXT_PUBLIC_SITE_URL .env | cut -d '=' -f2)" \
-  -t cyber-skill .
+```cron
+15 3 * * * /root/workspace/cyberskill/scripts/backup-db.sh >> /root/workspace/cyberskill/backups/backup.log 2>&1
 ```
 
 ---
 
-## Step 5: Verify Deployment
+## Realtime (SSE) behind Traefik
 
-1. Check if containers are running:
-
-   ```bash
-   docker compose ps
-   ```
-
-2. Check logs for errors:
-
-   ```bash
-   docker compose logs -f --tail=100
-   ```
-
-3. Open your website in browser and verify changes are live
+SSE works through Traefik with **no extra config** — Traefik streams responses and does not buffer.
+The stream routes (`/api/chat/stream`, `/api/admin/chat/stream`) already set
+`Cache-Control: no-cache, no-transform` + `X-Accel-Buffering: no` and emit heartbeat comments every 20s.
+If you ever front the app with nginx instead, add for those two paths:
+`proxy_buffering off;`, `proxy_cache off;`, and a long `proxy_read_timeout` (e.g. `1h`).
 
 ---
 
-## 📋 Quick Cheatsheet (Copy-Paste Version)
+## Troubleshooting
 
-### On Local Machine:
-
-```bash
-git add .
-git commit -m "Update description"
-git push origin main
-```
-
-### On Server:
-
-```bash
-# 1-liner to update and redeploy
-cd ~/cyber-skill_online && \
-git pull origin main && \
-docker build --network=host \
-  --build-arg NEXT_PUBLIC_SUPABASE_URL="$(grep NEXT_PUBLIC_SUPABASE_URL .env | cut -d '=' -f2)" \
-  --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="$(grep NEXT_PUBLIC_SUPABASE_ANON_KEY .env | cut -d '=' -f2)" \
-  --build-arg NEXT_PUBLIC_ABLY_KEY="$(grep NEXT_PUBLIC_ABLY_KEY .env | cut -d '=' -f2)" \
-  --build-arg NEXT_PUBLIC_SITE_URL="$(grep NEXT_PUBLIC_SITE_URL .env | cut -d '=' -f2)" \
-  -t cyber-skill . && \
-docker stop cyber-skill && docker rm cyber-skill && \
-docker run -d \
-  --name cyber-skill \
-  --restart always \
-  --network n8n_default \
-  --env-file .env \
-  --label "traefik.enable=true" \
-  --label "traefik.http.routers.cyberskill.rule=Host(\`cyberskill.pro\`) || Host(\`cyberskill.online\`)" \
-  --label "traefik.http.routers.cyberskill.entrypoints=websecure" \
-  --label "traefik.http.routers.cyberskill.tls=true" \
-  --label "traefik.http.routers.cyberskill.tls.certresolver=mytlschallenge" \
-  --label "traefik.http.services.cyberskill.loadbalancer.server.port=3000" \
-  cyber-skill
-```
-
----
-
-## 🔧 Troubleshooting
-
-### Changes not showing?
-
-- Clear browser cache (Ctrl+Shift+R)
-- Check if git pull was successful
-- Verify Docker rebuild completed
-
-### Docker build errors?
-
-- Check logs: `docker logs cyber-skill`
-- Try no-cache build: add `--no-cache` to build command
-
-### Container won't start?
-
-- Check what's using the port: `lsof -i :3000`
-- Kill stuck containers: `docker rm -f cyber-skill`
-
----
-
-## 🔄 Environment Variables
-
-If you updated `.env.local` locally, remember:
-
-1. The `.env.local` file is usually in `.gitignore` (not pushed to GitHub)
-2. You need to manually update it on the server:
-   ```bash
-   nano /path/to/your/project/.env.local
-   # or
-   vim /path/to/your/project/.env.local
-   ```
-3. Then rebuild and restart Docker (follow Step 4)
+- **App can't reach DB** → `DATABASE_URL` host must be `db` (the compose service alias); `docker compose ps` should show `cyberskill-db` healthy.
+- **Admin can't log in** → re-seed via `scripts/seed-admin.mjs`; confirm `AUTH_SECRET` and `AUTH_TRUST_HOST=true` are set.
+- **Chat not updating live** → check the `/api/chat/stream` EventSource in the browser Network tab and `docker compose logs app` for `[realtime]` errors.
+- **Container won't start** → `docker compose logs app`; verify `.env` is present and complete.

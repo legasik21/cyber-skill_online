@@ -1,143 +1,92 @@
-# Online Chat System - Setup Guide
+# Online Chat System — Setup Guide (self-hosted stack)
 
-## Quick Start
+The live chat is **fully self-hosted** — no external SaaS except Telegram (outbound notifications):
 
-### 1. Install Dependencies
+| Concern   | Implementation                                                        |
+| --------- | --------------------------------------------------------------------- |
+| Database  | Self-hosted **PostgreSQL** (`pg` driver, typed data layer `src/lib/db.ts`) |
+| Admin auth| **NextAuth v5** Credentials provider against `admin_users` (bcrypt)   |
+| Realtime  | **SSE + Postgres `LISTEN/NOTIFY`** (`src/lib/realtime.ts`)            |
+| Notify    | **Telegram** (outbound only, optional)                               |
+
+## Quick Start (Docker — production parity)
+
+```bash
+cp .env.example .env          # fill POSTGRES_PASSWORD, AUTH_SECRET, ADMIN_EMAIL/PASSWORD, …
+docker compose up -d --build  # starts Postgres (db) + the Next.js app
+```
+
+`database/schema.sql` is auto-applied on first DB init. Then seed the first admin:
+
+```bash
+set -a; . ./.env; set +a
+DATABASE_URL="postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@127.0.0.1:5432/$POSTGRES_DB" \
+  node scripts/seed-admin.mjs
+```
+
+- **Main site**: chat widget appears bottom-right on every page.
+- **Admin dashboard**: `/admin/login` → sign in with `ADMIN_EMAIL` / `ADMIN_PASSWORD`.
+
+## Local development
 
 ```bash
 npm install
-```
-
-### 2. Set Up Supabase
-
-1. Go to [https://supabase.com](https://supabase.com) and create a new project
-2. In the SQL Editor, run the schema from `database/schema.sql`
-3. Go to Settings → API to get your keys:
-
-   - `https://your-project.supabase.co`
-   - `your-anon-key`
-   - `your-service-role-key` (found in "service_role" secret)
-
-4. Create your first admin user:
-   - Go to Authentication → Users → Add User
-   - After creating, go to Users → Click on user → Raw Data
-   - Update `user_metadata` or `app_metadata` to include: `{"role": "admin"}`
-
-### 3. Set Up Ably
-
-1. Go to [https://ably.com](https://ably.com) and create a free account
-2. Create a new app
-3. Go to API Keys tab and copy:
-   - Root API Key for `your-ably-root-key`
-   - Create a new publishable key for `your-ably-publishable-key`
-
-### 4. Configure Environment Variables
-
-Create `.env.local` in project root:
-
-```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-
-# Ably
-ABLY_API_KEY=your-root-api-key
-NEXT_PUBLIC_ABLY_KEY=your-publishable-key
-
-# Security (generate random string)
-CRON_SECRET=your-random-secret-minimum-32-chars
-
-# App
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-```
-
-### 5. Run Development Server
-
-```bash
+# point DATABASE_URL at a local/dev Postgres, set AUTH_SECRET + ADMIN_* in .env.local
+node scripts/seed-admin.mjs
 npm run dev
 ```
 
-Visit:
+## Environment variables
 
-- **Main site**: http://localhost:3000 (chat widget appears bottom-right)
-- **Admin dashboard**: http://localhost:3000/admin/login
-
-## Production Deployment
-
-### Deploy to Vercel
-
-1. Push code to GitHub
-2. Import project in Vercel
-3. Add all environment variables from `.env.local`
-4. Update `NEXT_PUBLIC_SITE_URL` to your production domain
-5. Deploy!
-
-The cron job (`vercel.json`) will automatically run daily at 2 AM to clean old conversations.
+See `.env.example`. Key vars: `DATABASE_URL`, `AUTH_SECRET`, `NEXTAUTH_URL`, `AUTH_TRUST_HOST`,
+`ADMIN_EMAIL`, `ADMIN_PASSWORD`, `CRON_SECRET`, `TELEGRAM_*`, `AI_CHAT_ENABLED` (keep `false`).
+There are **no** Supabase or Ably variables anymore.
 
 ## Using the Chat System
 
 ### For Visitors
-
-- Chat widget appears automatically on all pages
-- Click to start conversation
-- Messages are delivered in real-time
-- Works offline (reconnects automatically)
+- Widget appears automatically on all pages; messages persist in Postgres.
+- Replies arrive in real time over an SSE stream (`EventSource`), which auto-reconnects.
 
 ### For Admins
-
-1. Login at `/admin/login`
-2. View all active conversations
-3. Click a conversation to start chatting
-4. Use "Close Conversation" to mark as complete
-5. All actions are logged in audit table
+1. Log in at `/admin/login` (NextAuth session cookie).
+2. View conversations, reply, and "Close Conversation" to finish.
+3. Admin actions are written to the `admin_actions` audit table.
 
 ## Security Features
 
-✅ **HttpOnly cookies** for visitor tracking  
-✅ **Rate limiting** (10 messages/min, 3 conversations/hour)  
-✅ **Channel restrictions** via Ably tokens  
-✅ **Admin authentication** via Supabase Auth  
-✅ **Action logging** for compliance  
-✅ **30-day data retention** automatic cleanup
-
-## Troubleshooting
-
-**Chat widget not appearing?**
-
-- Check browser console for errors
-- Verify environment variables are set
-- Ensure ChatWidget is imported in `layout.tsx`
-
-**Messages not sending?**
-
-- Check Ably API key is correct
-- Verify Supabase connection
-- Check rate limits in browser network tab
-
-**Admin can't login?**
-
-- Verify user has `role: "admin"` in metadata
-- Check Supabase Auth is configured
-- Ensure credentials are correct
-
-**Cron job not running?**
-
-- Verify `vercel.json` is deployed
-- Check Vercel Dashboard → Settings → Cron Jobs
-- Test manually: `curl https://your-domain.com/api/cron/cleanup`
+- ✅ **HttpOnly visitor cookie** for visitor tracking (set in middleware)
+- ✅ **Rate limiting** (10 messages/min, 3 conversations/hour)
+- ✅ **SSE authorization** — visitor stream gated by `visitor_id` + conversation ownership; admin stream by NextAuth session
+- ✅ **Admin auth** via NextAuth Credentials (bcrypt-hashed passwords, JWT session)
+- ✅ **Admin route protection** via middleware (`/admin/*`, `/api/admin/*`)
+- ✅ **Action logging** for compliance
+- ✅ **Data retention** cleanup endpoint (`/api/cron/cleanup`, guarded by `CRON_SECRET`)
 
 ## Architecture
 
 ```
 Client (Browser)
-  ↓
-ChatWidget → Ably (WebSocket) → Admin Dashboard
-  ↓                                ↓
-API Routes ←→ Supabase PostgreSQL ←
-  ↓
-Rate Limit Check
-Validation (Zod)
+  │  EventSource (SSE)            POST /api/chat/*
+  ▼                                   │
+/api/chat/stream  ◄── NOTIFY ──┐      ▼
+                                │   API routes ──► PostgreSQL (pg Pool)
+Admin Dashboard                 │      │              │
+  │  EventSource (SSE)          │      │   pg_notify('chat_events', …)
+  ▼                             └──────┘              │
+/api/admin/chat/stream  ◄── dedicated LISTEN client ─┘
+                                 (src/lib/realtime.ts Hub)
+```
+
+A message write issues `NOTIFY chat_events` (id-only payload); a single per-process `LISTEN`
+client fetches the row and fans it out to the SSE connections subscribed to that conversation.
+
+## Cron cleanup (self-hosted)
+
+`vercel.json` cron is not used. Run retention cleanup via a host cron hitting the endpoint:
+
+```cron
+0 2 * * * curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://cyberskill.online/api/cron/cleanup
 ```
 
 ## File Structure
@@ -146,25 +95,17 @@ Validation (Zod)
 src/
 ├── app/
 │   ├── api/
-│   │   ├── chat/          # Client chat endpoints
-│   │   ├── admin/chat/    # Admin endpoints
-│   │   └── cron/cleanup/  # Data retention
-│   └── admin/
-│       ├── login/         # Admin auth
-│       └── chat/          # Admin dashboard
-├── components/
-│   ├── ChatWidget.tsx     # Client chat UI
-│   └── admin/             # Admin components
-├── hooks/
-│   └── useChat.ts         # Chat logic hook
+│   │   ├── chat/{send,conversation,stream}/   # visitor endpoints (stream = SSE)
+│   │   ├── admin/chat/{send,conversations,messages,assign,close,stream}/
+│   │   ├── auth/[...nextauth]/                # NextAuth handlers
+│   │   └── cron/cleanup/                      # data retention
+│   └── admin/{login,chat,providers}/          # admin UI + SessionProvider
+├── auth.ts, auth.config.ts                    # NextAuth v5 (node + edge-safe split)
+├── middleware.ts                              # visitor cookie + /admin protection
+├── hooks/useChat.ts                           # chat hook (EventSource client)
 └── lib/
-    ├── db.ts              # Supabase client
-    ├── ably.ts            # Ably client
-    ├── validation.ts      # Zod schemas
-    ├── ratelimit.ts       # Rate limiting
-    └── auth.ts            # Admin auth
+    ├── db.ts                                  # PostgreSQL (pg) typed data layer
+    ├── realtime.ts                            # SSE + LISTEN/NOTIFY hub
+    ├── auth.ts                                # requireAdmin() (session)
+    ├── validation.ts, ratelimit.ts, telegram.ts
 ```
-
-## Need Help?
-
-Check the implementation plan for detailed architecture and API documentation.
