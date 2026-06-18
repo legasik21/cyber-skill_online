@@ -46,7 +46,7 @@ services:
         condition: service_healthy
     environment:
       NODE_ENV: production
-      AI_CHAT_ENABLED: "false"
+      AI_CHAT_ENABLED: ${AI_CHAT_ENABLED:-false}
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
       DATABASE_URL: ${DATABASE_URL}
       AUTH_SECRET: ${AUTH_SECRET}
@@ -58,6 +58,7 @@ services:
       CRON_SECRET: ${CRON_SECRET:-}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       GEMINI_MODEL: ${GEMINI_MODEL:-}
+      GEMINI_FALLBACK_MODEL: ${GEMINI_FALLBACK_MODEL:-}
     networks:
       - traefik-public
       - internal
