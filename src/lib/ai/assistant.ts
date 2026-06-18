@@ -17,7 +17,7 @@ export type ChatTurn = { sender_type: "visitor" | "agent"; body: string }
 export type ToolCallRecord = { name: string; input: Record<string, unknown>; result: unknown }
 export type AssistantResult = { reply: string; escalated: boolean; toolCalls: ToolCallRecord[] }
 
-const MAX_ITERATIONS = 6
+const MAX_ITERATIONS = 8
 const MAX_TURNS = 30
 const REQUEST_TIMEOUT_MS = 30000
 const FALLBACK_REPLY = "Let me connect you with a team member."
