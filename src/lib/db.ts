@@ -53,12 +53,12 @@ declare global {
 }
 
 function createPool(): Pool {
-  const connectionString = process.env.DATABASE_URL;
-  if (!connectionString) {
-    throw new Error('Missing DATABASE_URL environment variable');
-  }
+  // DATABASE_URL is intentionally NOT required here. `next build` imports route
+  // modules during page-data collection (no env), and a module-scope throw would
+  // fail the build. The Pool does not open a connection until the first query, so
+  // we construct it unconditionally and validate the env at query time instead.
   const p = new Pool({
-    connectionString,
+    connectionString: process.env.DATABASE_URL,
     max: 10,
     idleTimeoutMillis: 30_000,
     connectionTimeoutMillis: 10_000,
@@ -78,6 +78,9 @@ export async function query<T = Record<string, unknown>>(
   text: string,
   params?: unknown[],
 ): Promise<T[]> {
+  if (!process.env.DATABASE_URL) {
+    throw new Error('Missing DATABASE_URL environment variable');
+  }
   const res = await pool.query(text, params);
   return res.rows as T[];
 }
