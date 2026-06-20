@@ -4,9 +4,9 @@ import { pageMetadata, serviceJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/JsonLd";
 
 const PATH = "/services/battle-pass";
-const TITLE = "Battle Pass Boost — All 50 Levels";
+const TITLE = "WoT Battle Pass Boost — All 50 Levels";
 const DESCRIPTION =
-  "Complete World of Tanks Battle Pass Season XX: Searching the Sands and claim the exclusive KB-52 (Tier IX). Fast, secure season progression (all 50 levels) by pro players.";
+  "WoT Battle Pass boost — complete all 50 levels and claim the season's exclusive reward tank. Fast, secure season progression by pro players.";
 
 export const metadata: Metadata = pageMetadata({ title: TITLE, description: DESCRIPTION, path: PATH });
 

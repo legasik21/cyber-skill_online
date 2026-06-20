@@ -94,7 +94,7 @@ export default function BattlePassPage() {
               <div className="flex items-center gap-3 mb-4">
                 <Trophy className="h-10 w-10 text-cyan-400" />
                 <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-                  Battle Pass Boosting
+                  World of Tanks Battle Pass Boost (All 50 Levels)
                 </h1>
               </div>
               
