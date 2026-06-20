@@ -9,6 +9,34 @@ import styles from './ChatWidget.module.css';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
 
+// Google Ads SECONDARY conversion — "Chat started" (a public client-side value).
+const CHAT_STARTED_CONVERSION = 'AW-17868439825/VkOICPD4xcIcEJGCq8hC';
+const CHAT_STARTED_FLAG = 'cs-chat-started-fired';
+// Backstop guard so the conversion fires at most once per page load even when
+// sessionStorage is unavailable (e.g. private mode).
+let chatStartedFiredThisLoad = false;
+
+// Fire the "Chat started" secondary conversion exactly once per browsing session,
+// on the visitor's first sent message. sessionStorage makes it survive refreshes
+// and new conversation ids; window.gtag is loaded in the root layout. No PII is sent.
+function fireChatStartedConversion() {
+  if (typeof window === 'undefined') return;
+  if (chatStartedFiredThisLoad) return;
+  const w = window as unknown as { gtag?: (...args: unknown[]) => void };
+  if (typeof w.gtag !== 'function') return;
+  try {
+    if (sessionStorage.getItem(CHAT_STARTED_FLAG)) {
+      chatStartedFiredThisLoad = true;
+      return;
+    }
+    sessionStorage.setItem(CHAT_STARTED_FLAG, '1');
+  } catch {
+    // sessionStorage blocked — rely on the in-memory guard for this page load.
+  }
+  chatStartedFiredThisLoad = true;
+  w.gtag('event', 'conversion', { send_to: CHAT_STARTED_CONVERSION });
+}
+
 export default function ChatWidget() {
   const t = useTranslations('chatWidget');
   const pathname = usePathname();
@@ -99,6 +127,9 @@ export default function ChatWidget() {
     setInputValue('');
     try {
       await sendMessage(text);
+      // Visitor sent a chat message → fire the "Chat started" secondary
+      // conversion (guarded to once per session / page load).
+      fireChatStartedConversion();
     } catch (err) {
       setInputValue(text);
     }

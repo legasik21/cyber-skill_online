@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useRef } from "react"
 import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 import { CheckCircle } from "lucide-react"
@@ -8,18 +9,28 @@ import { useTranslations } from "next-intl"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import { motion } from "framer-motion"
-import Script from "next/script";
+
+// Google Ads PRIMARY conversion — "Submit lead form" (a public client-side value).
+const LEAD_FORM_CONVERSION = "AW-17868439825/XuKBCO-NleIbEJGCq8hC"
 
 export default function OrderSuccessPage() {
   const t = useTranslations("orderSuccess")
+
+  // Fire the lead-form conversion once when this success page mounts. The page
+  // renders only after a successful order submission, so one mount == one order.
+  // Guard window.gtag (loaded in the root layout) and a ref so React re-renders
+  // or dev double-invoke never fire it twice.
+  const firedRef = useRef(false)
+  useEffect(() => {
+    if (firedRef.current) return
+    const w = window as unknown as { gtag?: (...args: unknown[]) => void }
+    if (typeof w.gtag !== "function") return
+    firedRef.current = true
+    w.gtag("event", "conversion", { send_to: LEAD_FORM_CONVERSION })
+  }, [])
+
   return (
     <>
-      {/* Event snippet for Submit lead form (1) conversion page */}
-      <Script id="google-ads-conversion" strategy="afterInteractive">
-        {`
-          gtag('event', 'conversion', {'send_to': 'AW-17868439825/XuKBCO-NleIbEJGCq8hC'});
-        `}
-      </Script>
       <Header />
       <div className="min-h-screen bg-background text-foreground pt-20">
         <div className="container mx-auto px-4 py-20">
