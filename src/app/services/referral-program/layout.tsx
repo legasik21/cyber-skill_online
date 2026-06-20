@@ -4,7 +4,7 @@ import { pageMetadata, serviceJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/JsonLd";
 
 const PATH = "/services/referral-program";
-const TITLE = "WoT Referral Program Service";
+const TITLE = "WoT Referral Program — Tier 8 Premium Tank";
 const DESCRIPTION =
   "Get a Tier 8 Premium tank and bonds through the WoT Referral Program. We handle all recruiting for you — fixed $100 price, completed in 7–14 days.";
 
