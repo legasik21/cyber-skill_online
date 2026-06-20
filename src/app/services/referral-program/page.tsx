@@ -12,6 +12,7 @@ import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Link from "next/link"
 import { useOrderSubmit } from "@/hooks/useOrderSubmit"
+import { REFERRAL_PRICE, priceReferralProgram } from "@/lib/pricing/referral-program"
 
 const orderFormSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -20,10 +21,9 @@ const orderFormSchema = z.object({
   additionalInfo: z.string().optional(),
 })
 
-const SERVICE_PRICE = 100
-
 export default function ReferralProgramServicePage() {
   const { submitOrder, isSubmitting } = useOrderSubmit()
+  const SERVICE_PRICE = priceReferralProgram().total
   const form = useForm<z.infer<typeof orderFormSchema>>({
     resolver: zodResolver(orderFormSchema),
     defaultValues: {

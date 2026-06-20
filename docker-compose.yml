@@ -1,0 +1,90 @@
+# CyberSkill — production deploy (Docker + Traefik) for cyberskill.online
+# Fully self-hosted chat stack: app (Next.js standalone) + db (PostgreSQL).
+# Zero external SaaS except Telegram (outbound notifications). Secrets from ./.env (gitignored).
+#
+#   cd /root/workspace/cyberskill && docker compose up -d --build
+#
+# Postgres is published ONLY on 127.0.0.1 (host-local seed/backup/psql tooling) and joined to a
+# private network shared with the app — it is never reachable from the public internet.
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: cyberskill-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-cyberskill}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-cyberskill}
+    volumes:
+      - cyberskill-db-data:/var/lib/postgresql/data
+      # Auto-applied only on first init (empty data dir); idempotent if re-run.
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    ports:
+      - "127.0.0.1:5432:5432"
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cyberskill} -d ${POSTGRES_DB:-cyberskill}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Only the public site URL is build-time (inlined). Everything else is runtime.
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+    image: cyberskill:latest
+    container_name: cyberskill
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      AI_CHAT_ENABLED: ${AI_CHAT_ENABLED:-false}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+      DATABASE_URL: ${DATABASE_URL}
+      AUTH_SECRET: ${AUTH_SECRET}
+      NEXTAUTH_URL: ${NEXTAUTH_URL}
+      AUTH_TRUST_HOST: "true"
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+      TELEGRAM_ORDERS_CHAT_ID: ${TELEGRAM_ORDERS_CHAT_ID:-}
+      CRON_SECRET: ${CRON_SECRET}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-}
+      GEMINI_FALLBACK_MODEL: ${GEMINI_FALLBACK_MODEL:-}
+    networks:
+      - traefik-public
+      - internal
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3000/',r=>process.exit(r.statusCode<500?0:1)).on('error',()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-public"
+      - "traefik.http.routers.cyberskill.rule=Host(`cyberskill.online`)"
+      - "traefik.http.routers.cyberskill.entrypoints=websecure"
+      - "traefik.http.routers.cyberskill.priority=1"
+      - "traefik.http.routers.cyberskill.tls=true"
+      - "traefik.http.routers.cyberskill.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.cyberskill.middlewares=default-security-headers@file"
+      - "traefik.http.services.cyberskill.loadbalancer.server.port=3000"
+
+volumes:
+  cyberskill-db-data:
+    name: cyberskill-db-data
+
+networks:
+  internal:
+    name: cyberskill-internal
+  traefik-public:
+    external: true

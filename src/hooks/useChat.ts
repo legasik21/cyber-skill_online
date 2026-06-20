@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import * as Ably from 'ably';
-import { Message, createSupabaseClient } from '@/lib/db';
+import { Message } from '@/lib/db';
 
 interface UseChatOptions {
   conversationId?: string;
@@ -8,15 +7,9 @@ interface UseChatOptions {
   adminId?: string;
 }
 
-// Helper to get auth token for admin requests
-async function getAuthToken(): Promise<string | null> {
-  try {
-    const supabase = createSupabaseClient();
-    const { data: { session } } = await supabase.auth.getSession();
-    return session?.access_token || null;
-  } catch {
-    return null;
-  }
+interface AiState {
+  paused: boolean;
+  reason: string | null;
 }
 
 interface UseChatReturn {
@@ -26,173 +19,135 @@ interface UseChatReturn {
   error: string | null;
   isClosed: boolean;
   isManagerTyping: boolean;
+  aiState: AiState;
   sendMessage: (body: string) => Promise<void>;
   createConversation: () => Promise<string>;
   resetConversation: () => void;
 }
 
+/**
+ * Chat hook. Realtime is delivered over Server-Sent Events (self-hosted SSE +
+ * Postgres LISTEN/NOTIFY); admin requests are authenticated by the NextAuth
+ * session cookie (no Authorization header needed).
+ */
 export function useChat(options: UseChatOptions = {}): UseChatReturn {
-  const { conversationId, isAdmin = false, adminId } = options;
-  
+  const { conversationId, isAdmin = false } = options;
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isClosed, setIsClosed] = useState(false);
   const [isManagerTyping, setIsManagerTyping] = useState(false);
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
-  const ablyClientRef = useRef<Ably.Realtime | null>(null);
-  const channelRef = useRef<Ably.RealtimeChannel | null>(null);
+  const [aiState, setAiState] = useState<AiState>({ paused: false, reason: null });
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const eventSourceRef = useRef<EventSource | null>(null);
 
-  // Initialize Ably connection
-  const initializeAbly = useCallback(async (convId: string) => {
-    try {
-      // Get Ably token from server
-      const headers: Record<string, string> = { 
-        'Content-Type': 'application/json' 
-      };
-
-      if (isAdmin) {
-        const token = await getAuthToken();
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
-        }
+  // Open the SSE stream for a conversation.
+  const initializeStream = useCallback(
+    (convId: string) => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
       }
 
-      const response = await fetch('/api/chat/token', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          conversation_id: convId,
-          is_admin: isAdmin,
-          admin_id: adminId,
-        }),
-      });
+      const endpoint = isAdmin
+        ? `/api/admin/chat/stream?conversation_id=${encodeURIComponent(convId)}`
+        : `/api/chat/stream?conversation_id=${encodeURIComponent(convId)}`;
 
-      if (!response.ok) {
-        throw new Error('Failed to get Ably token');
-      }
+      const es = new EventSource(endpoint, { withCredentials: true });
+      eventSourceRef.current = es;
 
-      const { token } = await response.json();
-
-      // Create Ably client
-      const client = new Ably.Realtime({
-        token,
-        autoConnect: true,
-        disconnectedRetryTimeout: 3000,
-      });
-
-      ablyClientRef.current = client;
-
-      // Handle connection state
-      client.connection.on('connected', () => {
+      es.onopen = () => {
         setIsConnected(true);
         setError(null);
-      });
+      };
 
-      client.connection.on('disconnected', () => {
+      es.onerror = () => {
+        // EventSource auto-reconnects; reflect the transient disconnect.
         setIsConnected(false);
+      };
+
+      es.addEventListener('message', (e) => {
+        try {
+          const newMessage = JSON.parse(e.data) as Message;
+          setMessages((prev) =>
+            prev.some((m) => m.id === newMessage.id) ? prev : [...prev, newMessage],
+          );
+        } catch {
+          // ignore malformed event
+        }
       });
 
-      client.connection.on('failed', () => {
-        setIsConnected(false);
-        setError('Connection failed');
-      });
-
-      // Subscribe to conversation channel
-      const channel = client.channels.get(`chat:${convId}`);
-      channelRef.current = channel;
-
-      channel.subscribe('message', (message: Ably.InboundMessage) => {
-        const newMessage = message.data as Message;
-        setMessages(prev => {
-          // Avoid duplicates
-          const exists = prev.some(m => m.id === newMessage.id);
-          if (exists) return prev;
-          return [...prev, newMessage];
-        });
-      });
-
-      // Subscribe to conversation_closed event
-      channel.subscribe('conversation_closed', () => {
+      es.addEventListener('conversation_closed', () => {
         setIsClosed(true);
       });
 
-      // Subscribe to manager typing indicator
-      channel.subscribe('manager_typing', (message: Ably.InboundMessage) => {
-        const isTyping = message.data?.isTyping ?? false;
+      es.addEventListener('manager_typing', (event) => {
+        const e = event as MessageEvent;
+        let isTyping = false;
+        try {
+          isTyping = Boolean(JSON.parse(e.data)?.isTyping);
+        } catch {
+          isTyping = false;
+        }
         setIsManagerTyping(isTyping);
-        
-        // Auto-clear typing indicator after 5 seconds if no update received
-        if (typingTimeoutRef.current) {
-          clearTimeout(typingTimeoutRef.current);
-        }
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
         if (isTyping) {
-          typingTimeoutRef.current = setTimeout(() => {
-            setIsManagerTyping(false);
-          }, 5000);
+          typingTimeoutRef.current = setTimeout(() => setIsManagerTyping(false), 5000);
         }
       });
 
-    } catch (err) {
-      console.error('Error initializing Ably:', err);
-      setError(err instanceof Error ? err.message : 'Connection error');
-    }
-  }, [isAdmin, adminId]);
-
-  // Load existing messages
-  const loadMessages = useCallback(async (convId: string) => {
-    try {
-      setIsLoading(true);
-      
-      const endpoint = isAdmin
-        ? `/api/admin/chat/messages/${convId}`
-        : `/api/chat/conversation?id=${convId}`;
-      
-      // Add auth token for admin requests
-      const headers: Record<string, string> = {};
-      if (isAdmin) {
-        const token = await getAuthToken();
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
+      es.addEventListener('ai_state', (event) => {
+        const e = event as MessageEvent;
+        try {
+          const d = JSON.parse(e.data);
+          setAiState({ paused: Boolean(d?.paused), reason: d?.reason ?? null });
+        } catch {
+          // ignore malformed event
         }
-      }
-
-      const response = await fetch(endpoint, {
-        headers: isAdmin ? headers : undefined
       });
-      
-      if (!response.ok) {
-        throw new Error('Failed to load messages');
+    },
+    [isAdmin],
+  );
+
+  const loadMessages = useCallback(
+    async (convId: string) => {
+      try {
+        setIsLoading(true);
+        const endpoint = isAdmin
+          ? `/api/admin/chat/messages/${convId}`
+          : `/api/chat/conversation?id=${convId}`;
+        const response = await fetch(endpoint);
+        if (!response.ok) {
+          throw new Error('Failed to load messages');
+        }
+        const data = await response.json();
+        setMessages(data.messages || []);
+        if (data.conversation) {
+          setAiState({
+            paused: Boolean(data.conversation.ai_paused),
+            reason: data.conversation.pause_reason ?? null,
+          });
+        }
+        setError(null);
+      } catch (err) {
+        console.error('Error loading messages:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load messages');
+      } finally {
+        setIsLoading(false);
       }
+    },
+    [isAdmin],
+  );
 
-      const data = await response.json();
-      const msgs = isAdmin ? data.messages : data.messages;
-      
-      setMessages(msgs || []);
-      setError(null);
-    } catch (err) {
-      console.error('Error loading messages:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load messages');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [isAdmin]);
-
-  // Create new conversation
   const createConversation = useCallback(async (): Promise<string> => {
     try {
       setIsLoading(true);
-      
-      const response = await fetch('/api/chat/conversation', {
-        method: 'POST',
-      });
-
+      const response = await fetch('/api/chat/conversation', { method: 'POST' });
       if (!response.ok) {
         throw new Error('Failed to create conversation');
       }
-
       const data = await response.json();
       return data.conversation_id;
     } catch (err) {
@@ -204,86 +159,59 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     }
   }, []);
 
-  // Send message
-  const sendMessage = useCallback(async (body: string) => {
-    if (!conversationId) {
-      setError('No active conversation');
-      return;
-    }
-
-    try {
-      const endpoint = isAdmin
-        ? '/api/admin/chat/send'
-        : '/api/chat/send';
-
-      // Prepare headers
-      const headers: Record<string, string> = { 
-        'Content-Type': 'application/json' 
-      };
-
-      if (isAdmin) {
-        const token = await getAuthToken();
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
+  const sendMessage = useCallback(
+    async (body: string) => {
+      if (!conversationId) {
+        setError('No active conversation');
+        return;
+      }
+      try {
+        const endpoint = isAdmin ? '/api/admin/chat/send' : '/api/chat/send';
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ conversation_id: conversationId, body: body.trim() }),
+        });
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({}));
+          throw new Error(data.error || 'Failed to send message');
         }
+        // The new message is echoed back via the SSE stream.
+      } catch (err) {
+        console.error('Error sending message:', err);
+        setError(err instanceof Error ? err.message : 'Failed to send message');
+        throw err;
       }
+    },
+    [conversationId, isAdmin],
+  );
 
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          conversation_id: conversationId,
-          body: body.trim(),
-        }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to send message');
-      }
-
-      // Message will be received via Ably subscription
-    } catch (err) {
-      console.error('Error sending message:', err);
-      setError(err instanceof Error ? err.message : 'Failed to send message');
-      throw err;
-    }
-  }, [conversationId, isAdmin]);
-
-  // Initialize when conversation ID is available
+  // Initialize when conversation ID is available.
   useEffect(() => {
     if (conversationId) {
       loadMessages(conversationId);
-      initializeAbly(conversationId);
+      initializeStream(conversationId);
     }
-
     return () => {
-      // Cleanup
-      if (channelRef.current) {
-        channelRef.current.unsubscribe();
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
       }
-      if (ablyClientRef.current) {
-        ablyClientRef.current.close();
-      }
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     };
-  }, [conversationId, loadMessages, initializeAbly]);
+  }, [conversationId, loadMessages, initializeStream]);
 
-  // Reset conversation (for starting new conversation after closed)
   const resetConversation = useCallback(() => {
     setMessages([]);
     setIsClosed(false);
     setIsManagerTyping(false);
+    setAiState({ paused: false, reason: null });
     setError(null);
-    // Cleanup existing connection
-    if (channelRef.current) {
-      channelRef.current.unsubscribe();
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
     }
-    if (ablyClientRef.current) {
-      ablyClientRef.current.close();
-    }
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
   }, []);
 
   return {
@@ -293,6 +221,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     error,
     isClosed,
     isManagerTyping,
+    aiState,
     sendMessage,
     createConversation,
     resetConversation,

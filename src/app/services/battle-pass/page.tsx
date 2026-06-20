@@ -12,10 +12,7 @@ import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Link from "next/link"
 import { useOrderSubmit } from "@/hooks/useOrderSubmit"
-
-// Battle Pass pricing
-const PRICE_PER_LEVEL = 2.5
-const MAX_LEVELS = 50
+import { PRICE_PER_LEVEL, MAX_LEVELS, priceBattlePass } from "@/lib/pricing/battle-pass"
 
 const orderFormSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -51,31 +48,11 @@ export default function BattlePassPage() {
   useEffect(() => {
     const current = currentLevel === "" ? 0 : currentLevel
     const target = targetLevel === "" ? 0 : targetLevel
-    
-    if (current < 1 || target < current || target > MAX_LEVELS) {
-      setBasePrice(0)
-      setDiscount(0)
-      setFinalPrice(0)
-      setLevelsToBoost(0)
-      return
-    }
 
-    const levels = target - current + 1
+    const { levelsToBoost: levels, basePrice: base, discount: discountPercent, total: final } =
+      priceBattlePass({ currentLevel: current, targetLevel: target })
+
     setLevelsToBoost(levels)
-    
-    const base = levels * PRICE_PER_LEVEL
-    
-    // Volume discounts
-    let discountPercent = 0
-    if (levels >= 50) {
-      discountPercent = 15
-    } else if (levels >= 25) {
-      discountPercent = 10
-    }
-    
-    const discountAmount = base * (discountPercent / 100)
-    const final = base - discountAmount
-    
     setBasePrice(base)
     setDiscount(discountPercent)
     setFinalPrice(final)

@@ -1,83 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
+import { listConversations } from '@/lib/db';
+
+export const runtime = 'nodejs';
 
 /**
- * Get list of conversations for admin
+ * Get list of conversations for admin (each with its last message + total count).
  */
 export async function GET(request: NextRequest) {
   try {
-    // Check admin authentication
-    const authResult = await requireAdmin(request);
-    
+    const authResult = await requireAdmin();
     if ('error' in authResult) {
-      return NextResponse.json(
-        { error: authResult.error },
-        { status: authResult.status }
-      );
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const rawPage = parseInt(searchParams.get('page') || '1', 10);
+    const rawLimit = parseInt(searchParams.get('limit') || '50', 10);
+    if (Number.isNaN(rawPage) || Number.isNaN(rawLimit) || rawPage < 1 || rawLimit < 1) {
+      return NextResponse.json({ error: 'Invalid pagination params' }, { status: 400 });
+    }
+    const page = rawPage;
+    const limit = Math.min(rawLimit, 100); // hard cap to bound the query/response
     const status = searchParams.get('status') || 'all';
-    
     const offset = (page - 1) * limit;
 
-    // Fetch conversations
-    let query = supabaseAdmin
-      .from('conversations')
-      .select(`
-        *,
-        messages (
-          id,
-          body,
-          sender_type,
-          created_at
-        )
-      `, { count: 'exact' })
-      .order('last_message_at', { ascending: false })
-      .range(offset, offset + limit - 1);
+    const { conversations, total } = await listConversations({ status, limit, offset });
 
-    // Filter by status if not 'all'
-    if (status !== 'all') {
-      query = query.eq('status', status);
-    }
-
-    const { data: conversations, error, count } = await query;
-
-    if (error) {
-      console.error('Error fetching conversations:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch conversations' },
-        { status: 500 }
-      );
-    }
-
-    // Format conversations with last message
-    const formattedConversations = conversations?.map(conv => {
-      const lastMessage = conv.messages && conv.messages.length > 0
-        ? conv.messages[conv.messages.length - 1]
-        : null;
-
-      return {
-        ...conv,
-        last_message: lastMessage,
-        messages: undefined, // Remove full messages array
-      };
-    });
-
-    return NextResponse.json({
-      conversations: formattedConversations || [],
-      total: count || 0,
-      page,
-      limit,
-    });
+    return NextResponse.json({ conversations, total, page, limit });
   } catch (error) {
     console.error('Error in conversations endpoint:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

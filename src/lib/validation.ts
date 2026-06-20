@@ -34,8 +34,16 @@ export const closeConversationSchema = z.object({
   conversation_id: z.string().uuid('Invalid conversation ID'),
 });
 
+// Admin AI takeover/resume validation: paused=true => stop AI (manager takes over),
+// paused=false => resume AI.
+export const takeoverSchema = z.object({
+  conversation_id: z.string().uuid('Invalid conversation ID'),
+  paused: z.boolean(),
+});
+
 export type MessageInput = z.infer<typeof messageSchema>;
 export type CreateConversationInput = z.infer<typeof createConversationSchema>;
 export type AdminMessageInput = z.infer<typeof adminMessageSchema>;
 export type AssignConversationInput = z.infer<typeof assignConversationSchema>;
 export type CloseConversationInput = z.infer<typeof closeConversationSchema>;
+export type TakeoverInput = z.infer<typeof takeoverSchema>;

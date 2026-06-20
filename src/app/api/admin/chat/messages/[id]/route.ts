@@ -1,50 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
+import { getMessages, getConversationById } from '@/lib/db';
+
+export const runtime = 'nodejs';
 
 /**
- * Get messages for a specific conversation
+ * Get messages for a specific conversation (admin).
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    // Check admin authentication
-    const authResult = await requireAdmin(request);
-    
+    const authResult = await requireAdmin();
     if ('error' in authResult) {
-      return NextResponse.json(
-        { error: authResult.error },
-        { status: authResult.status }
-      );
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
 
     const { id: conversationId } = await params;
+    const [messages, conversation] = await Promise.all([
+      getMessages(conversationId),
+      getConversationById(conversationId),
+    ]);
 
-    // Fetch messages
-    const { data: messages, error } = await supabaseAdmin
-      .from('messages')
-      .select('*')
-      .eq('conversation_id', conversationId)
-      .order('created_at', { ascending: true });
-
-    if (error) {
-      console.error('Error fetching messages:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch messages' },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      messages: messages || [],
-    });
+    return NextResponse.json({ messages, conversation });
   } catch (error) {
     console.error('Error in messages endpoint:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

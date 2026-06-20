@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { createSupabaseClient } from '@/lib/db';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import styles from './login.module.css';
 
@@ -18,38 +18,18 @@ export default function AdminLoginPage() {
     setIsLoading(true);
 
     try {
-      const supabase = createSupabaseClient();
-      
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      const res = await signIn('credentials', {
         email,
         password,
+        redirect: false,
       });
 
-      if (signInError) {
-        throw signInError;
+      if (!res || res.error) {
+        throw new Error('Invalid email or password');
       }
 
-      if (!data.user) {
-        throw new Error('Login failed');
-      }
-
-      // Check if user has admin role (optional - for production)
-      const isAdmin = data.user.user_metadata?.role === 'admin' || 
-                      data.user.app_metadata?.role === 'admin';
-
-      if (!isAdmin) {
-        // For testing: allow any authenticated user
-        console.log('User does not have admin role, but allowing for testing');
-        // Uncomment below to enforce admin role in production:
-        // await supabase.auth.signOut();
-        // throw new Error('Insufficient permissions');
-      }
-
-      // Wait a bit for session to be properly set
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Redirect to admin dashboard
       router.push('/admin/chat');
+      router.refresh();
     } catch (err) {
       console.error('Login error:', err);
       setError(err instanceof Error ? err.message : 'Login failed');
@@ -99,11 +79,7 @@ export default function AdminLoginPage() {
             />
           </div>
 
-          <button
-            type="submit"
-            className={styles.submitButton}
-            disabled={isLoading}
-          >
+          <button type="submit" className={styles.submitButton} disabled={isLoading}>
             {isLoading ? (
               <>
                 <div className={styles.spinner} />

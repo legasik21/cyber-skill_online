@@ -13,30 +13,10 @@ import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Link from "next/link"
 import { useOrderSubmit } from "@/hooks/useOrderSubmit"
+import { WN8_PRICING, WINRATE_PRICING, DAMAGE_PRICING, priceWn8Boost } from "@/lib/pricing/wn8-boost"
 
 // Service types
 type ServiceType = "wn8" | "winrate" | "damage"
-
-// Pricing per battle based on WN8 tier
-const WN8_PRICING = {
-  "2500-3000": 1.1,  // $1.1 per battle
-  "3000-4000": 1.5,  // $1.5 per battle
-  "4000+": 1.8,      // $1.8 per battle
-}
-
-// Winrate boosting pricing
-const WINRATE_PRICING = {
-  "60%": 1.0,   // $1 per battle
-  "65%": 1.5,   // $1 + 50% = $1.5 per battle
-  "70%": 2.5,   // $1 + 150% = $2.5 per battle
-}
-
-// High Damage pricing
-const DAMAGE_PRICING = {
-  "4000+": 1.75, // $1.75 per battle
-  "4500+": 2.0,  // $2 per battle
-  "5000+": 2.5,  // $2.5 per battle
-}
 
 const orderFormSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -90,54 +70,18 @@ export default function WN8BoostPage() {
   // Calculate pricing whenever battles, service type, or tier changes
   useEffect(() => {
     const battles = numberOfBattles === "" ? 0 : numberOfBattles
-    
-    if (battles < 20) {
-      setBasePrice(0)
-      setDiscount(0)
-      setFinalPrice(0)
-      return
-    }
 
-    let pricePerBattle = 0
-    
-    // Get base price based on service type
-    if (serviceType === "wn8") {
-      pricePerBattle = WN8_PRICING[selectedTier as keyof typeof WN8_PRICING] || 0
-      // Apply SPG modifier (+100% for tiers 2500-3000 and 3000-4000 only)
-      if (playSPG && (selectedTier === "2500-3000" || selectedTier === "3000-4000")) {
-        pricePerBattle = pricePerBattle * 2
-      }
-    } else if (serviceType === "winrate") {
-      pricePerBattle = WINRATE_PRICING[selectedTier as keyof typeof WINRATE_PRICING] || 0
-      // Apply SPG modifier (+100% for 60% winrate only)
-      if (playSPG && selectedTier === "60%") {
-        pricePerBattle = pricePerBattle * 2
-      }
-    } else if (serviceType === "damage") {
-      pricePerBattle = DAMAGE_PRICING[selectedTier as keyof typeof DAMAGE_PRICING] || 0
-      // No SPG modifier for damage service type
-    }
-    
-    const base = battles * pricePerBattle
-    
-    let discountPercent = 0
-    if (battles >= 100) {
-      discountPercent = 20
-    } else if (battles >= 50) {
-      discountPercent = 15
-    }
-    
-    const discountAmount = base * (discountPercent / 100)
-    let final = base - discountAmount
-    
-    // Apply "Get the Replays" option (+10% to total)
-    if (getReplays) {
-      final = final * 1.1
-    }
-    
+    const { base, discountPercent, total } = priceWn8Boost({
+      serviceType,
+      tier: selectedTier,
+      numberOfBattles: battles,
+      playSPG,
+      getReplays,
+    })
+
     setBasePrice(base)
     setDiscount(discountPercent)
-    setFinalPrice(final)
+    setFinalPrice(total)
   }, [numberOfBattles, selectedTier, playSPG, getReplays, serviceType])
 
   async function onSubmit(values: z.infer<typeof orderFormSchema>) {

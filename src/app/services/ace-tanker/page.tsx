@@ -13,21 +13,7 @@ import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Link from "next/link"
 import { useOrderSubmit } from "@/hooks/useOrderSubmit"
-
-// Pricing based on Tier
-const TIER_PRICING = {
-  "lower": 15.0,
-  "8": 20.0,
-  "9_10": 23.0,
-  "11": 27.0,
-}
-
-const TIER_LABELS = {
-  "lower": "Tier I - VII",
-  "8": "Tier VIII",
-  "9_10": "Tier IX - X",
-  "11": "Tier XI",
-}
+import { TIER_PRICING, TIER_LABELS, priceAceTanker } from "@/lib/pricing/ace-tanker"
 
 const orderFormSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -74,20 +60,12 @@ export default function AceTankerPage() {
 
   // Calculate pricing
   useEffect(() => {
-    const rawTierPrice = TIER_PRICING[tankTier]
-    
-    // SPG adds 100% to base price (doubles it)
-    const spgExtra = isSpg ? rawTierPrice : 0
-    
-    const adjustedBase = rawTierPrice + spgExtra
+    const { base, spgExtra, replaysExtra, total } = priceAceTanker({ tankTier, isSpg, getReplays })
 
-    // Get Replays adds 20% to the Adjusted Base
-    const replaysExtra = getReplays ? (adjustedBase * 0.20) : 0
-    
-    setBasePrice(rawTierPrice)
+    setBasePrice(base)
     setSpgCharge(spgExtra)
     setReplaysCharge(replaysExtra)
-    setFinalPrice(adjustedBase + replaysExtra)
+    setFinalPrice(total)
   }, [tankTier, getReplays, isSpg])
 
   async function onSubmit(values: z.infer<typeof orderFormSchema>) {

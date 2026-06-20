@@ -44,3 +44,9 @@ next-env.d.ts
 # derivatives (hero-bg.mp4 / hero-bg.webm / hero-poster.webp) are committed
 /public/cyberskill_bg_hero.mp4
 /public/bg_cyberskill.webm
+
+# DB backups (generated)
+backups/
+
+# .env.example is a committed template (the .env* rule above would otherwise exclude it)
+!.env.example
