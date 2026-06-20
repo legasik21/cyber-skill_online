@@ -195,7 +195,7 @@ export default function Home() {
     <>
       <JsonLd data={boostingReviewsJsonLd(locale)} />
       <Header />
-      <div className="min-h-screen bg-background text-foreground overflow-x-hidden pt-[136px] md:pt-28">
+      <div className="min-h-screen bg-background text-foreground overflow-x-hidden pt-20">
 
       {/* Hero Section */}
       <section className="relative py-20 lg:py-32 overflow-hidden">
