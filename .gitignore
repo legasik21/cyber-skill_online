@@ -50,3 +50,7 @@ backups/
 
 # .env.example is a committed template (the .env* rule above would otherwise exclude it)
 !.env.example
+
+# Claude Code agent tooling (local config + installed skill bundles)
+.claude/
+skills-lock.json
