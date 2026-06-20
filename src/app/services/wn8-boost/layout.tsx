@@ -4,7 +4,7 @@ import { pageMetadata, serviceJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/JsonLd";
 
 const PATH = "/services/wn8-boost";
-const TITLE = "WN8, Winrate & High Damage Boost";
+const TITLE = "WoT WN8 Boost — Winrate & High Damage";
 const DESCRIPTION =
   "Raise your World of Tanks WN8, winrate and average damage with top-0.1% boosters. Transparent per-battle pricing, volume discounts and full account safety.";
 

@@ -122,7 +122,7 @@ export default function WN8BoostPage() {
               <div className="flex items-center gap-3 mb-4">
                 <Target className="h-10 w-10 text-primary" />
                 <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-                  WN8, Winrate, High Damage Service
+                  WoT WN8 Boost — Winrate & High Damage
                 </h1>
               </div>
               <p className="text-lg text-muted-foreground mb-6">
