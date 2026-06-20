@@ -4,9 +4,9 @@ import { pageMetadata, serviceJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/JsonLd";
 
 const PATH = "/services/credit-farm";
-const TITLE = "Credit & Bonds Farming";
+const TITLE = "WoT Credit Booster & Bonds Farm";
 const DESCRIPTION =
-  "Farm millions of World of Tanks credits and bonds fast — no grinding. Efficient Front Line credit farming by pro players with VPN-protected account safety.";
+  "WoT credit booster: farm millions of credits & bonds fast — no grind. Efficient Front Line farming by pros, VPN-protected account safety.";
 
 export const metadata: Metadata = pageMetadata({ title: TITLE, description: DESCRIPTION, path: PATH });
 
