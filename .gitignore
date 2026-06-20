@@ -50,3 +50,7 @@ backups/
 
 # .env.example is a committed template (the .env* rule above would otherwise exclude it)
 !.env.example
+
+# Local agent tooling (installed skills / lockfile)
+.agents/
+skills-lock.json
