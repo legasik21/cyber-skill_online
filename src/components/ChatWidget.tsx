@@ -2,12 +2,15 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import { useChat } from '@/hooks/useChat';
 import { Message } from '@/lib/db';
 import styles from './ChatWidget.module.css';
 import { formatDistanceToNow } from 'date-fns';
+import { de } from 'date-fns/locale';
 
 export default function ChatWidget() {
+  const t = useTranslations('chatWidget');
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [conversationId, setConversationId] = useState<string>();
@@ -64,7 +67,7 @@ export default function ChatWidget() {
     try {
       const convId = await createConversation();
       setConversationId(convId);
-      
+
       // Show automated welcome message after 2 seconds (only once per session)
       if (!hasShownWelcome) {
         welcomeTimeoutRef.current = setTimeout(() => {
@@ -126,7 +129,7 @@ export default function ChatWidget() {
         <button
           className={styles.toggleButton}
           onClick={toggleChat}
-          aria-label="Open chat"
+          aria-label={t('open')}
         >
           <svg
             width="24"
@@ -140,7 +143,7 @@ export default function ChatWidget() {
           >
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
-          <span className={styles.badge}>Chat</span>
+          <span className={styles.badge}>{t('badge')}</span>
         </button>
       )}
 
@@ -150,7 +153,7 @@ export default function ChatWidget() {
           {/* Header */}
           <div className={styles.chatHeader}>
             <div className={styles.headerTitle}>
-              <h3>Live Support</h3>
+              <h3>{t('liveSupport')}</h3>
               <div className={styles.statusIndicator}>
                 <span
                   className={`${styles.statusDot} ${
@@ -158,14 +161,14 @@ export default function ChatWidget() {
                   }`}
                 />
                 <span className={styles.statusText}>
-                  {isClosed ? 'Closed' : isConnected ? 'Online' : 'Connecting...'}
+                  {isClosed ? t('statusClosed') : isConnected ? t('statusOnline') : t('statusConnecting')}
                 </span>
               </div>
             </div>
             <button
               className={styles.closeButton}
               onClick={toggleChat}
-              aria-label="Close chat"
+              aria-label={t('close')}
             >
               <svg
                 width="20"
@@ -196,7 +199,7 @@ export default function ChatWidget() {
               }}
             >
               <span aria-hidden>👤</span>
-              <span>A team member is now with you — feel free to keep typing.</span>
+              <span>{t('managerTookOver')}</span>
             </div>
           )}
 
@@ -205,11 +208,11 @@ export default function ChatWidget() {
             {isLoading && messages.length === 0 ? (
               <div className={styles.loadingState}>
                 <div className={styles.spinner} />
-                <p>Loading chat...</p>
+                <p>{t('loading')}</p>
               </div>
             ) : messages.length === 0 && !hasShownWelcome ? (
               <div className={styles.emptyState}>
-                <p>👋 Welcome! How can we help you today?</p>
+                <p>{t('emptyWelcome')}</p>
               </div>
             ) : (
               <>
@@ -217,23 +220,23 @@ export default function ChatWidget() {
                 {hasShownWelcome && messages.length === 0 && (
                   <div className={`${styles.messageBubble} ${styles.agentMessage} ${styles.welcomeMessage}`}>
                     <div className={styles.messageHeader}>
-                      <span className={styles.messageSender}>Support</span>
-                      <span className={styles.messageTime}>just now</span>
+                      <span className={styles.messageSender}>{t('sender.support')}</span>
+                      <span className={styles.messageTime}>{t('time.justNow')}</span>
                     </div>
                     <div className={styles.messageBody}>
-                      Hello! Welcome to CyberSkill. We&apos;re here to help you dominate World of Tanks. Whether it&apos;s stat boosting, tank research, or marks of excellence — just let us know what you need, and our manager will guide you!
+                      {t('welcomeMessage')}
                     </div>
                   </div>
                 )}
                 {messages.map((message) => (
                   <MessageBubble key={message.id} message={message} />
                 ))}
-                
+
                 {/* Manager Typing Indicator */}
                 {isManagerTyping && (
                   <div className={`${styles.messageBubble} ${styles.agentMessage}`}>
                     <div className={styles.messageHeader}>
-                      <span className={styles.messageSender}>Support</span>
+                      <span className={styles.messageSender}>{t('sender.support')}</span>
                     </div>
                     <div className={`${styles.messageBody} ${styles.typingIndicator}`}>
                       <span className={styles.typingDot}></span>
@@ -254,7 +257,7 @@ export default function ChatWidget() {
 
             {!isConnected && !isClosed && messages.length > 0 && (
               <div className={styles.offlineNotice}>
-                <span>Reconnecting...</span>
+                <span>{t('reconnecting')}</span>
               </div>
             )}
 
@@ -267,13 +270,13 @@ export default function ChatWidget() {
                     <polyline points="22 4 12 14.01 9 11.01" />
                   </svg>
                 </div>
-                <h4>Conversation Closed</h4>
-                <p>If you have any additional questions, start a new conversation.</p>
+                <h4>{t('conversationClosed.title')}</h4>
+                <p>{t('conversationClosed.body')}</p>
                 <button
                   className={styles.newConversationButton}
                   onClick={handleNewConversation}
                 >
-                  New Conversation
+                  {t('newConversation')}
                 </button>
               </div>
             )}
@@ -285,7 +288,7 @@ export default function ChatWidget() {
               <input
                 type="text"
                 className={styles.messageInput}
-                placeholder="Type your message..."
+                placeholder={t('inputPlaceholder')}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 disabled={!isConnected || !conversationId}
@@ -294,7 +297,7 @@ export default function ChatWidget() {
                 type="submit"
                 className={styles.sendButton}
                 disabled={!inputValue.trim() || !isConnected || !conversationId}
-                aria-label="Send message"
+                aria-label={t('send')}
               >
                 <svg
                   width="20"
@@ -317,9 +320,12 @@ export default function ChatWidget() {
 }
 
 function MessageBubble({ message }: { message: Message }) {
+  const t = useTranslations('chatWidget');
+  const locale = useLocale();
   const isVisitor = message.sender_type === 'visitor';
   const timeAgo = formatDistanceToNow(new Date(message.created_at), {
     addSuffix: true,
+    locale: locale === 'de' ? de : undefined,
   });
 
   return (
@@ -330,7 +336,7 @@ function MessageBubble({ message }: { message: Message }) {
     >
       <div className={styles.messageHeader}>
         <span className={styles.messageSender}>
-          {isVisitor ? 'You' : 'Support'}
+          {isVisitor ? t('sender.you') : t('sender.support')}
         </span>
         <span className={styles.messageTime}>{timeAgo}</span>
       </div>

@@ -2,11 +2,12 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Star, ChevronLeft, ChevronRight, Quote, User } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { reviews } from "@/lib/reviews";
+import { reviews, type Locale } from "@/lib/reviews";
 
 interface ReviewCardProps {
   review: typeof reviews[0];
@@ -14,11 +15,14 @@ interface ReviewCardProps {
 
 function ReviewCard({ review }: ReviewCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  
+  const t = useTranslations("reviews");
+  const locale = useLocale() as Locale;
+  const body = review.body[locale] ?? review.body.en;
+
   // Truncate at ~120 chars which roughly corresponds to 4 lines
   const CHAR_LIMIT = 120;
-  const shouldTruncate = review.review.length > CHAR_LIMIT;
-  
+  const shouldTruncate = body.length > CHAR_LIMIT;
+
   return (
     <Card className="h-full border-border/50 bg-card/50 flex flex-col snap-center min-w-[300px] md:min-w-[350px] mx-2 transition-all hover:bg-card hover:border-primary/30">
       <CardHeader className="pb-2">
@@ -45,16 +49,16 @@ function ReviewCard({ review }: ReviewCardProps) {
              "text-sm text-muted-foreground pt-4 px-2 italic leading-relaxed min-h-[5rem]",
              !isExpanded && shouldTruncate && "line-clamp-4"
            )}>
-             "{review.review}"
+             &ldquo;{body}&rdquo;
            </p>
         </div>
-        
+
         {shouldTruncate && (
-          <button 
+          <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="text-xs text-primary font-semibold mt-3 self-start hover:underline"
           >
-            {isExpanded ? "Show less" : "Read more..."}
+            {isExpanded ? t("showLess") : t("readMore")}
           </button>
         )}
       </CardContent>
@@ -63,6 +67,7 @@ function ReviewCard({ review }: ReviewCardProps) {
 }
 
 export default function ReviewsSlider() {
+  const t = useTranslations("reviews");
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -139,7 +144,7 @@ export default function ReviewsSlider() {
        <div className="md:hidden flex justify-center mt-4 gap-2">
          {/* Simple indicators */}
          <div className="text-xs text-muted-foreground animate-pulse">
-           Swipe to see more &rarr;
+           {t("swipeHint")}
          </div>
        </div>
     </div>

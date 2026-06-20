@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { reviews, reviewStats } from "@/lib/reviews";
+import { reviews, reviewStats, type Locale as ReviewLocale } from "@/lib/reviews";
+import { routing } from "@/i18n/routing";
 
 /**
  * Production origin used to build absolute canonical / Open Graph / sitemap /
  * JSON-LD URLs.
  *
  * DEFERRED — set at deploy: point NEXT_PUBLIC_SITE_URL at the real domain
- * (e.g. https://cyberskill.pro). The localhost fallback exists only so local
+ * (e.g. https://cyberskill.online). The localhost fallback exists only so local
  * production builds resolve cleanly; it must NOT be treated as the canonical
  * production domain. See docs/SEO_AUDIT_REPORT.md (DEFERRED checklist).
  */
@@ -23,13 +24,88 @@ export const SOCIAL_LINKS = [
   "https://www.tiktok.com/@cyberskill.pro",
 ];
 
+type Locale = (typeof routing.locales)[number];
+
 const abs = (path: string): string =>
   path.startsWith("http") ? path : `${SITE_URL}${path === "/" ? "" : path}`;
 
 /**
- * Per-page metadata. `title` is the page-specific part only — the root layout
- * applies the `%s | CyberSkill` template. Canonical/OG URLs are relative and
- * resolved to absolute by Next via `metadataBase` (set in the root layout).
+ * Build the public URL for a locale-agnostic path in a given locale.
+ * en (default) stays un-prefixed (localePrefix: "as-needed"); de gets "/de".
+ *   localeUrl("en", "/services/wn8-boost") -> https://site/services/wn8-boost
+ *   localeUrl("de", "/services/wn8-boost") -> https://site/de/services/wn8-boost
+ *   localeUrl("de", "/")                   -> https://site/de
+ */
+export function localeUrl(locale: Locale, path: string): string {
+  const clean = path === "/" ? "" : path;
+  const prefix = locale === routing.defaultLocale ? "" : `/${locale}`;
+  return `${SITE_URL}${prefix}${clean}`;
+}
+
+/** OpenGraph locale tag for a given app locale. */
+export function ogLocale(locale: Locale): string {
+  return locale === "de" ? "de_DE" : "en_US";
+}
+
+/**
+ * hreflang alternates for a locale-agnostic path: every locale's URL plus an
+ * x-default pointing at the non-prefixed (en) URL. Used by every public page.
+ */
+export function hreflangAlternates(path: string): Record<string, string> {
+  const languages: Record<string, string> = {};
+  for (const locale of routing.locales) {
+    languages[locale] = localeUrl(locale, path);
+  }
+  languages["x-default"] = localeUrl(routing.defaultLocale, path);
+  return languages;
+}
+
+/**
+ * Locale-aware per-page metadata. `title` is the page-specific part only — the
+ * localized root layout applies the `%s | CyberSkill` template. Produces the
+ * correct per-locale canonical, full hreflang alternate set (en / de / x-default)
+ * and locale-specific OpenGraph tags.
+ */
+export function localizedPageMetadata(opts: {
+  locale: Locale;
+  title: string;
+  description: string;
+  path: string;
+  noindex?: boolean;
+}): Metadata {
+  const { locale, title, description, path, noindex } = opts;
+  const canonical = localeUrl(locale, path);
+  return {
+    title,
+    description,
+    alternates: {
+      canonical,
+      languages: hreflangAlternates(path),
+    },
+    openGraph: {
+      type: "website",
+      siteName: SITE_NAME,
+      locale: ogLocale(locale),
+      title,
+      description,
+      url: canonical,
+      // Re-reference the generated OG image: a per-route openGraph override
+      // otherwise drops the inherited file-convention image.
+      images: ["/opengraph-image"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ["/opengraph-image"],
+    },
+    ...(noindex ? { robots: { index: false, follow: false } } : null),
+  };
+}
+
+/**
+ * Legacy locale-agnostic metadata helper. Retained for non-localized, noindex
+ * utility areas (e.g. /admin) where hreflang/canonical alternates are not wanted.
  */
 export function pageMetadata(opts: {
   title: string;
@@ -49,8 +125,6 @@ export function pageMetadata(opts: {
       title,
       description,
       url: path,
-      // Re-reference the generated OG image: a per-route openGraph override
-      // otherwise drops the inherited file-convention image.
       images: ["/opengraph-image"],
     },
     twitter: {
@@ -80,14 +154,14 @@ export function organizationJsonLd() {
   };
 }
 
-export function websiteJsonLd() {
+export function websiteJsonLd(locale: Locale = routing.defaultLocale) {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "@id": WEBSITE_ID,
-    url: `${SITE_URL}/`,
+    url: localeUrl(locale, "/") + "/",
     name: SITE_NAME,
-    inLanguage: "en",
+    inLanguage: locale,
     publisher: { "@id": ORG_ID },
   };
 }
@@ -97,15 +171,18 @@ export function serviceJsonLd(opts: {
   description: string;
   path: string;
   priceFrom?: number;
+  locale?: Locale;
 }) {
-  const { name, description, path, priceFrom } = opts;
+  const { name, description, path, priceFrom, locale = routing.defaultLocale } = opts;
+  const url = localeUrl(locale, path);
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Service",
     name,
     description,
     serviceType: name,
-    url: abs(path),
+    url,
+    inLanguage: locale,
     provider: { "@id": ORG_ID },
     areaServed: "Worldwide",
   };
@@ -115,13 +192,16 @@ export function serviceJsonLd(opts: {
       priceCurrency: "USD",
       price: priceFrom,
       availability: "https://schema.org/InStock",
-      url: abs(path),
+      url,
     };
   }
   return data;
 }
 
-export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
+export function breadcrumbJsonLd(
+  items: { name: string; path: string }[],
+  locale: Locale = routing.defaultLocale,
+) {
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -129,7 +209,7 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
       "@type": "ListItem",
       position: i + 1,
       name: item.name,
-      item: abs(item.path),
+      item: localeUrl(locale, item.path),
     })),
   };
 }
@@ -138,8 +218,10 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
  * Homepage Product + AggregateRating + Review schema. Modeled as a Product
  * (most reliably eligible for review-snippet stars) representing the overall
  * boosting offering, with the honest on-page aggregate (≈4.7 / 15 reviews).
+ * Review bodies follow the active locale so the structured data matches the
+ * on-page reviews.
  */
-export function boostingReviewsJsonLd() {
+export function boostingReviewsJsonLd(locale: Locale = routing.defaultLocale) {
   return {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -164,7 +246,7 @@ export function boostingReviewsJsonLd() {
         bestRating: 5,
         worstRating: 1,
       },
-      reviewBody: r.review,
+      reviewBody: r.body[locale as ReviewLocale] ?? r.body[routing.defaultLocale],
     })),
   };
 }

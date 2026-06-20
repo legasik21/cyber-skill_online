@@ -6,7 +6,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/admin", "/api", "/order"],
+      // Cover both the non-prefixed (en) and /de variants of the noindex areas.
+      disallow: ["/admin", "/api", "/order", "/de/order"],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,

@@ -1,45 +1,51 @@
 "use client"
 
-import Link from "next/link"
 import Image from "next/image"
+import { Link } from "@/i18n/navigation"
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { Menu, X, ChevronRight, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/Button"
+import LanguageSwitcher from "@/components/LanguageSwitcher"
 
 export default function Header() {
+  const t = useTranslations("header")
+  const tn = useTranslations("serviceNav")
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
   const [isDesktopServicesOpen, setIsDesktopServicesOpen] = useState(false)
   const [isMobileServicesOpen, setIsMobileServicesOpen] = useState(false)
 
+  // Service ids/hrefs are stable (kept unchanged for SEO); only the labels are
+  // sourced from translations (serviceNav namespace).
   const services = [
-    { id: "wn8-boost", label: "WN8, Winrate, High Damage", href: "/services/wn8-boost" },
-    { id: "credit-farm", label: "Credit and Bonds Farming", href: "/services/credit-farm" },
-    { 
-      id: "campaign", 
-      label: "Campaign Missions", 
+    { id: "wn8-boost", label: tn("wn8Boost"), href: "/services/wn8-boost" },
+    { id: "credit-farm", label: tn("creditFarm"), href: "/services/credit-farm" },
+    {
+      id: "campaign",
+      label: tn("campaign"),
       href: "/services/campaign-missions",
       children: [
-        { id: "campaign-1", label: "Campaign 1.0 (Obj. 260)", href: "/services/campaign-missions/1.0" },
-        { id: "campaign-2", label: "Campaign 2.0 (Obj. 279e)", href: "/services/campaign-missions/2.0" },
-        { id: "campaign-3", label: "Campaign 3.0 (Black Rock)", href: "/services/campaign-missions/3.0" },
+        { id: "campaign-1", label: tn("campaign1"), href: "/services/campaign-missions/1.0" },
+        { id: "campaign-2", label: tn("campaign2"), href: "/services/campaign-missions/2.0" },
+        { id: "campaign-3", label: tn("campaign3"), href: "/services/campaign-missions/3.0" },
       ]
     },
-    { id: "moe", label: "Mark of Excellence", href: "/services/mark-of-excellence" },
-    { id: "onslaught", label: "Onslaught", href: "/services/onslaught" },
-    { id: "tier-leveling", label: "Tier Leveling", href: "/services/tier-leveling" },
-    { id: "exp-farm", label: "Exp Farm", href: "/services/exp-farm" },
-    { id: "ace-tanker", label: "Ace Tanker", href: "/services/ace-tanker" },
-    { id: "battle-pass", label: "Battle Pass", href: "/services/battle-pass" },
-    { id: "referral", label: "Referral Program", href: "/services/referral-program" },
+    { id: "moe", label: tn("moe"), href: "/services/mark-of-excellence" },
+    { id: "onslaught", label: tn("onslaught"), href: "/services/onslaught" },
+    { id: "tier-leveling", label: tn("tierLeveling"), href: "/services/tier-leveling" },
+    { id: "exp-farm", label: tn("expFarm"), href: "/services/exp-farm" },
+    { id: "ace-tanker", label: tn("aceTanker"), href: "/services/ace-tanker" },
+    { id: "battle-pass", label: tn("battlePass"), href: "/services/battle-pass" },
+    { id: "referral", label: tn("referralProgram"), href: "/services/referral-program" },
   ]
 
   const navItems = [
-    { label: "Home", href: "/" },
-    { label: "Events", href: "/events" },
-    { label: "Guarantee", href: "/#guarantee" },
-    { label: "Reviews", href: "/#reviews" },
-    { label: "Contact", href: "/#contact" },
+    { label: t("nav.home"), href: "/" },
+    { label: t("nav.events"), href: "/events" },
+    { label: t("nav.guarantee"), href: "/#guarantee" },
+    { label: t("nav.reviews"), href: "/#reviews" },
+    { label: t("nav.contact"), href: "/#contact" },
   ]
 
   const toggleSubmenu = (id: string, e: React.MouseEvent) => {
@@ -53,10 +59,10 @@ export default function Header() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
-            <Image 
-              src="/cyber-skill_logo.svg" 
-              alt="CyberSkill Logo" 
-              width={50} 
+            <Image
+              src="/cyber-skill_logo.svg"
+              alt="CyberSkill Logo"
+              width={50}
               height={50}
               className="h-12 w-auto"
             />
@@ -73,9 +79,9 @@ export default function Header() {
                 {item.label}
               </Link>
             ))}
-            
+
             {/* Services Dropdown */}
-            <div 
+            <div
               className="relative group"
               onMouseEnter={() => setIsDesktopServicesOpen(true)}
               onMouseLeave={() => setIsDesktopServicesOpen(false)}
@@ -85,15 +91,15 @@ export default function Header() {
                 className="text-foreground hover:text-primary transition-colors font-medium flex items-center py-2"
                 aria-expanded={isDesktopServicesOpen}
               >
-                Services
+                {t("services")}
                 <ChevronDown className={`w-4 h-4 ml-1 transition-transform duration-200 ${isDesktopServicesOpen ? 'rotate-180' : ''}`} />
               </Link>
-              
+
               {/* Dropdown Menu */}
-              <div 
+              <div
                 className={`absolute top-full left-1/2 -translate-x-1/2 mt-0 w-72 bg-card border border-border rounded-lg shadow-xl transition-all duration-200 z-50 overflow-visible ${
-                  isDesktopServicesOpen 
-                    ? "opacity-100 visible translate-y-0" 
+                  isDesktopServicesOpen
+                    ? "opacity-100 visible translate-y-0"
                     : "opacity-0 invisible -translate-y-2"
                 }`}
               >
@@ -139,26 +145,31 @@ export default function Header() {
                 </div>
               </div>
             </div>
-            
-            <Button size="sm" className="ml-4" asChild>
+
+            <LanguageSwitcher className="ml-4" />
+
+            <Button size="sm" className="ml-2" asChild>
               <Link href="/#services">
-                Get Started
+                {t("getStarted")}
               </Link>
             </Button>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-secondary/50 transition-colors"
-            aria-label="Toggle menu"
-          >
-            {isMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </button>
+          {/* Mobile controls */}
+          <div className="flex items-center gap-2 md:hidden">
+            <LanguageSwitcher />
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 rounded-lg hover:bg-secondary/50 transition-colors"
+              aria-label={t("toggleMenu")}
+            >
+              {isMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
@@ -175,8 +186,7 @@ export default function Header() {
                   {item.label}
                 </Link>
               ))}
-              
-              {/* Services Dropdown - Collapsible on Mobile */}
+
               {/* Services Dropdown - Collapsible on Mobile */}
               <div>
                 <button
@@ -184,10 +194,10 @@ export default function Header() {
                   className="w-full flex items-center justify-between text-foreground hover:text-primary transition-colors font-medium px-2 py-1"
                   aria-expanded={isMobileServicesOpen}
                 >
-                  <span>Services</span>
+                  <span>{t("services")}</span>
                   <ChevronDown className={`w-5 h-5 transition-transform duration-200 ${isMobileServicesOpen ? 'rotate-180' : ''}`} />
                 </button>
-                
+
                 {isMobileServicesOpen && (
                   <div className="pl-4 space-y-1 bg-secondary/10 rounded-lg py-2 mt-2 mx-2">
                     {services.map((service) => {
@@ -233,8 +243,12 @@ export default function Header() {
                   </div>
                 )}
               </div>
-              
 
+              <Button size="sm" className="mx-2" asChild>
+                <Link href="/#services" onClick={() => setIsMenuOpen(false)}>
+                  {t("getStarted")}
+                </Link>
+              </Button>
             </div>
           </div>
         )}

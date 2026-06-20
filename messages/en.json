@@ -1,0 +1,2100 @@
+{
+  "metadata": {
+    "home": {
+      "title": "World of Tanks Boosting Service — WoT Boost | CyberSkill",
+      "description": "WoT boosting service by top-0.1% players. Raise your WN8, farm credits, complete campaign missions & get 3 Marks of Excellence — fast, safe, guaranteed."
+    }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you are looking for doesn't exist or has been moved.",
+    "backHome": "Back to Home"
+  },
+  "home": {
+    "hero": {
+      "titlePrefix": "WoT Boosting Service by",
+      "subtitle": "Professional World of Tanks boosting services. Raise your WN8, get 3 Marks of Excellence, and complete campaign missions effortlessly.",
+      "ourServices": "Our Services",
+      "chatAssistant": "Chat Assistant"
+    },
+    "eventsSection": {
+      "heading": "Current Events",
+      "subheading": "Take advantage of special events and limited-time offers",
+      "viewAll": "View All Events"
+    },
+    "servicesSection": {
+      "heading": "Our Premium Services",
+      "subheading": "Choose the boost that fits your goals.",
+      "learnMore": "Learn More",
+      "orderNow": "Order Now",
+      "items": {
+        "wn8": {
+          "description": "Increase your stats and improve your WN8 rating efficiently.",
+          "price": "From $10"
+        },
+        "credits": {
+          "description": "Get millions of credits quickly without the grind.",
+          "price": "From $15"
+        },
+        "campaign": {
+          "description": "Complete difficult missions (Obj. 279e, Chimera) with ease.",
+          "price": "Custom"
+        },
+        "moe": {
+          "description": "Get 3 marks on your favorite tanks. Top 1% performance.",
+          "price": "From $0.30/point"
+        },
+        "onslaught": {
+          "description": "Dominate the Onslaught mode and climb the ranks.",
+          "price": "From $15"
+        },
+        "tierLeveling": {
+          "description": "Rapidly level up your tanks and crews to tier X.",
+          "price": "From $25"
+        },
+        "expFarm": {
+          "description": "Gain experience points for any tank in your garage.",
+          "price": "From $3"
+        },
+        "aceTanker": {
+          "description": "Get the Ace Tanker mastery badge on your vehicles.",
+          "price": "From $15"
+        },
+        "battlePass": {
+          "description": "Complete all 50 Battle Pass levels and unlock exclusive rewards.",
+          "price": "From $10"
+        },
+        "referral": {
+          "description": "Get a Tier 8 Premium Tank and Bonds. We handle the recruiting.",
+          "price": "$100"
+        }
+      }
+    },
+    "guarantee": {
+      "heading": "CyberSkill Guarantee",
+      "subheading": "Your satisfaction and security are our top priorities",
+      "secure": {
+        "title": "100% Secure Service",
+        "body": "We adhere to strict security rules. Your account safety is paramount, which is why we insist on linking your phone number and enabling 2FA. Our employees never ask for unnecessary personal data."
+      },
+      "satisfaction": {
+        "title": "Satisfaction Guaranteed",
+        "body": "Optimal market relations are only possible if the customer is completely satisfied. We have clear refund terms if our service doesn't meet your requirements or if results aren't achieved."
+      },
+      "readPolicy": "Read Full Guarantee Policy",
+      "cards": {
+        "privacy": {
+          "title": "Data Privacy",
+          "sub": "Encrypted & Confidential"
+        },
+        "refunds": {
+          "title": "Fast Refunds",
+          "sub": "Clear Terms"
+        },
+        "result": {
+          "title": "Result Oriented",
+          "sub": "Guaranteed Goals"
+        },
+        "support": {
+          "title": "Expert Support",
+          "sub": "24/7 Assistance"
+        }
+      }
+    },
+    "reviewsSection": {
+      "heading": "What Our Clients Say",
+      "subheading": "Trusted by thousands of World of Tanks players worldwide",
+      "stats": {
+        "orders": "Orders Completed",
+        "rating": "Average Rating",
+        "support": "Support Available",
+        "secure": "Secure & Safe"
+      }
+    },
+    "contact": {
+      "heading": "Ready to Boost?",
+      "subheading": "Fill out the form and we'll get back to you.",
+      "emailLabel": "Email",
+      "discordLabel": "Discord Tag *",
+      "serviceLabel": "Service Interest",
+      "detailsLabel": "Additional Details",
+      "emailPlaceholder": "your@email.com",
+      "discordPlaceholder": "Username#1234",
+      "detailsPlaceholder": "Tell us more about what you need...",
+      "selectService": "Select a service...",
+      "sending": "Sending...",
+      "submit": "Submit Request",
+      "errors": {
+        "email": "Invalid email address",
+        "discord": "Please enter your Discord tag",
+        "service": "Please select a service"
+      }
+    }
+  },
+  "serviceNav": {
+    "wn8Boost": "WN8, Winrate, High Damage",
+    "creditFarm": "Credit and Bonds Farming",
+    "campaign": "Campaign Missions",
+    "campaign1": "Campaign 1.0 (Obj. 260)",
+    "campaign2": "Campaign 2.0 (Obj. 279e)",
+    "campaign3": "Campaign 3.0 (Black Rock)",
+    "moe": "Mark of Excellence",
+    "onslaught": "Onslaught",
+    "tierLeveling": "Tier Leveling",
+    "expFarm": "Exp Farm",
+    "aceTanker": "Ace Tanker",
+    "battlePass": "Battle Pass",
+    "referralProgram": "Referral Program"
+  },
+  "header": {
+    "nav": {
+      "home": "Home",
+      "events": "Events",
+      "guarantee": "Guarantee",
+      "reviews": "Reviews",
+      "contact": "Contact"
+    },
+    "services": "Services",
+    "getStarted": "Get Started",
+    "toggleMenu": "Toggle menu"
+  },
+  "footer": {
+    "tagline": "Professional World of Tanks boosting services. Raise your WN8, get 3 Marks of Excellence, and complete campaign missions effortlessly.",
+    "servicesHeading": "Our Services",
+    "legalHeading": "Legal",
+    "connectHeading": "Connect With Us",
+    "legal": {
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "cookies": "Cookie Policy",
+      "guarantee": "Guarantee",
+      "referral": "Referral Rewards"
+    },
+    "copyright": "© 2017-{year} CyberSkill. All rights reserved.",
+    "disclaimer": "Not affiliated with Wargaming. World of Tanks is a trademark of Wargaming.net."
+  },
+  "eventBanner": {
+    "title": "🐉 Season of the Crimson Dragon",
+    "dateRange": "Jan 14 - Feb 22, 2026",
+    "activeNow": "ACTIVE NOW",
+    "readMore": "Read more..."
+  },
+  "reviews": {
+    "readMore": "Read more...",
+    "showLess": "Show less",
+    "swipeHint": "Swipe to see more →"
+  },
+  "chatWidget": {
+    "open": "Open chat",
+    "close": "Close chat",
+    "badge": "Chat",
+    "liveSupport": "Live Support",
+    "statusClosed": "Closed",
+    "statusOnline": "Online",
+    "statusConnecting": "Connecting...",
+    "managerTookOver": "A team member is now with you — feel free to keep typing.",
+    "loading": "Loading chat...",
+    "emptyWelcome": "👋 Welcome! How can we help you today?",
+    "sender": {
+      "support": "Support",
+      "you": "You"
+    },
+    "time": {
+      "justNow": "just now"
+    },
+    "welcomeMessage": "Hello! Welcome to CyberSkill. We're here to help you dominate World of Tanks. Whether it's stat boosting, tank research, or marks of excellence — just let us know what you need, and our manager will guide you!",
+    "reconnecting": "Reconnecting...",
+    "conversationClosed": {
+      "title": "Conversation Closed",
+      "body": "If you have any additional questions, start a new conversation."
+    },
+    "newConversation": "New Conversation",
+    "inputPlaceholder": "Type your message...",
+    "send": "Send message"
+  },
+  "order": {
+    "metaTitle": "Order",
+    "metaDescription": "CyberSkill order status."
+  },
+  "orderSuccess": {
+    "title": "Order Submitted Successfully!",
+    "thankYou": "Thank you for your order! Our manager will contact you via Discord within 24 hours.",
+    "whatNext": "What happens next?",
+    "step1": "Our manager will review your order",
+    "step2": "You will receive a Discord friend request",
+    "step3": "We will discuss details and payment",
+    "step4": "Work begins immediately after confirmation",
+    "backHome": "Back to Home",
+    "viewServices": "View Services"
+  },
+  "orderError": {
+    "title": "Order Failed",
+    "reason": {
+      "validation": "Please fill in all required fields correctly.",
+      "telegram": "Could not send your order. Please try again or contact us via Discord.",
+      "server": "Server error occurred. Please try again later.",
+      "default": "Something went wrong while processing your order."
+    },
+    "needHelp": "Need help?",
+    "needHelpBody": "If you continue to experience issues, please contact us directly via our Discord server or use the live chat on the website.",
+    "tryAgain": "Try Again",
+    "backHome": "Back to Home",
+    "loading": "Loading..."
+  },
+  "events": {
+    "metaTitle": "WoT Events & Boost Offers",
+    "metaDescription": "Current, upcoming and past World of Tanks events with limited-time boost offers — Battle Pass Season XX, Tankfest 2026, Onslaught, special modes and more. Grab the rewards before they end.",
+    "backToHome": "Back to Home",
+    "hero": {
+      "title": "World of Tanks Events",
+      "subtitle": "Track what's live, what's coming, and what just wrapped. Get professional boosting for every limited-time mode, season and special event."
+    },
+    "active": {
+      "heading": "Active Events",
+      "subheading": "Events currently running in-game",
+      "empty": "No events are running right now — check back soon for the next season."
+    },
+    "upcoming": {
+      "heading": "Upcoming Events",
+      "subheading": "Announced and on the horizon — get a head start",
+      "empty": "No upcoming events announced yet. We'll add them here the moment Wargaming reveals what's next."
+    },
+    "past": {
+      "heading": "Past Events",
+      "subheading": "Archive of previous events"
+    },
+    "card": {
+      "eventDetails": "Event Details",
+      "boostServices": "Boost Services",
+      "badgePast": "PAST EVENT",
+      "ended": "Ended:",
+      "status": "Status:",
+      "completed": "Completed",
+      "eventEnded": "Event Ended"
+    },
+    "why": {
+      "heading": "Why Use Our Event Boosting?",
+      "subheading": "Professional help for limited-time events",
+      "items": [
+        {
+          "title": "Don't Miss Out",
+          "desc": "Limited-time events have exclusive rewards. Our boosters ensure you get everything before the event ends."
+        },
+        {
+          "title": "Expert Players",
+          "desc": "Our team has extensive experience with all World of Tanks events and knows the most efficient strategies."
+        },
+        {
+          "title": "All Rewards",
+          "desc": "We'll help you unlock all available rewards, including rare premium tanks and exclusive customizations."
+        }
+      ],
+      "cta": "Get Started with Event Boosting"
+    },
+    "data": {
+      "active": [
+        {
+          "emoji": "🏜️",
+          "accent": "cyan",
+          "badge": "ACTIVE NOW",
+          "title": "Battle Pass Season XX: Searching the Sands",
+          "description": "The summer Battle Pass is live. Push through three desert-themed chapters and claim the exclusive KB-52 with your Tokens.",
+          "details": [
+            {
+              "icon": "📅",
+              "text": "Duration: Jun 3 – Sep 2, 2026"
+            },
+            {
+              "icon": "🏆",
+              "text": "Reward Tank: KB-52 (Tier IX, 28 Tokens)"
+            },
+            {
+              "icon": "🎨",
+              "text": "Tier X styles: WZ-113G FT, Bat.-Châtillon 25 t, CS-63"
+            },
+            {
+              "icon": "📚",
+              "text": "Three chapters · Tokens, Bonds, Crew & more"
+            }
+          ],
+          "boostTitle": "Boost Services Available",
+          "offers": [
+            {
+              "label": "Level Boost",
+              "price": "$2.5/lvl",
+              "note": "Fast progression through every Battle Pass stage"
+            },
+            {
+              "label": "Full Pass (50 levels)",
+              "price": "$125",
+              "note": "Complete all chapters and bank the KB-52 Tokens"
+            }
+          ],
+          "ctaLabel": "Order Battle Pass Boost",
+          "ctaHref": "/services/battle-pass"
+        },
+        {
+          "emoji": "🕹️",
+          "accent": "amber",
+          "badge": "ACTIVE NOW",
+          "title": "Arcade Cabinet: Equalize!",
+          "description": "A limited-time arcade mode where every tank is equalized across Tiers I–X. Pure skill, big progression rewards — but only until June 21.",
+          "details": [
+            {
+              "icon": "📅",
+              "text": "Duration: Jun 12 – 21, 2026"
+            },
+            {
+              "icon": "⚔️",
+              "text": "Mode: Equalized all-tier arcade battles (I–X)"
+            },
+            {
+              "icon": "🏆",
+              "text": "Up to 350K credits, 5,250 bonds & Free XP"
+            },
+            {
+              "icon": "🎟️",
+              "text": "Battle Pass Points & Premium Account time"
+            }
+          ],
+          "boostTitle": "Boost Services Available",
+          "offers": [
+            {
+              "label": "Credit Farm",
+              "price": "From $4.5/M",
+              "note": "Bank millions of credits while the mode is live"
+            },
+            {
+              "label": "Bond Farm",
+              "price": "$7/100",
+              "note": "Stack bonds from the equalized battles"
+            }
+          ],
+          "ctaLabel": "Order Arcade Boost",
+          "ctaHref": "/services/arcade-cabinet"
+        }
+      ],
+      "upcoming": [
+        {
+          "emoji": "🏆",
+          "accent": "emerald",
+          "badge": "UPCOMING",
+          "title": "Tankfest 2026",
+          "description": "The Tank Museum's legendary weekend returns. Grind the Road to Tankfest missions for the Tiger 131, then tune in to the Online stream for Mystery Drops.",
+          "details": [
+            {
+              "icon": "📅",
+              "text": "Road to Tankfest: from Jun 22 · Online Stream: Jun 26 – 28"
+            },
+            {
+              "icon": "🎖️",
+              "text": "Mission Reward: VI Tiger 131 (German Premium)"
+            },
+            {
+              "icon": "🎁",
+              "text": "Mystery Drops: 3D styles & Premium vehicles"
+            },
+            {
+              "icon": "📺",
+              "text": "Tankfest Token Store: free Premium tank"
+            }
+          ],
+          "boostTitle": "Boost Services Available",
+          "offers": [
+            {
+              "label": "Tiger 131 Missions",
+              "price": "Custom",
+              "note": "We complete the Road to Tankfest missions for the Tiger 131"
+            },
+            {
+              "label": "Mission Bundle",
+              "price": "Get a quote",
+              "note": "Stack rewards across the Tankfest weekend"
+            }
+          ],
+          "ctaLabel": "Order Mission Boost",
+          "ctaHref": "/services/campaign-missions"
+        }
+      ],
+      "past": [
+        {
+          "emoji": "🔫",
+          "title": "Steel Hunter Summer 2026",
+          "description": "Battle royale survival — Survival of the Fittest.",
+          "ended": "Jun 15, 2026"
+        },
+        {
+          "emoji": "🔄",
+          "title": "Trade-In: Try Something New",
+          "description": "Trade Tier VI–VIII Premiums for 50% gold value toward a new tank.",
+          "ended": "Jun 12, 2026"
+        },
+        {
+          "emoji": "🎖️",
+          "title": "D-Day: 82nd Anniversary",
+          "description": "Commemorative missions, D-Day Tokens and the 'Turning the Tide' style.",
+          "ended": "Jun 12, 2026"
+        },
+        {
+          "emoji": "🧊",
+          "title": "Battle Pass Season XIX: Operation Borealis",
+          "description": "Arctic season — reward tank Saryuda plus three Tier X 3D styles.",
+          "ended": "Jun 3, 2026"
+        },
+        {
+          "emoji": "🐉",
+          "title": "Onslaught: Season of the Jade Dragon",
+          "description": "Year of the Dragon finale — annual reward, the Ashbringer.",
+          "ended": "Jun 1, 2026"
+        },
+        {
+          "emoji": "🕊️",
+          "title": "VE Day: 81st Anniversary",
+          "description": "Victory in Europe missions and the M4-85 reward tank.",
+          "ended": "May 14, 2026"
+        },
+        {
+          "emoji": "🖖",
+          "title": "Star Trek Collaboration",
+          "description": "The AAT60 tank and the U.S.S. Enterprise crew.",
+          "ended": "May 8, 2026"
+        },
+        {
+          "emoji": "🎂",
+          "title": "World of Tanks 15th Birthday",
+          "description": "Anniversary gifts, Cupcake Tokens and the T26E3 Eagle 7.",
+          "ended": "Apr 20, 2026"
+        },
+        {
+          "emoji": "☘️",
+          "title": "Glorious in Green (Steel Hunter: Shamrock)",
+          "description": "St. Patrick's festival with the Shamrock Showdown battle royale.",
+          "ended": "Mar 20, 2026"
+        },
+        {
+          "emoji": "🌸",
+          "title": "Girls und Panzer (5th Collaboration)",
+          "description": "StuG III Ausf. F Kabasan and the Team-Kabasan crew.",
+          "ended": "Mar 12, 2026"
+        },
+        {
+          "emoji": "🌱",
+          "title": "Spring Token Store",
+          "description": "Twitch Drops tokens for Premium tanks VK 45.03 & Heavy Tank No. VI.",
+          "ended": "Mar 30, 2026"
+        },
+        {
+          "emoji": "🐉",
+          "title": "Onslaught: Season of the Crimson Dragon",
+          "description": "Year of the Dragon, Season 2 — progress toward the Ashbringer.",
+          "ended": "Feb 23, 2026"
+        },
+        {
+          "emoji": "🤖",
+          "title": "Battle Pass Special: RoboCop",
+          "description": "The RoboCop collaboration and the OCP Peacekeeper tank.",
+          "ended": "Jan 29, 2026"
+        },
+        {
+          "emoji": "🎄",
+          "title": "Holiday Ops 2026",
+          "description": "Festive bonuses, the Festive Tree and special rewards.",
+          "ended": "Jan 12, 2026"
+        },
+        {
+          "emoji": "🎁",
+          "title": "Battle Pass: Holiday Havoc",
+          "description": "Winter special pass — Santa & Krampowski crew commanders.",
+          "ended": "Jan 12, 2026"
+        }
+      ]
+    }
+  },
+  "aceTanker": {
+    "metaTitle": "WoT Ace Tanker Boost — Mastery Badge",
+    "metaDescription": "Get the Ace Tanker mastery badge on any World of Tanks vehicle. Top-0.1% boosters secure the top-marksman score for your tanks — fast and safe.",
+    "breadcrumb": {
+      "home": "Home",
+      "services": "Services",
+      "current": "Ace Tanker"
+    },
+    "backToHome": "Back to Home",
+    "hero": {
+      "title": "World of Tanks Ace Tanker Mastery Boost",
+      "subtitle": "Get the coveted \"Mastery Badge: Ace Tanker\" on any vehicle. Join the top 1% of players.",
+      "orderNow": "Order Now"
+    },
+    "calculator": {
+      "title": "Price Configurator",
+      "description": "Select tank tier to see the price",
+      "tankTierLabel": "Tank Tier",
+      "extraOptionsLabel": "Extra Options",
+      "spgLabel": "SPG (Artillery)",
+      "spgNotePrefix": "Boosting Ace Tanker on SPG is much harder. ",
+      "spgNoteHighlight": "+100% to price",
+      "spgNoteSuffix": ".",
+      "replaysLabel": "Get Replays",
+      "replaysNotePrefix": "We will provide the replay file of the battle. ",
+      "replaysNoteHighlight": "+20% to price",
+      "replaysNoteSuffix": ".",
+      "basePriceLabel": "Base Price ({tier}):",
+      "spgFeeLabel": "SPG Fee (+100%):",
+      "replaysFeeLabel": "Get Replays (+20%):",
+      "totalLabel": "Total:",
+      "guaranteeNote": "Guaranteed result. If we fail, you get a full refund."
+    },
+    "order": {
+      "title": "Order Details",
+      "description": "Tell us which tank needs the Ace badge",
+      "tankNameLabel": "Tank Name *",
+      "tankNamePlaceholder": "e.g. Object 140, Bourrasque",
+      "emailLabel": "Email Address *",
+      "emailPlaceholder": "your@email.com",
+      "discordLabel": "Discord Tag *",
+      "discordPlaceholder": "Username#1234",
+      "serverLabel": "Server *",
+      "serverSelect": "Select server...",
+      "serverNa": "North America",
+      "serverEu": "Europe",
+      "serverAsia": "Asia",
+      "serverRu": "Russia",
+      "summaryTitle": "Order Summary:",
+      "summaryService": "Service:",
+      "summaryServiceName": "Ace Tanker (Mastery Badge)",
+      "summaryTier": "Tier:",
+      "summaryClass": "Class:",
+      "summaryClassValue": "SPG (Artillery)",
+      "summaryGetReplays": "Get Replays:",
+      "summaryYes": "Yes",
+      "summaryNo": "No",
+      "summaryTotalCost": "Total Cost:",
+      "additionalInfoLabel": "Additional Information (Optional)",
+      "additionalInfoPlaceholder": "Any specific equipment or preferences...",
+      "submitting": "Sending Order...",
+      "submit": "Submit Order - ${price}",
+      "disclaimer": "By submitting this form, you agree to our Terms of Service."
+    },
+    "howItWorks": {
+      "heading": "How It Works",
+      "step1Title": "Select Tank",
+      "step1Body": "Tell us which tank you want to Ace. We supply a pro who knows that tank perfectly.",
+      "step2Title": "We Dominate",
+      "step2Body": "Our booster plays battles until they achieve a base XP higher than 99% of players in the last 7 days.",
+      "step3Title": "Receive Badge",
+      "step3Body": "Login to find the golden \"M\" badge in your stats and the replay of the epic battle."
+    },
+    "errors": {
+      "email": "Invalid email address",
+      "discord": "Please enter your Discord tag",
+      "tankName": "Please enter the tank name",
+      "tier": "Please select a tier",
+      "server": "Please select a server"
+    }
+  },
+  "arcadeCabinet": {
+    "metaTitle": "Arcade Cabinet: Equalize! — Event Boost",
+    "metaDescription": "Farm the World of Tanks Arcade Cabinet: Equalize! event (June 12–21, 2026) — equalized all-tier battles dropping credits, bonds, Battle Pass Points and Free XP. Pro boosting before it ends.",
+    "breadcrumb": {
+      "home": "Home",
+      "services": "Services",
+      "current": "Arcade Cabinet: Equalize!"
+    },
+    "backToHome": "Back to Home",
+    "hero": {
+      "title": "Arcade Cabinet: Equalize!",
+      "bannerStatus": "Live now · June 12 – 21, 2026 — ends June 21",
+      "bannerNote": "A limited-time special battle mode. Once it's gone, the equalized credits, bonds and Free XP go with it — don't wait until the last day.",
+      "intro": "Arcade Cabinet: Equalize! drops every tank into equalized all-tier arcade battles, balancing vehicles across Tiers I–X so skill decides the match. Each fight rains down credits, bonds, Battle Pass Points, Free XP and WoT Premium Account time — and our boosters can farm it all for you before the cabinet powers down.",
+      "cta": "Farm the Rewards"
+    },
+    "rewards": {
+      "title": "Event Rewards",
+      "description": "What the Arcade Cabinet pays out",
+      "duration": "Duration: June 12 – 21, 2026 — a short window, ends June 21.",
+      "equalized": "Equalized all-tier battles — every tank balanced across Tiers I–X.",
+      "credits": "Up to 350K credits & ~5,250 bonds across the event.",
+      "extras": "Battle Pass Points, Free XP & WoT Premium Account time."
+    },
+    "boost": {
+      "title": "Boost Services",
+      "description": "The closest boosts to grab every reward",
+      "creditLabel": "Credit & Bonds Farming",
+      "creditPrice": "From $4.5/M credits · $7 / 100 bonds",
+      "creditNote": "Cash in the equalized battles for credits and bonds without the grind.",
+      "creditCta": "Order Credit & Bonds Farm",
+      "expLabel": "Exp Farm",
+      "expPrice": "From $3",
+      "expNote": "Convert the event's Free XP into unlocked modules and new tanks.",
+      "expCta": "Order Exp Farm"
+    },
+    "why": {
+      "heading": "Why Boost This Event",
+      "limitedTitle": "Limited Window",
+      "limitedBody": "The cabinet only runs June 12 – 21. Once June 21 passes, the equalized rewards are gone for good.",
+      "payoutTitle": "Max Payout",
+      "payoutBody": "We push for the full haul — up to 350K credits, ~5,250 bonds, Battle Pass Points and Free XP.",
+      "prosTitle": "Equalized Pros",
+      "prosBody": "Our players know the equalized all-tier meta and farm the cabinet efficiently on your account."
+    }
+  },
+  "battlePass": {
+    "metaTitle": "WoT Battle Pass Boost — All 50 Levels",
+    "metaDescription": "WoT Battle Pass boost — complete all 50 levels and claim the season's exclusive reward tank. Fast, secure season progression by pro players.",
+    "breadcrumb": {
+      "home": "Home",
+      "services": "Services",
+      "current": "Battle Pass"
+    },
+    "backToHome": "Back to Home",
+    "hero": {
+      "title": "World of Tanks Battle Pass Boost (All 50 Levels)",
+      "eventLabel": "Current Event: Battle Pass Season XX — Searching the Sands",
+      "eventDescriptionPrefix": "Push through three desert-themed chapters and claim the exclusive ",
+      "eventTank": "KB-52 (Tier IX)",
+      "eventDescriptionSuffix": " with your Tokens. Season XX runs June 3 – September 2, 2026.",
+      "subtitle": "Complete your Battle Pass and unlock all 50 levels of exclusive rewards with our professional boosting service",
+      "calculatePrice": "Calculate Your Price"
+    },
+    "calculator": {
+      "title": "Price Calculator",
+      "description": "Configure your order and see the price instantly",
+      "currentLevelLabel": "Current Battle Pass Level",
+      "currentLevelPlaceholder": "Enter your current level (1-50)",
+      "targetLevelLabel": "Target Battle Pass Level",
+      "targetLevelPlaceholder": "Enter target level (1-50)",
+      "targetTooLow": "Target level cannot be lower than current level",
+      "levelsToBoost": "Levels to boost:",
+      "levelLabel": "Level {level}",
+      "pricePerLevel": "Price per level:",
+      "basePrice": "Base Price ({count} levels):",
+      "discount": "Discount ({percent}%):",
+      "total": "Total:",
+      "volumeDiscountsTitle": "💰 Volume Discounts:",
+      "discountTier1": "25-49 stages:",
+      "discountTier1Value": "10% OFF",
+      "discountTier2": "50 stages:",
+      "discountTier2Value": "15% OFF",
+      "securityBadge": "100% secure with VPN protection and privacy guaranteed"
+    },
+    "order": {
+      "title": "Complete Your Order",
+      "description": "Fill in your details to get started",
+      "emailLabel": "Email Address *",
+      "emailPlaceholder": "your@email.com",
+      "discordLabel": "Discord Tag *",
+      "discordPlaceholder": "Username#1234",
+      "serverLabel": "Server *",
+      "serverSelect": "Select server...",
+      "serverNa": "North America",
+      "serverEu": "Europe",
+      "serverAsia": "Asia",
+      "serverRu": "Russia",
+      "summaryTitle": "Order Summary:",
+      "summaryService": "Service:",
+      "summaryServiceName": "Battle Pass Boosting",
+      "summaryFromLevel": "From Level:",
+      "summaryToLevel": "To Level:",
+      "summaryLevelsToBoost": "Levels to boost:",
+      "summaryDiscount": "Discount:",
+      "summaryDiscountValue": "{percent}% OFF",
+      "summaryTotalCost": "Total Cost:",
+      "additionalInfoLabel": "Additional Information (Optional)",
+      "additionalInfoPlaceholder": "Any specific requirements or preferences...",
+      "submitting": "Sending Order...",
+      "submit": "Submit Order - ${price}",
+      "disclaimer": "By submitting this form, you agree to our Terms of Service and Privacy Policy. We'll contact you within 30 minutes to confirm your order."
+    },
+    "features": {
+      "heading": "Why Choose Our Service?",
+      "secureTitle": "100% Secure",
+      "secureBody": "VPN protection, encrypted connections, and complete privacy guaranteed.",
+      "allLevelsTitle": "All 50 Levels",
+      "allLevelsBody": "Complete access to all Battle Pass rewards and exclusive content.",
+      "expertTitle": "Expert Players",
+      "expertBody": "Our boosters efficiently complete all challenges and missions.",
+      "volumeTitle": "Volume Discounts",
+      "volumeBody": "Save up to 15% when boosting 50 levels."
+    },
+    "howItWorks": {
+      "heading": "How It Works",
+      "step1Title": "Select Levels",
+      "step1Body": "Choose your current Battle Pass level and your target level (up to 50).",
+      "step2Title": "We Boost",
+      "step2Body": "Our expert players efficiently complete Battle Pass challenges and missions.",
+      "step3Title": "Claim Rewards",
+      "step3Body": "Enjoy all the exclusive Battle Pass rewards, tokens, and premium content!"
+    },
+    "errors": {
+      "email": "Invalid email address",
+      "discord": "Please enter your Discord tag",
+      "minLevel": "Minimum level is 1",
+      "maxLevel": "Maximum level is 50",
+      "server": "Please select a server"
+    }
+  },
+  "campaign10": {
+    "metaTitle": "Obj. 260 Mission Boost (Campaign 1.0)",
+    "metaDescription": "Unlock the Object 260 reward tank — we complete all Campaign 1.0 personal missions for you. Fast, secure, by top-0.1% players.",
+    "breadcrumb": {
+      "home": "Home",
+      "services": "Services",
+      "campaign": "Campaign Missions",
+      "current": "Campaign 1.0"
+    },
+    "backToHome": "Back to Home",
+    "hero": {
+      "back": "Back to Campaigns",
+      "title": "World of Tanks Obj. 260 Mission Boost",
+      "subtitle": "Complete campaign missions and earn prestigious reward tanks including Object 260, T 55A, and more.",
+      "anyMissionSet": "Any Mission Set",
+      "anyDifficulty": "Any Difficulty",
+      "priceFrom": "From $5",
+      "calculateNow": "Calculate now"
+    },
+    "calculator": {
+      "heading": "Mission Calculator",
+      "subheading": "Select multiple missions for any tank - click cells to toggle selection",
+      "selectAllTank25": "Select All (25% OFF)",
+      "allSelectedTank25": "All Selected (25% OFF)",
+      "typeColumn": "Type",
+      "selected": "selected",
+      "selectAll": "Select All",
+      "all": "All",
+      "off15": "15% OFF",
+      "off25": "25% OFF",
+      "honorsNote": "*If you need to complete any mission with honors (with second task), it will cost an additional 50% of the mission price. Please leave a comment in the order form or contact our manager.",
+      "clearAll": "Clear all"
+    },
+    "panel": {
+      "title": "Selected Missions",
+      "selected": "selected",
+      "emptyTitle": "No missions selected",
+      "emptyHint": "Click on cells in the grid to add missions",
+      "allRange": "All (1-15)",
+      "off15": "15% OFF",
+      "off25": "25% OFF",
+      "basePrice": "Base price:",
+      "discount": "Discount:",
+      "total": "Total:",
+      "continueOrder": "Continue the order"
+    },
+    "order": {
+      "title": "Complete Your Order",
+      "description": "Fill in your details to finalize your mission order",
+      "emailLabel": "Email Address *",
+      "emailPlaceholder": "your@email.com",
+      "discordLabel": "Discord Tag *",
+      "discordPlaceholder": "Username#1234",
+      "serverLabel": "Server *",
+      "serverSelect": "Select server...",
+      "serverNa": "North America",
+      "serverEu": "Europe",
+      "serverAsia": "Asia",
+      "serverRu": "Russia",
+      "summaryTitle": "Order Summary:",
+      "summaryCampaign": "Campaign:",
+      "summaryMissionsSelected": "Missions Selected:",
+      "missionsUnit": "{count} missions",
+      "off25": "25% OFF",
+      "basePrice": "Base Price:",
+      "totalDiscount": "Total Discount:",
+      "totalPrice": "Total Price:",
+      "noMissionsNote": "*Please use the calculator above to select your missions first",
+      "additionalInfoLabel": "Additional Information (Optional)",
+      "additionalInfoPlaceholder": "Any specific requirements or preferences...",
+      "submitting": "Sending Order...",
+      "submit": "Submit Order - ${price}",
+      "submitNoMissions": "Select Missions in Calculator First",
+      "disclaimer": "By submitting this form, you agree to our Terms of Service and Privacy Policy. We'll contact you within 30 minutes to confirm your order."
+    },
+    "features": {
+      "heading": "Why Choose Our Service?",
+      "secureTitle": "100% Secure",
+      "secureBody": "VPN protection, encrypted connections, and complete privacy guaranteed.",
+      "expertTitle": "Expert Players",
+      "expertBody": "Campaign specialists with proven track records of completion.",
+      "trackingTitle": "Progress Tracking",
+      "trackingBody": "Real-time updates on mission completion and progress milestones.",
+      "resultsTitle": "Guaranteed Results",
+      "resultsBody": "We complete the missions or your money back - no questions asked."
+    },
+    "errors": {
+      "email": "Invalid email address",
+      "discord": "Please enter your Discord tag",
+      "server": "Please select a server"
+    }
+  },
+  "campaign20": {
+    "metaTitle": "Obj. 279(e) Mission Boost (Campaign 2.0)",
+    "metaDescription": "Get the Object 279(e) — we complete every Campaign 2.0 mission with honors. Expert boosters, guaranteed result, full account safety.",
+    "breadcrumb": {
+      "home": "Home",
+      "services": "Services",
+      "campaign": "Campaign Missions",
+      "current": "Campaign 2.0"
+    },
+    "backToHome": "Back to Home",
+    "hero": {
+      "backToCampaigns": "Back to Campaigns",
+      "title": "World of Tanks Obj. 279(e) Mission Boost",
+      "subtitle": "Complete challenging campaign missions and earn the Excalibur, Chimera, and the legendary Object 279 (e).",
+      "anyMissionSet": "Any Mission Set",
+      "hardDifficulty": "Hard Difficulty",
+      "priceFrom": "From $15",
+      "calculateNow": "Calculate now"
+    },
+    "calculator": {
+      "heading": "Mission Calculator",
+      "subheading": "Select multiple missions for any tank - click cells to toggle selection",
+      "allSelectedTank": "All Selected (25% OFF)",
+      "selectAllTank": "Select All (25% OFF)",
+      "selectedCount": "{count} selected",
+      "typeColumn": "Type",
+      "fullTypeDiscount": "15% OFF",
+      "selectAllType": "All",
+      "selectAllTypeMobile": "Select All",
+      "honorsNote": "*If you need to complete any mission with honors (with second task), it will cost an additional 50% of the mission price. Please leave a comment in the order form or contact our manager.",
+      "clearAll": "Clear all"
+    },
+    "selected": {
+      "heading": "Selected Missions",
+      "selectedCount": "{count} selected",
+      "emptyTitle": "No missions selected",
+      "emptyHint": "Click on cells in the grid to add missions",
+      "allRange": "All (1-15)",
+      "fullTypeDiscount": "15% OFF",
+      "fullTankDiscount": "25% OFF",
+      "basePrice": "Base price:",
+      "discount": "Discount:",
+      "total": "Total:",
+      "continueOrder": "Continue the order"
+    },
+    "order": {
+      "title": "Complete Your Order",
+      "description": "Fill in your details to finalize your mission order",
+      "emailLabel": "Email Address *",
+      "emailPlaceholder": "your@email.com",
+      "discordLabel": "Discord Tag *",
+      "discordPlaceholder": "Username#1234",
+      "serverLabel": "Server *",
+      "serverSelect": "Select server...",
+      "serverNa": "North America",
+      "serverEu": "Europe",
+      "serverAsia": "Asia",
+      "serverRu": "Russia",
+      "summaryTitle": "Order Summary:",
+      "summaryCampaign": "Campaign:",
+      "summaryMissionsSelected": "Missions Selected:",
+      "summaryTankMissions": "{count} missions",
+      "summaryFullTankDiscount": "25% OFF",
+      "summaryBasePrice": "Base Price:",
+      "summaryTotalDiscount": "Total Discount:",
+      "summaryTotalPrice": "Total Price:",
+      "summaryEmptyNote": "*Please use the calculator above to select your missions first",
+      "additionalInfoLabel": "Additional Information (Optional)",
+      "additionalInfoPlaceholder": "Any specific requirements or preferences...",
+      "submitting": "Sending Order...",
+      "submit": "Submit Order - ${price}",
+      "submitEmpty": "Select Missions in Calculator First",
+      "disclaimer": "By submitting this form, you agree to our Terms of Service and Privacy Policy. We'll contact you within 30 minutes to confirm your order."
+    },
+    "features": {
+      "heading": "Why Choose Our Service?",
+      "secureTitle": "100% Secure",
+      "secureBody": "VPN protection, encrypted connections, and complete privacy guaranteed.",
+      "expertTitle": "Expert Players",
+      "expertBody": "Campaign specialists with proven track records of completion.",
+      "trackingTitle": "Progress Tracking",
+      "trackingBody": "Real-time updates on mission completion and progress milestones.",
+      "resultsTitle": "Guaranteed Results",
+      "resultsBody": "We complete the missions or your money back - no questions asked."
+    },
+    "errors": {
+      "email": "Invalid email address",
+      "discord": "Please enter your Discord tag",
+      "server": "Please select a server"
+    }
+  },
+  "campaign30": {
+    "metaTitle": "Black Rock Mission Boost (Campaign 3.0)",
+    "metaDescription": "Earn the Black Rock reward tank — we clear all Campaign 3.0 missions for you. Fast, secure boosting by professional players.",
+    "breadcrumb": {
+      "home": "Home",
+      "services": "Services",
+      "campaign": "Campaign Missions",
+      "current": "Campaign 3.0"
+    },
+    "backToHome": "Back to Home",
+    "hero": {
+      "back": "Back to Campaigns",
+      "title": "World of Tanks Black Rock Mission Boost",
+      "subtitle": "Complete Vanguard, Ambush, and Assistance missions for Windhund, Dravec, and Black Rock.",
+      "anyMissionSet": "Any Mission Set",
+      "extremeDifficulty": "Extreme Difficulty",
+      "priceFrom": "From $20",
+      "calculateNow": "Calculate now"
+    },
+    "calculator": {
+      "heading": "Mission Calculator",
+      "subheading": "Select multiple missions - click cells to toggle selection",
+      "selectAllTank25": "Select All (25% OFF)",
+      "allSelectedTank25": "All Selected (25% OFF)",
+      "seriesColumn": "Series",
+      "selected": "selected",
+      "selectAll": "Select All",
+      "all": "All",
+      "off15": "15% OFF",
+      "off25": "25% OFF",
+      "honorsNote": "*If you need to complete any mission with honors (with second task), it will cost an additional 50% of the mission price. Please leave a comment in the order form or contact our manager.",
+      "clearAll": "Clear all"
+    },
+    "panel": {
+      "title": "Selected Missions",
+      "selected": "selected",
+      "emptyTitle": "No missions selected",
+      "emptyHint": "Click on cells in the grid to add missions",
+      "allRange": "All (1-15)",
+      "off15": "15% OFF",
+      "off25": "25% OFF",
+      "basePrice": "Base price:",
+      "discount": "Discount:",
+      "total": "Total:",
+      "continueOrder": "Continue the order"
+    },
+    "order": {
+      "title": "Complete Your Order",
+      "description": "Fill in your details to finalize your mission order",
+      "emailLabel": "Email Address *",
+      "emailPlaceholder": "your@email.com",
+      "discordLabel": "Discord Tag *",
+      "discordPlaceholder": "Username#1234",
+      "serverLabel": "Server *",
+      "serverSelect": "Select server...",
+      "serverNa": "North America",
+      "serverEu": "Europe",
+      "serverAsia": "Asia",
+      "serverRu": "Russia",
+      "summaryTitle": "Order Summary:",
+      "summaryCampaign": "Campaign:",
+      "summaryMissionsSelected": "Missions Selected:",
+      "missionsUnit": "{count} missions",
+      "off25": "25% OFF",
+      "basePrice": "Base Price:",
+      "totalDiscount": "Total Discount:",
+      "totalPrice": "Total Price:",
+      "noMissionsNote": "*Please use the calculator above to select your missions first",
+      "additionalInfoLabel": "Additional Information (Optional)",
+      "additionalInfoPlaceholder": "Any specific requirements or preferences...",
+      "submitting": "Sending Order...",
+      "submit": "Submit Order - ${price}",
+      "submitNoMissions": "Select Missions in Calculator First",
+      "disclaimer": "By submitting this form, you agree to our Terms of Service and Privacy Policy. We'll contact you within 30 minutes to confirm your order."
+    },
+    "features": {
+      "heading": "Why Choose Our Service?",
+      "secureTitle": "100% Secure",
+      "secureBody": "VPN protection, encrypted connections, and complete privacy guaranteed.",
+      "expertTitle": "Expert Players",
+      "expertBody": "Campaign specialists with proven track records of completion.",
+      "trackingTitle": "Progress Tracking",
+      "trackingBody": "Real-time updates on mission completion and progress milestones.",
+      "resultsTitle": "Guaranteed Results",
+      "resultsBody": "We complete the missions or your money back - no questions asked."
+    },
+    "errors": {
+      "email": "Invalid email address",
+      "discord": "Please enter your Discord tag",
+      "server": "Please select a server"
+    }
+  },
+  "campaignMissions": {
+    "metaTitle": "WoT Campaign Missions — Obj. 279e & 260",
+    "metaDescription": "Complete the toughest World of Tanks campaign missions — Obj. 260, Obj. 279(e) and Black Rock — with expert boosters and unlock elite reward tanks.",
+    "breadcrumb": {
+      "home": "Home",
+      "services": "Services",
+      "current": "Campaign Missions"
+    },
+    "backToHome": "Back to Home",
+    "hero": {
+      "title": "World of Tanks Campaign Missions Boost (Obj. 279e)"
+    },
+    "campaignTitle": "Campaign {version}",
+    "rewardTanks": "Reward Tanks:",
+    "viewCampaign": "View Campaign",
+    "campaigns": {
+      "1.0": {
+        "description": "The original campaign featuring classic missions with balanced difficulty"
+      },
+      "2.0": {
+        "description": "Enhanced campaign with more challenging objectives and multiple prestigious rewards"
+      },
+      "3.0": {
+        "description": "The ultimate challenge featuring extreme difficulty and legendary tier rewards"
+      }
+    },
+    "features": {
+      "heading": "Why Choose Our Campaign Service?",
+      "secureTitle": "100% Secure",
+      "secureBody": "VPN protection, encrypted connections, and complete account safety.",
+      "expertTitle": "Expert Players",
+      "expertBody": "Campaign specialists with years of experience and proven results.",
+      "guaranteedTitle": "Guaranteed Completion",
+      "guaranteedBody": "We complete your missions or you get a full refund - no questions asked.",
+      "fastTitle": "Fast Turnaround",
+      "fastBody": "Quick response times and efficient mission completion schedule."
+    }
+  },
+  "cookies": {
+    "metaTitle": "Cookie Policy",
+    "metaDescription": "How CyberSkill uses cookies and similar technologies on our World of Tanks boosting website, and how you can manage your cookie preferences.",
+    "backToHome": "Back to Home",
+    "title": "Cookie Policy",
+    "what": {
+      "heading": "1. What Are Cookies?",
+      "body": "Cookies are small text files that are placed on your computer or mobile device when you visit a website. They are widely used to make websites work more efficiently and provide information to website owners."
+    },
+    "howWeUse": {
+      "heading": "2. How We Use Cookies",
+      "intro": "CyberSkill uses cookies for the following purposes:",
+      "essentialTerm": "Essential Cookies:",
+      "essentialDesc": "Required for the website to function properly",
+      "performanceTerm": "Performance Cookies:",
+      "performanceDesc": "Help us understand how visitors interact with our website",
+      "functionalityTerm": "Functionality Cookies:",
+      "functionalityDesc": "Remember your preferences and settings",
+      "analyticsTerm": "Analytics Cookies:",
+      "analyticsDesc": "Collect anonymous data about website usage"
+    },
+    "types": {
+      "heading": "3. Types of Cookies We Use",
+      "session": {
+        "title": "Session Cookies",
+        "description": "Temporary cookies that expire when you close your browser. These are essential for navigating the website and using its features."
+      },
+      "persistent": {
+        "title": "Persistent Cookies",
+        "description": "Remain on your device for a set period or until you delete them. These help us remember your preferences across visits."
+      },
+      "thirdParty": {
+        "title": "Third-Party Cookies",
+        "description": "Set by third-party services we use, such as analytics providers. These help us improve our services and understand user behavior."
+      }
+    },
+    "specific": {
+      "heading": "4. Specific Cookies We Use",
+      "colName": "Cookie Name",
+      "colPurpose": "Purpose",
+      "colDuration": "Duration",
+      "sessionIdPurpose": "Maintain user session",
+      "sessionIdDuration": "Session",
+      "preferencesPurpose": "Store user preferences",
+      "preferencesDuration": "1 year",
+      "analyticsIdPurpose": "Website analytics",
+      "analyticsIdDuration": "2 years",
+      "cookieConsentPurpose": "Remember cookie preferences",
+      "cookieConsentDuration": "1 year"
+    },
+    "managing": {
+      "heading": "5. Managing Cookies",
+      "intro": "You can control and manage cookies in several ways:",
+      "item1": "Use your browser settings to block or delete cookies",
+      "item2": "Adjust your cookie preferences in our cookie consent banner",
+      "item3": "Use browser extensions or privacy tools",
+      "item4": "Clear cookies regularly through your browser",
+      "note": "Please note that blocking essential cookies may affect the functionality of our website."
+    },
+    "thirdParty": {
+      "heading": "6. Third-Party Services",
+      "intro": "We use third-party services that may set cookies, including:",
+      "googleAnalytics": "Google Analytics (website analytics)",
+      "payment": "Payment processors (secure transactions)",
+      "social": "Social media platforms (social sharing features)",
+      "note": "These third parties have their own privacy policies and cookie policies."
+    },
+    "updates": {
+      "heading": "7. Updates to This Policy",
+      "body": "We may update this Cookie Policy to reflect changes in our practices or for legal reasons. Please check this page periodically for updates."
+    },
+    "contact": {
+      "heading": "8. Contact Us",
+      "body": "If you have questions about our use of cookies, please contact us at privacy@cyberskill.com."
+    },
+    "lastUpdated": "Last Updated: December 1, 2025"
+  },
+  "creditFarm": {
+    "metaTitle": "WoT Credit Booster & Bonds Farm",
+    "metaDescription": "WoT credit booster: farm millions of credits & bonds fast — no grind. Efficient Front Line farming by pros, VPN-protected account safety.",
+    "breadcrumb": {
+      "home": "Home",
+      "services": "Services",
+      "current": "Credit Farming"
+    },
+    "backToHome": "Back to Home",
+    "hero": {
+      "title": "WoT Credit Booster & Bonds Farming",
+      "subtitle": "Fast and secure credit farming to build your in-game wealth with professional players",
+      "calculatePrice": "Calculate Your Price"
+    },
+    "calculator": {
+      "title": "Price Calculator",
+      "description": "Configure your order and see the price instantly",
+      "serviceType": "Service Type",
+      "credits": "Credits",
+      "bonds": "Bonds",
+      "packageTier": "Package Tier",
+      "wn8Tier": "WN8 Tier",
+      "perMillion": "${price} per million",
+      "standardPrice": "Standard price",
+      "modifierToBase": "+{modifier}% to base price",
+      "silverBoosters": "Silver Boosters",
+      "dontUseSilverBoosters": "Dont use my Silver Boosters",
+      "silverBoostersNotePrefix": "If we can't use your own Silver Boosters, the price will be ",
+      "silverBoostersNoteHighlight": "30% more",
+      "silverBoostersNoteSuffix": ".",
+      "creditsAmountLabel": "Credits Amount (millions)",
+      "bondsAmountLabel": "Bonds Amount",
+      "creditsAmountPlaceholder": "Enter credit amount in millions",
+      "minMillion": "1 million is the minimum",
+      "bondsMoreNote": "* If you need more bonds, please specify the amount in the \"Additional Information\".",
+      "basePrice": "Base Price:",
+      "discount": "Discount ({discount}%):",
+      "silverBoostersCharge": "Silver Boosters (+30%):",
+      "total": "Total:",
+      "volumeDiscountsTitle": "💰 Volume Discounts:",
+      "volumeTier1Prefix": "20-39M credits: ",
+      "volumeTier1Off": "10% OFF",
+      "volumeTier2Prefix": "40-69M credits: ",
+      "volumeTier2Off": "15% OFF",
+      "volumeTier3Prefix": "70M+ credits: ",
+      "volumeTier3Off": "20% OFF",
+      "securityBadge": "100% secure with VPN protection and privacy guaranteed"
+    },
+    "orderForm": {
+      "title": "Complete Your Order",
+      "description": "Fill in your details to get started",
+      "emailLabel": "Email Address *",
+      "emailPlaceholder": "your@email.com",
+      "discordLabel": "Discord Tag *",
+      "discordPlaceholder": "Username#1234",
+      "serverLabel": "Server *",
+      "serverSelect": "Select server...",
+      "serverNa": "North America",
+      "serverEu": "Europe",
+      "serverAsia": "Asia",
+      "serverRu": "Russia",
+      "summaryTitle": "Order Summary:",
+      "summaryService": "Service:",
+      "summaryServiceCredits": "Credit and Bonds Farming",
+      "summaryServiceBonds": "Bonds Farming",
+      "summaryTier": "Tier:",
+      "summarySilverBoosters": "Silver Boosters:",
+      "summarySilverBoostersDont": "Dont use Silver boosters (+30%)",
+      "summarySilverBoostersUse": "Use Silver boosters",
+      "summaryCredits": "Credits:",
+      "summaryBonds": "Bonds:",
+      "summaryTotalCost": "Total Cost:",
+      "additionalInfoLabel": "Additional Information (Optional)",
+      "additionalInfoPlaceholder": "Any specific requirements or preferences...",
+      "sendingOrder": "Sending Order...",
+      "submitOrder": "Submit Order - ${price}",
+      "terms": "By submitting this form, you agree to our Terms of Service and Privacy Policy. We'll contact you within 30 minutes to confirm your order."
+    },
+    "features": {
+      "heading": "Why Choose Our Service?",
+      "secureTitle": "100% Secure",
+      "secureBody": "VPN protection, encrypted connections, and complete privacy guaranteed.",
+      "fastTitle": "Fast Farming",
+      "fastBody": "Efficient credit farming with premium tanks and optimal strategies.",
+      "trackingTitle": "Progress Tracking",
+      "trackingBody": "Real-time updates on your credit accumulation progress.",
+      "volumeTitle": "Volume Discounts",
+      "volumeBody": "Save up to 20% when ordering 70M+ credits."
+    },
+    "howItWorks": {
+      "heading": "How It Works",
+      "step1Title": "Select Amount",
+      "step1Body": "Choose how many million credits you need and your preferred package tier.",
+      "step2Title": "We Farm",
+      "step2Body": "Our expert players efficiently farm credits using premium tanks and optimal strategies.",
+      "step3Title": "Enjoy Wealth",
+      "step3Body": "Receive your credits and spend them on tanks, equipment, and upgrades you've always wanted!"
+    },
+    "errors": {
+      "email": "Invalid email address",
+      "discord": "Please enter your Discord tag",
+      "serviceType": "Please select a service type",
+      "tier": "Please select a tier",
+      "amount": "Minimum amount required",
+      "server": "Please select a server"
+    }
+  },
+  "expFarm": {
+    "metaTitle": "World of Tanks XP Boost — Exp & Free XP Farm",
+    "metaDescription": "World of Tanks XP boost: farm experience on any tank in your garage. Fast, affordable XP & Free XP farming to unlock modules and new tanks — no grind.",
+    "breadcrumb": {
+      "home": "Home",
+      "services": "Services",
+      "current": "Exp Farm"
+    },
+    "backToHome": "Back to Home",
+    "hero": {
+      "title": "World of Tanks XP Boost & Experience Farm",
+      "subtitle": "Level up your tanks and unlock new tiers faster with our professional XP farming service",
+      "calculatePrice": "Calculate Your Price"
+    },
+    "calculator": {
+      "title": "Price Calculator",
+      "description": "Configure your XP order and see costs instantly",
+      "packageTierLabel": "Package Tier",
+      "pricePer10k": "${price} per 10k XP",
+      "xpBoostersLabel": "XP Boosters (Personal Reserves)",
+      "dontUseBoostersTitle": "Dont use my XP Boosters",
+      "dontUseBoostersNotePre": "If we can't use your own Personal Reserves (XP Boosters), the price will be ",
+      "dontUseBoostersNoteStrong": "30% more",
+      "dontUseBoostersNotePost": ".",
+      "xpAmountLabel": "XP Amount (in thousands)",
+      "xpAmountPlaceholder": "e.g. 50 for 50,000 XP",
+      "minXpNote": "10k XP is the minimum (enter 10)",
+      "xpAmountHelp": "Enter 50 for 50,000 XP, 100 for 100,000 XP, etc.",
+      "basePrice": "Base Price:",
+      "discount": "Discount ({discount}%):",
+      "xpBoostersCharge": "XP Boosters (+30%):",
+      "total": "Total:",
+      "volumeDiscountsTitle": "💰 Volume Discounts:",
+      "discount100to249Pre": "100k-249k XP: ",
+      "discount100to249Strong": "10% OFF",
+      "discount250to499Pre": "250k-499k XP: ",
+      "discount250to499Strong": "15% OFF",
+      "discount500Pre": "500k+ XP: ",
+      "discount500Strong": "20% OFF",
+      "securityBadge": "100% secure with VPN protection and privacy guaranteed"
+    },
+    "order": {
+      "title": "Complete Your Order",
+      "description": "Fill in your details to get started",
+      "emailLabel": "Email Address *",
+      "emailPlaceholder": "your@email.com",
+      "discordLabel": "Discord Tag *",
+      "discordPlaceholder": "Username#1234",
+      "serverLabel": "Server *",
+      "serverSelect": "Select server...",
+      "serverNa": "North America",
+      "serverEu": "Europe",
+      "serverAsia": "Asia",
+      "serverRu": "Russia",
+      "summaryTitle": "Order Summary:",
+      "summaryPackage": "Package:",
+      "summaryBoosters": "Boosters:",
+      "summaryBoostersDont": "Dont use XP boosters (+30%)",
+      "summaryBoostersUse": "Use XP boosters",
+      "summaryExperience": "Experience:",
+      "summaryExperienceValue": "{amount}k XP",
+      "summaryTotalCost": "Total Cost:",
+      "additionalInfoLabel": "Additional Information (Optional)",
+      "additionalInfoPlaceholder": "Any specific tanks, goals, or requirements...",
+      "submitting": "Sending Order...",
+      "submit": "Submit Order - ${price}",
+      "disclaimer": "By submitting this form, you agree to our Terms of Service and Privacy Policy. We'll contact you within 30 minutes to confirm your order."
+    },
+    "features": {
+      "heading": "Why Choose Our Service?",
+      "secureTitle": "100% Secure",
+      "secureBody": "VPN protection and strict privacy protocols for your account safety.",
+      "fastTitle": "Fast Progression",
+      "fastBody": "Maximize XP earnings per hour with our expert players.",
+      "goalsTitle": "Specific Goals",
+      "goalsBody": "We focus on the exact tanks and modules you want to unlock.",
+      "discountsTitle": "Great Discounts",
+      "discountsBody": "Get up to 20% off on larger XP orders."
+    },
+    "howItWorks": {
+      "heading": "How It Works",
+      "step1Title": "Select XP Amount",
+      "step1Body": "Choose how much Experience (XP) you need and your preferred efficiency tier.",
+      "step2Title": "We Grind",
+      "step2Body": "Our pro players battle consistently to earn XP and unlock upgrades for you.",
+      "step3Title": "Unlock Tiers",
+      "step3Body": "Log in to find your tanks leveled up and ready for the next tier of research!"
+    },
+    "errors": {
+      "email": "Invalid email address",
+      "discord": "Please enter your Discord tag",
+      "wn8Tier": "Please select a WN8 tier",
+      "minXp": "Minimum 10k XP required",
+      "server": "Please select a server"
+    }
+  },
+  "guarantee": {
+    "metaTitle": "Our Guarantee — Secure & Satisfaction",
+    "metaDescription": "CyberSkill's guarantee: 100% secure boosting with VPN protection, strict account safety, clear refund terms and satisfaction guaranteed on every order.",
+    "backToHome": "Back to Home",
+    "hero": {
+      "title": "CyberSkill Guarantee",
+      "subtitle": "Optimal market relations are only possible if the customer is completely satisfied. Our service adheres to this rule when working with people, without exception."
+    },
+    "satisfaction": {
+      "title": "Customer Satisfaction",
+      "body": "Once you have experienced our terms and conditions, you are guaranteed not to want to stop working with us. Our reputation among our customers is of paramount importance to us, which is why we have special refund terms and conditions on our website."
+    },
+    "refund": {
+      "title": "Refund Policy",
+      "intro": "The customer may request a refund in the following cases:",
+      "reasons": [
+        "If the terms of fulfillment did not meet their requirements",
+        "If they change their mind about using the help of our professionals",
+        "If there is a disagreement about the terms or an erroneous payment to the specified details",
+        "If the specified result is not achieved due to circumstances"
+      ],
+      "contactPrompt": "For questions about refunds, please contact us:"
+    },
+    "privacy": {
+      "title": "Data Privacy",
+      "body": "Customer convenience is our top priority. That is why we always insist on changing your password before and after placing an order, as well as linking your account to your personal phone number.",
+      "warning": "Our employees do not request personal data necessary to restore access to your account. This information must remain confidential."
+    },
+    "security": {
+      "title": "Account Security",
+      "subtitle": "We take the security of your account seriously. Follow these guidelines to ensure maximum protection while using our services.",
+      "phone": {
+        "title": "Link Your Phone & 2FA",
+        "body": "To keep your account safe, you should link it to your phone number. It's also a good idea to set up two-step verification (you'll get a code in a special app on your phone that you'll need to enter every time you log in to your account)."
+      },
+      "control": {
+        "title": "Complete Control",
+        "body": "You can do this in your account on the World of Tanks website. After these steps, no one but you will be able to access your personal account, let alone change your password or email address."
+      },
+      "safeBoosting": {
+        "title": "Safe Boosting Process",
+        "body": "At the same time, the driver will have password access to your account in the WOT client, so they can complete the order, and everything will be completely safe for you.",
+        "cta": "Explore Our Safe Services"
+      }
+    }
+  },
+  "markOfExcellence": {
+    "metaTitle": "WoT Marks of Excellence Boost — 3 MoE",
+    "metaDescription": "Get 3 Marks of Excellence on your favourite tanks with top-1% boosters. Show elite World of Tanks performance with guaranteed MoE results and safety.",
+    "breadcrumb": {
+      "home": "Home",
+      "services": "Services",
+      "current": "Mark of Excellence"
+    },
+    "backToHome": "Back to Home",
+    "hero": {
+      "title": "WoT 3 Marks of Excellence (MoE) Boost",
+      "description": "Achieve your desired Mark of Excellence percentage with our professional boosting service. Select your current and target progress, tank difficulty, and additional options.",
+      "progressBadge": "1% - 95% Progress",
+      "anyTank": "Any Tank",
+      "fromPrice": "From $0.30/point",
+      "calculateNow": "Calculate now"
+    },
+    "calculator": {
+      "heading": "Price Calculator",
+      "subheading": "Configure your boost parameters and get instant pricing",
+      "progress": {
+        "title": "Progress Selection",
+        "description": "Choose your current and target MoE percentage",
+        "from": "From:",
+        "to": "To:",
+        "toBoost": "Progress to boost:"
+      },
+      "difficulty": {
+        "title": "Tank Difficulty",
+        "description": "Select the difficulty of your tank (disabled if Special Vehicle is selected)",
+        "noFee": "No fee"
+      },
+      "specialVehicle": {
+        "title": "Special Vehicle Fee (Optional)",
+        "description": "Select your tank from the list (replaces Tank Difficulty)",
+        "unselect": "Unselect",
+        "selectPlaceholder": "Select your tank..."
+      },
+      "silver": {
+        "title": "Silver Farming Options",
+        "description": "To complete this service, your account needs Credits. If you're low on credits, you can order farming together with Mark of Excellence at a discount."
+      },
+      "summary": {
+        "title": "Price Summary",
+        "progress": "Progress:",
+        "boost": "Boost:",
+        "difficulty": "Difficulty:",
+        "vehicle": "Vehicle:",
+        "silver": "Silver:",
+        "basePrice": "Base price:",
+        "vehicleFee": "Vehicle Fee:",
+        "silverAddon": "Silver Add-on:",
+        "total": "Total:",
+        "continueToOrder": "Continue to Order",
+        "selectHint": "Please select a special vehicle or tank difficulty to continue"
+      }
+    },
+    "orderForm": {
+      "title": "Complete Your Order",
+      "description": "Fill in your details to finalize your MoE boost order",
+      "emailLabel": "Email Address *",
+      "emailPlaceholder": "your@email.com",
+      "discordLabel": "Discord Tag *",
+      "discordPlaceholder": "Username#1234",
+      "serverLabel": "Server *",
+      "serverPlaceholder": "Select server...",
+      "serverNa": "North America",
+      "serverEu": "Europe",
+      "serverAsia": "Asia",
+      "serverRu": "Russia",
+      "additionalInfoLabel": "Additional Information (Optional)",
+      "additionalInfoPlaceholder": "Any special requests or notes...",
+      "summaryTitle": "Order Summary:",
+      "service": "Service:",
+      "serviceName": "Mark of Excellence",
+      "progress": "Progress:",
+      "difficulty": "Difficulty:",
+      "vehicle": "Vehicle:",
+      "silver": "Silver:",
+      "totalPrice": "Total Price:",
+      "sending": "Sending Order...",
+      "placeOrder": "Place Order"
+    },
+    "errors": {
+      "email": "Invalid email address",
+      "discord": "Please enter your Discord tag",
+      "server": "Please select a server"
+    }
+  },
+  "onslaught": {
+    "metaTitle": "WoT Onslaught Boost — Legend Rank",
+    "metaDescription": "Climb to Legend rank in World of Tanks Onslaught. Our 7v7 specialists boost your rating and earn bonds, styles and the annual reward tank — securely.",
+    "breadcrumb": {
+      "home": "Home",
+      "services": "Services",
+      "current": "Onslaught"
+    },
+    "backToHome": "Back to Home",
+    "hero": {
+      "title": "World of Tanks Onslaught Rank Boost (Legend)",
+      "subtitle": "Climb the ranks in Onslaught mode 7v7 battles to earn exclusive rewards and unlock the powerful 114 SP2 tank at Gold rank.",
+      "tagYearOfDragon": "Year of the Dragon",
+      "tagAshbringer": "Ashbringer Tank",
+      "tagRexDraconis": "Rex Draconis Style",
+      "calculateButton": "Calculate Rating Boost"
+    },
+    "seasonCards": {
+      "annualRewardTitle": "Annual Reward",
+      "annualRewardName": "Ashbringer",
+      "annualRewardDesc": "Tier X Polish Heavy with 3D Style. Collect 9+ Onslaught Colors!",
+      "goldRewardTitle": "Gold Rank Reward",
+      "goldRewardName": "114 SP2",
+      "goldRewardDesc": "Tier X Chinese TD available for purchase at Gold rank!",
+      "rentalTitle": "Rental Tanks",
+      "rentalNames": "Ho-Ri 3, Super Conqueror, K-91",
+      "rentalDesc": "Free Tier X rentals with garage slots!"
+    },
+    "rankStages": {
+      "heading": "Onslaught Rank Stages",
+      "unit": "pts",
+      "note": "* 3000-3999 points does not guarantee Legend rank"
+    },
+    "calculator": {
+      "title": "Rating Calculator",
+      "description": "Select your current and target rating points",
+      "currentRatingLabel": "Current rating",
+      "desiredRatingLabel": "Desired rating",
+      "pointsToBoost": "Points to boost:",
+      "pointsDelta": "+{points} pts",
+      "extraOptions": "Extra Options",
+      "missionsLabel": "Complete 30 missions with all rewards",
+      "missionsNotePre": "Get all the progressive rewards from 30 Onslaught missions. ",
+      "missionsNotePrice": "+$40.00",
+      "missionsNotePost": ".",
+      "platoonLabel": "Play with Booster (Platoon)",
+      "platoonNotePre": "Fight alongside our Pro. You play your own account. ",
+      "platoonNotePrice": "+40% to price",
+      "platoonNotePost": ".",
+      "silverFarmHeading": "Add Silver Farming",
+      "silverNoExtra": "No Extra",
+      "boostPriceLabel": "Boost Price ({from} → {to} pts):",
+      "boosterChargeLabel": "Play with Booster (+40%):",
+      "silverChargeLabel": "Silver Farm:",
+      "missionsChargeLabel": "30 Missions Reward:",
+      "totalLabel": "Total:",
+      "securityBadge": "100% secure. We use VPN matching your location if we play on your account."
+    },
+    "order": {
+      "title": "Order Details",
+      "description": "We will contact you to set up the session",
+      "emailLabel": "Email Address *",
+      "emailPlaceholder": "your@email.com",
+      "discordLabel": "Discord Tag *",
+      "discordPlaceholder": "Username#1234",
+      "serverLabel": "Server *",
+      "serverSelect": "Select server...",
+      "serverNa": "North America",
+      "serverEu": "Europe",
+      "serverAsia": "Asia",
+      "serverRu": "Russia",
+      "summaryTitle": "Order Summary:",
+      "summaryBoost": "Boost:",
+      "summaryType": "Type:",
+      "summaryTypePlatoon": "Platoon with Pro",
+      "summaryTypeShare": "Account Share (Piloted)",
+      "summarySilverFarm": "Silver Farm:",
+      "summaryMissions": "30 Missions:",
+      "summaryMissionsValue": "Yes (+$40)",
+      "summaryTotalCost": "Total Cost:",
+      "additionalInfoLabel": "Additional Information (Optional)",
+      "additionalInfoPlaceholder": "Preferred playing times, specific tanks to use, etc...",
+      "submitting": "Sending Order...",
+      "submit": "Submit Order - ${price}",
+      "disclaimer": "By submitting this form, you agree to our Terms of Service. We guarantee rank completion or full refund."
+    },
+    "seasonRewards": {
+      "heading": "🐉 Season of the Crimson Dragon Rewards",
+      "subheading": "Exclusive rewards for each rank tier",
+      "iron": {
+        "title": "Iron Rank",
+        "range": "0 - 499 points",
+        "items": [
+          "Iron Dragon decal",
+          "Basic Dog Tag Background"
+        ]
+      },
+      "bronze": {
+        "title": "Bronze Rank",
+        "range": "500 - 999 points",
+        "items": [
+          "Bronze Dragon decal",
+          "Rex Draconis (Crimson) camo",
+          "500 Bonds"
+        ]
+      },
+      "silver": {
+        "title": "Silver Rank",
+        "range": "1000 - 1499 points",
+        "items": [
+          "Silver Dragon decal",
+          "\"Supernova\" stripe",
+          "1,000 Bonds"
+        ]
+      },
+      "gold": {
+        "title": "Gold Rank",
+        "range": "1500 - 1999 points",
+        "items": [
+          "Gold Dragon decal & emblem",
+          "\"Burning Oath\" badge",
+          "114 SP2 purchase access",
+          "2,000 Bonds"
+        ]
+      },
+      "champion": {
+        "title": "Champion Rank",
+        "range": "2000 - 2999 points",
+        "items": [
+          "Full Rex Draconis (Crimson) 2D style",
+          "\"Crown of Flame\" badge",
+          "Improved Equipment pieces",
+          "3,500 Bonds"
+        ]
+      },
+      "legend": {
+        "title": "Legend Rank",
+        "range": "4000+ points",
+        "items": [
+          "\"Trial by Fire\" medal",
+          "Complete Rex Draconis set",
+          "T3 Improved Equipment",
+          "5,000+ Bonds",
+          "Legend Dog Tag Background"
+        ]
+      },
+      "annual": {
+        "title": "Annual Reward: Ashbringer",
+        "subtitle": "Collect Onslaught Colors throughout the Year of the Dragon",
+        "tankHeading": "Ashbringer Tank",
+        "tankBody": "Tier X Polish Heavy Tank (60TP replica) with a unique progressive 3D style and a crew with 3 extra perks trained.",
+        "tankItems": [
+          "9 Colors: Silver Dragon 3D Style",
+          "12 Colors: Gold Dragon 3D Style",
+          "15 Colors: Champion 3D Style",
+          "18 Colors: Legend 3D Style"
+        ],
+        "missionsHeading": "Weekly Missions (30 Total)",
+        "missionsBody": "Complete missions for progressive rewards:",
+        "missionsItems": [
+          "WoT Premium Account days",
+          "Bonds & Credits",
+          "Equipment directives",
+          "5, 15, 25, 30 mission milestones for big prizes"
+        ]
+      }
+    },
+    "features": {
+      "heading": "Why Buy Onslaught Boost?",
+      "rewardsTitle": "Exclusive Rewards",
+      "rewardsBody": "Get the Rex Draconis style, bonds, and access to the 114 SP2 tank.",
+      "playersTitle": "Top Players",
+      "playersBody": "Our boosters are high-rank competitors who dominate the meta.",
+      "guaranteeTitle": "Guaranteed Result",
+      "guaranteeBody": "We don't stop until the target rank is achieved, no excuses.",
+      "prestigeTitle": "Prestige",
+      "prestigeBody": "Show off your Legend rank badge to clanmates and friends."
+    },
+    "howItWorks": {
+      "heading": "How It Works",
+      "step1Title": "Select Rating",
+      "step1Body": "Select your current rating and the rating you want to achieve (e.g., 2000+ for Champion).",
+      "step2Title": "Pro Platoon",
+      "step2Body": "Our super-unicum players will play on your account or platoon with you (optional).",
+      "step3Title": "Get Rewards",
+      "step3Body": "Enjoy your rewards: Bonds, equipment, 2D/3D styles, and the exclusive rental tank."
+    },
+    "errors": {
+      "email": "Invalid email address",
+      "discord": "Please enter your Discord tag",
+      "server": "Please select a server",
+      "target": "Target rating must be higher than current rating"
+    }
+  },
+  "privacy": {
+    "metaTitle": "Privacy Policy",
+    "metaDescription": "How CyberSkill collects, uses and protects your personal data when you use our World of Tanks boosting services. Read our full privacy policy.",
+    "backToHome": "Back to Home",
+    "title": "Privacy Policy",
+    "lastUpdated": "Last Updated: December 1, 2025",
+    "collect": {
+      "title": "1. Information We Collect",
+      "intro": "We collect information that you provide directly to us, including:",
+      "item1": "Account credentials for service delivery",
+      "item2": "Email addresses for communication",
+      "item3": "Payment information (processed securely through third-party providers)",
+      "item4": "Service preferences and requirements"
+    },
+    "use": {
+      "title": "2. How We Use Your Information",
+      "intro": "We use the information we collect to:",
+      "item1": "Provide and deliver our boosting services",
+      "item2": "Process your payments and transactions",
+      "item3": "Send you service updates and communications",
+      "item4": "Improve our services and customer experience",
+      "item5": "Protect against fraud and unauthorized access"
+    },
+    "security": {
+      "title": "3. Data Security",
+      "body": "We implement industry-standard security measures to protect your personal information. All account credentials are encrypted and stored securely. We use VPN protection during service delivery to ensure your account safety and privacy."
+    },
+    "sharing": {
+      "title": "4. Information Sharing",
+      "intro": "We do not sell, trade, or rent your personal information to third parties. We may share information only with:",
+      "item1": "Trusted service providers who assist in our operations",
+      "item2": "Law enforcement when required by law",
+      "item3": "Professional boosters assigned to your order (limited to necessary game credentials only)"
+    },
+    "retention": {
+      "title": "5. Data Retention",
+      "body": "We retain your personal information only for as long as necessary to provide our services and comply with legal obligations. Account credentials are deleted immediately after service completion."
+    },
+    "rights": {
+      "title": "6. Your Rights",
+      "intro": "You have the right to:",
+      "item1": "Access your personal information",
+      "item2": "Request correction of inaccurate data",
+      "item3": "Request deletion of your data",
+      "item4": "Opt-out of marketing communications"
+    },
+    "cookies": {
+      "title": "7. Cookies and Tracking",
+      "body": "We use cookies and similar technologies to improve your browsing experience. See our Cookie Policy for more details."
+    },
+    "changes": {
+      "title": "8. Changes to This Policy",
+      "body": "We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page and updating the \"Last Updated\" date."
+    },
+    "contact": {
+      "title": "9. Contact Us",
+      "body": "If you have questions about this Privacy Policy, please contact us at cyberskillwot@gmail.com."
+    }
+  },
+  "referral": {
+    "metaTitle": "Referral Rewards Program",
+    "metaDescription": "Invite friends to CyberSkill and earn $10 for every successful referral — your friend gets $10 off too. See the full referral program terms and rewards.",
+    "backToHome": "Back to Home",
+    "hero": {
+      "title": "CyberSkill Referral Program",
+      "subtitle": "Invite a friend — get $10!",
+      "description": "Earn a $10 discount for every friend who places an order. Your friend also gets $10 off their first order."
+    },
+    "benefits": {
+      "unlock": "Unlock referrals after spending $50",
+      "minOrder": "Minimum order: $20",
+      "cover": "Use bonuses to cover up to 20% of any order",
+      "noLimit": "No limit on invitations",
+      "cta": "Start inviting and save on your next order!"
+    },
+    "terms": {
+      "heading": "Terms & Conditions",
+      "eligibility": {
+        "title": "Eligibility",
+        "p1": "1.1. To participate in the CyberSkill Referral Program, a user must have completed orders with a total value of at least $50.",
+        "p2": "1.2. After meeting this requirement, the user receives a unique referral card from a CyberSkill manager."
+      },
+      "conditions": {
+        "title": "Referral Conditions",
+        "p1": "2.1. A referral is considered successful when:",
+        "item1": "the invited friend provides the referral card, and",
+        "item2": "places and completes an order with a minimum value of $20.",
+        "p2": "2.2. Each referral card may be used by a friend once."
+      },
+      "rewards": {
+        "title": "Referral Rewards",
+        "friendTitle": "3.1. Invited Friend Reward",
+        "friendItem1": "$10 discount on their first order",
+        "friendItem2": "Minimum order value: $20",
+        "referrerTitle": "3.2. Referrer Reward",
+        "referrerItem1": "$10 referral bonus for each successful referral",
+        "referrerItem2": "Bonus is credited after the invited friend completes a qualifying order"
+      },
+      "usage": {
+        "title": "Bonus Usage Rules",
+        "p1": "4.1. Referral bonuses can be used only on orders with a minimum value of $20.",
+        "p2": "4.2. Referral bonuses may be combined.",
+        "p3": "4.3. Referral bonuses can cover up to 20% of the total order value.",
+        "examplesTitle": "Examples:",
+        "example1Order": "Order $50 →",
+        "example1Discount": "Max discount $10 →",
+        "example1Pay": "Pay $40",
+        "example2Order": "Order $100 →",
+        "example2Discount": "Max discount $20 →",
+        "example2Pay": "Pay $80",
+        "p4": "4.4. Any unused bonus balance remains available for future orders and does not expire unless stated otherwise."
+      },
+      "limitations": {
+        "title": "Limitations & Fair Use",
+        "p1": "5.1. There is no limit on the number of friends a user can invite.",
+        "p2": "5.2. Self-referrals, duplicate accounts, abuse of the referral system, or any fraudulent activity are strictly prohibited.",
+        "p3": "5.3. CyberSkill reserves the right to revoke referral bonuses and suspend accounts involved in abusive behavior."
+      },
+      "changes": {
+        "title": "Program Changes",
+        "p1": "6.1. CyberSkill reserves the right to modify, suspend, or terminate the referral program at any time without prior notice.",
+        "p2": "6.2. Any changes will not affect bonuses already credited to user accounts."
+      },
+      "support": {
+        "title": "Support",
+        "p1": "For questions regarding the referral program, users may contact CyberSkill support via the quick chat located in the lower-right corner of the website."
+      }
+    }
+  },
+  "referralProgram": {
+    "metaTitle": "WoT Referral Program — Tier 8 Premium Tank",
+    "metaDescription": "Get a Tier 8 Premium tank and bonds through the WoT Referral Program. We handle all recruiting for you — fixed $100 price, completed in 7–14 days.",
+    "breadcrumb": {
+      "home": "Home",
+      "services": "Services",
+      "current": "Referral Program"
+    },
+    "backToHome": "Back to Home",
+    "hero": {
+      "title": "WoT Referral Program — Free Tier 8 Premium Tank",
+      "subtitle": "Get a Tier 8 Premium Tank and Bonds through the WoT Referral Program. We handle all the recruiting for you!",
+      "fixedPrice": "Fixed Price",
+      "orderNow": "Order Now"
+    },
+    "howItWorks": {
+      "heading": "How It Works",
+      "step1": {
+        "title": "Place Your Order",
+        "description": "Submit your order with your account details and preferred server."
+      },
+      "step2": {
+        "title": "We Recruit",
+        "description": "Our team recruits and levels referrals using your referral link."
+      },
+      "step3": {
+        "title": "Get Rewards",
+        "description": "Once complete, claim your Tier 8 Premium Tank and bonus rewards!"
+      }
+    },
+    "rewards": {
+      "heading": "What You Get",
+      "items": {
+        "tank": {
+          "title": "Tier 8 Premium Tank",
+          "description": "Choose from available reward tanks"
+        },
+        "bonus": {
+          "title": "Bonus Rewards",
+          "description": "Additional bonds and credits included"
+        },
+        "fast": {
+          "title": "Fast Completion",
+          "description": "Usually completed within 7-14 days"
+        }
+      },
+      "includesTitle": "Service Includes",
+      "features": {
+        "recruit": "We recruit 3 referrals for you",
+        "level": "Each referral reaches required level",
+        "choose": "You get to choose your reward tank",
+        "bonds": "Bonds included with completion",
+        "noSharing": "No account sharing required",
+        "safe": "100% safe and legitimate"
+      }
+    },
+    "order": {
+      "title": "Complete Your Order",
+      "description": "Fill in your details to get your Tier 8 Premium Tank",
+      "emailLabel": "Email Address *",
+      "emailPlaceholder": "your@email.com",
+      "discordLabel": "Discord Tag *",
+      "discordPlaceholder": "Username#1234",
+      "serverLabel": "Server *",
+      "serverSelect": "Select server...",
+      "serverNa": "North America",
+      "serverEu": "Europe",
+      "serverAsia": "Asia",
+      "serverRu": "Russia",
+      "summaryTitle": "Order Summary:",
+      "summaryService": "Service:",
+      "summaryServiceName": "Referral Program",
+      "summaryReward": "Reward:",
+      "summaryRewardValue": "Tier 8 Premium Tank + Bonds",
+      "summaryTotalCost": "Total Cost:",
+      "additionalInfoLabel": "Additional Information (Optional)",
+      "additionalInfoPlaceholder": "Any specific tank preferences or requirements...",
+      "submitting": "Sending Order...",
+      "submit": "Submit Order - ${price}",
+      "disclaimer": "By submitting this form, you agree to our Terms of Service and Privacy Policy. We'll contact you within 30 minutes to confirm your order."
+    },
+    "errors": {
+      "email": "Invalid email address",
+      "discord": "Please enter your Discord tag",
+      "server": "Please select a server"
+    }
+  },
+  "terms": {
+    "metaTitle": "Terms of Service",
+    "metaDescription": "The terms governing use of CyberSkill's World of Tanks boosting services — orders, payments, refunds and account safety. Read before you order.",
+    "backToHome": "Back to Home",
+    "heading": "Terms of Service",
+    "agreement": {
+      "heading": "1. Agreement to Terms",
+      "body": "By accessing and using CyberSkill's services, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing our services."
+    },
+    "description": {
+      "heading": "2. Service Description",
+      "body": "CyberSkill provides World of Tanks account boosting services, including but not limited to WN8 improvement, credit farming, campaign missions, and Mark of Excellence achievements. All services are performed by experienced players acting as independent contractors."
+    },
+    "security": {
+      "heading": "3. Account Security & Risks",
+      "body": "We use VPN protection matching your location to minimize risks. However, you acknowledge that using boosting services is a violation of the Game Developer's (Wargaming) End User License Agreement (EULA). CyberSkill is not responsible for any penalties, temporary bans, or permanent account suspensions. You use our services at your own risk."
+    },
+    "conduct": {
+      "heading": "4. User Conduct During Service",
+      "body": "To ensure safety, you must not log into your account while the service is being performed without prior coordination with our support team. Concurrent sessions from different locations significantly increase the risk of account flagging."
+    },
+    "payment": {
+      "heading": "5. Payment & Refunds",
+      "body": "All payments must be made in full before service delivery. Prices are subject to change. Refunds are handled on a case-by-case basis. If a refund is requested after the service has started, CyberSkill reserves the right to deduct a prorated amount for the work already completed."
+    },
+    "liability": {
+      "heading": "6. Limitation of Liability",
+      "body": "CyberSkill shall not be liable for any indirect, incidental, or consequential damages (including loss of in-game assets or account access). Our total liability is strictly limited to the amount paid for the specific service in question."
+    },
+    "modifications": {
+      "heading": "7. Modifications to Terms",
+      "body": "We reserve the right to modify these terms at any time. Your continued use of our services after changes constitutes acceptance of the modified terms."
+    },
+    "contact": {
+      "heading": "8. Contact Information",
+      "bodyPrefix": "For any inquiries regarding these Terms, please contact us at: ",
+      "bodySuffix": "."
+    }
+  },
+  "tierLeveling": {
+    "metaTitle": "WoT Tier Leveling Service — Tank Grinding",
+    "metaDescription": "Rapidly level any World of Tanks tank line or crew to Tier X. Skip the grind with fast, secure tech-tree boosting by professional players.",
+    "breadcrumb": {
+      "home": "Home",
+      "services": "Services",
+      "current": "Tier Leveling"
+    },
+    "backToHome": "Back to Home",
+    "hero": {
+      "title": "World of Tanks Tier Leveling & Tank Grinding",
+      "subtitle": "Rapidly level up your tanks from any tier to your desired tier. Select your current and target tier to get instant pricing.",
+      "calculatePrice": "Calculate Price"
+    },
+    "calculator": {
+      "heading": "Price Calculator",
+      "subheading": "Customize your service - select your desired tier range",
+      "tierSelectionTitle": "Tier Selection",
+      "tierSelectionDescription": "Choose your current tier and target tier (1-11)",
+      "fromTierLabel": "From Tier:",
+      "toTierLabel": "To Tier:",
+      "tiersToLevel": "Tiers to level:",
+      "tierRangeValue": "{from} → {to} ({count} tiers)",
+      "additionalOptionsTitle": "Additional Options",
+      "spgTitle": "SPG (Artillery)",
+      "spgNote": "Playing on SPG class tanks takes more time and effort.",
+      "spgSurchargeNote": "+30% to leveling cost",
+      "noBoostersTitle": "Don't use my XP Boosters",
+      "noBoostersNote": "We will play without using your personal reserves. Takes longer.",
+      "noBoostersSurchargeNote": "+30% to leveling cost",
+      "silverFarmingTitle": "Silver Farming (Optional)",
+      "silverFarmingDescription": "Add silver farming to your order at a discounted rate"
+    },
+    "summary": {
+      "title": "Price Summary",
+      "service": "Service:",
+      "serviceName": "Tier Leveling",
+      "tiers": "Tiers:",
+      "levelsToBoost": "Levels to boost:",
+      "levelsToBoostValue": "{count} tiers",
+      "basePrice": "Base price:",
+      "spgSurcharge": "SPG (Artillery) (+30%):",
+      "noBoostersSurcharge": "No Boosters (+30%):",
+      "silverFarming": "Silver Farming:",
+      "total": "Total:",
+      "continueToOrder": "Continue to Order"
+    },
+    "order": {
+      "title": "Complete Your Order",
+      "description": "Fill in your details to finalize your Tier Leveling order",
+      "emailLabel": "Email Address *",
+      "emailPlaceholder": "your@email.com",
+      "discordLabel": "Discord Tag *",
+      "discordPlaceholder": "Username#1234",
+      "serverLabel": "Server *",
+      "serverSelect": "Select server...",
+      "serverNa": "North America",
+      "serverEu": "Europe",
+      "serverAsia": "Asia",
+      "serverRu": "Russia",
+      "summaryTitle": "Order Summary:",
+      "summaryService": "Service:",
+      "summaryServiceName": "Tier Leveling",
+      "summaryTiers": "Tiers:",
+      "summaryClass": "Class:",
+      "summaryClassValue": "SPG (Artillery) (+30%)",
+      "summaryOption": "Option:",
+      "summaryOptionValue": "No Boosters (+30%)",
+      "summarySilver": "Silver:",
+      "summaryTotalCost": "Total Cost:",
+      "additionalInfoLabel": "Additional Information (Optional)",
+      "additionalInfoPlaceholder": "Any specific requirements or preferences...",
+      "submitting": "Sending Order...",
+      "submit": "Submit Order - ${price}",
+      "selectTierRange": "Select Tier Range",
+      "disclaimer": "By submitting this form, you agree to our Terms of Service and Privacy Policy. We'll contact you within 30 minutes to confirm your order."
+    },
+    "errors": {
+      "email": "Invalid email address",
+      "discord": "Please enter your Discord tag",
+      "server": "Please select a server"
+    }
+  },
+  "wn8Boost": {
+    "metaTitle": "WoT WN8 Boost — Winrate & High Damage",
+    "metaDescription": "Raise your World of Tanks WN8, winrate and average damage with top-0.1% boosters. Transparent per-battle pricing, volume discounts and full account safety.",
+    "breadcrumb": {
+      "home": "Home",
+      "services": "Services",
+      "current": "WN8 Boost"
+    },
+    "backToHome": "Back to Home",
+    "hero": {
+      "title": "WoT WN8 Boost — Winrate & High Damage",
+      "subtitle": "Professional boosting to elevate your WN8 rating through expertly played battles",
+      "calculatePrice": "Calculate Your Price"
+    },
+    "calculator": {
+      "title": "Price Calculator",
+      "description": "Configure your boost and see the price instantly",
+      "serviceTypeLabel": "Service Type",
+      "serviceWn8": "WN8",
+      "serviceWinrate": "Winrate",
+      "serviceDamage": "High Damage",
+      "targetWn8Tier": "Target WN8 Tier",
+      "targetWinrate": "Target Winrate",
+      "targetDamage": "Target Damage",
+      "tierUnitWn8": "WN8",
+      "tierUnitWinrate": "Winrate",
+      "tierUnitDamage": "DMG",
+      "perBattle": "per battle",
+      "numberOfBattles": "Number of Battles",
+      "battlesPlaceholder": "Enter number of battles",
+      "minBattlesNote": "20 is a minimum number of battles",
+      "additionalOptions": "Additional Options",
+      "playSpgTitle": "Play on SPG (Artillery)",
+      "playSpgNote": "+100% to base price",
+      "getReplaysTitle": "Get the Replays",
+      "getReplaysNote": "+10% to total cost",
+      "basePrice": "Base Price:",
+      "spgModifierIncluded": "SPG Modifier included",
+      "discount": "Discount ({discount}%):",
+      "getReplays": "Get Replays",
+      "total": "Total:",
+      "volumeDiscountsTitle": "💰 Volume Discounts:",
+      "discount50to99Pre": "50-99 battles: ",
+      "discount50to99Strong": "15% OFF",
+      "discount100Pre": "100+ battles: ",
+      "discount100Strong": "20% OFF",
+      "securityBadge": "100% secure with VPN protection and privacy guaranteed"
+    },
+    "order": {
+      "title": "Complete Your Order",
+      "description": "Fill in your details to get started",
+      "emailLabel": "Email Address *",
+      "emailPlaceholder": "your@email.com",
+      "discordLabel": "Discord Tag *",
+      "discordPlaceholder": "Username#1234",
+      "serverLabel": "Server *",
+      "serverSelect": "Select server...",
+      "serverNa": "North America",
+      "serverEu": "Europe",
+      "serverAsia": "Asia",
+      "serverRu": "Russia",
+      "summaryTitle": "Order Summary:",
+      "summaryServiceType": "Service Type:",
+      "summaryTier": "Tier:",
+      "summaryBattles": "Battles:",
+      "summaryPlaySpg": "Play on SPG:",
+      "summaryPlaySpgValue": "Yes (+100%)",
+      "summaryGetReplays": "Get Replays:",
+      "summaryGetReplaysValue": "Yes (+10%)",
+      "summaryTotalCost": "Total Cost:",
+      "additionalInfoLabel": "Additional Information (Optional)",
+      "additionalInfoPlaceholder": "Any specific requirements or preferences...",
+      "submitting": "Sending Order...",
+      "submit": "Submit Order - ${price}",
+      "disclaimer": "By submitting this form, you agree to our Terms of Service and Privacy Policy. We'll contact you within 30 minutes to confirm your order."
+    },
+    "features": {
+      "heading": "Why Choose Our Service?",
+      "secureTitle": "100% Secure",
+      "secureBody": "VPN protection, encrypted connections, and complete privacy guaranteed.",
+      "expertTitle": "Expert Boosters",
+      "expertBody": "Only top 0.1% players (3500+ WN8) handle your account.",
+      "trackingTitle": "Progress Tracking",
+      "trackingBody": "Real-time updates on completed battles and WN8 progress.",
+      "volumeTitle": "Volume Discounts",
+      "volumeBody": "Save up to 20% when ordering 100+ battles."
+    },
+    "howItWorks": {
+      "heading": "How It Works",
+      "step1Title": "Select Your Target",
+      "step1Body": "Choose your desired WN8 tier and the number of battles you want us to play on your account.",
+      "step2Title": "Expert Plays",
+      "step2Body": "Our professional boosters (WN8 3500+) play the specified number of battles achieving your target WN8.",
+      "step3Title": "Enjoy Results",
+      "step3Body": "Your WN8 rating improves to the target level. Track progress in real-time and enjoy your new stats!"
+    },
+    "errors": {
+      "email": "Invalid email address",
+      "discord": "Please enter your Discord tag",
+      "serviceType": "Please select a service type",
+      "tier": "Please select a tier",
+      "battles": "Minimum 20 battles required",
+      "server": "Please select a server"
+    }
+  }
+}

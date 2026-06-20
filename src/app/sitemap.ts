@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
-import { SITE_URL } from "@/lib/seo";
+import { localeUrl, hreflangAlternates } from "@/lib/seo";
+import { routing } from "@/i18n/routing";
 
 // Public, indexable routes only — admin/api/order are excluded (noindex).
 const PATHS = [
@@ -26,10 +27,23 @@ const PATHS = [
   "/terms",
 ];
 
+// One sitemap entry per (path × locale), each carrying the full set of
+// hreflang alternates (en / de / x-default) so search engines discover both
+// language versions. en stays un-prefixed; de is served under /de.
 export default function sitemap(): MetadataRoute.Sitemap {
-  return PATHS.map((path) => ({
-    url: `${SITE_URL}${path === "/" ? "" : path}`,
-    changeFrequency: path.startsWith("/services") ? "weekly" : "monthly",
-    priority: path === "/" ? 1 : path.startsWith("/services") ? 0.8 : 0.5,
-  }));
+  const entries: MetadataRoute.Sitemap = [];
+  for (const path of PATHS) {
+    const changeFrequency = path.startsWith("/services") ? "weekly" : "monthly";
+    const priority = path === "/" ? 1 : path.startsWith("/services") ? 0.8 : 0.5;
+    const languages = hreflangAlternates(path);
+    for (const locale of routing.locales) {
+      entries.push({
+        url: localeUrl(locale, path),
+        changeFrequency,
+        priority,
+        alternates: { languages },
+      });
+    }
+  }
+  return entries;
 }
