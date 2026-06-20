@@ -1,8 +1,8 @@
 {
   "metadata": {
     "home": {
-      "title": "CyberSkill — Professional World of Tanks Boosting Services",
-      "description": "Professional World of Tanks boosting by top-0.1% players. Raise your WN8, farm credits, complete campaign missions and earn Marks of Excellence — fast, secure and guaranteed."
+      "title": "World of Tanks Boosting Service — WoT Boost | CyberSkill",
+      "description": "WoT boosting service by top-0.1% players. Raise your WN8, farm credits, complete campaign missions & get 3 Marks of Excellence — fast, safe, guaranteed."
     }
   },
   "notFound": {
@@ -511,7 +511,7 @@
     }
   },
   "aceTanker": {
-    "metaTitle": "Ace Tanker Mastery Boost",
+    "metaTitle": "WoT Ace Tanker Boost — Mastery Badge",
     "metaDescription": "Get the Ace Tanker mastery badge on any World of Tanks vehicle. Top-0.1% boosters secure the top-marksman score for your tanks — fast and safe.",
     "breadcrumb": {
       "home": "Home",
@@ -520,7 +520,7 @@
     },
     "backToHome": "Back to Home",
     "hero": {
-      "title": "Ace Tanker Service",
+      "title": "World of Tanks Ace Tanker Mastery Boost",
       "subtitle": "Get the coveted \"Mastery Badge: Ace Tanker\" on any vehicle. Join the top 1% of players.",
       "orderNow": "Order Now"
     },
@@ -638,8 +638,8 @@
     }
   },
   "battlePass": {
-    "metaTitle": "Battle Pass Boost — All 50 Levels",
-    "metaDescription": "Complete World of Tanks Battle Pass Season XX: Searching the Sands and claim the exclusive KB-52 (Tier IX). Fast, secure season progression (all 50 levels) by pro players.",
+    "metaTitle": "WoT Battle Pass Boost — All 50 Levels",
+    "metaDescription": "WoT Battle Pass boost — complete all 50 levels and claim the season's exclusive reward tank. Fast, secure season progression by pro players.",
     "breadcrumb": {
       "home": "Home",
       "services": "Services",
@@ -647,7 +647,7 @@
     },
     "backToHome": "Back to Home",
     "hero": {
-      "title": "Battle Pass Boosting",
+      "title": "World of Tanks Battle Pass Boost (All 50 Levels)",
       "eventLabel": "Current Event: Battle Pass Season XX — Searching the Sands",
       "eventDescriptionPrefix": "Push through three desert-themed chapters and claim the exclusive ",
       "eventTank": "KB-52 (Tier IX)",
@@ -733,8 +733,8 @@
     }
   },
   "campaign10": {
-    "metaTitle": "Campaign 1.0 Boost — Object 260",
-    "metaDescription": "Unlock the Object 260 reward tank with our WoT Campaign 1.0 mission boost. Skilled boosters complete every personal mission set quickly and securely.",
+    "metaTitle": "Obj. 260 Mission Boost (Campaign 1.0)",
+    "metaDescription": "Unlock the Object 260 reward tank — we complete all Campaign 1.0 personal missions for you. Fast, secure, by top-0.1% players.",
     "breadcrumb": {
       "home": "Home",
       "services": "Services",
@@ -744,7 +744,7 @@
     "backToHome": "Back to Home",
     "hero": {
       "back": "Back to Campaigns",
-      "title": "Campaign 1.0",
+      "title": "World of Tanks Obj. 260 Mission Boost",
       "subtitle": "Complete campaign missions and earn prestigious reward tanks including Object 260, T 55A, and more.",
       "anyMissionSet": "Any Mission Set",
       "anyDifficulty": "Any Difficulty",
@@ -825,8 +825,8 @@
     }
   },
   "campaign20": {
-    "metaTitle": "Campaign 2.0 Boost — Object 279(e)",
-    "metaDescription": "Earn the legendary Object 279(e) with our WoT Campaign 2.0 boost. We complete all 279e personal missions, including the hardest, with top players.",
+    "metaTitle": "Obj. 279(e) Mission Boost (Campaign 2.0)",
+    "metaDescription": "Get the Object 279(e) — we complete every Campaign 2.0 mission with honors. Expert boosters, guaranteed result, full account safety.",
     "breadcrumb": {
       "home": "Home",
       "services": "Services",
@@ -836,7 +836,7 @@
     "backToHome": "Back to Home",
     "hero": {
       "backToCampaigns": "Back to Campaigns",
-      "title": "Campaign 2.0",
+      "title": "World of Tanks Obj. 279(e) Mission Boost",
       "subtitle": "Complete challenging campaign missions and earn the Excalibur, Chimera, and the legendary Object 279 (e).",
       "anyMissionSet": "Any Mission Set",
       "hardDifficulty": "Hard Difficulty",
@@ -916,8 +916,8 @@
     }
   },
   "campaign30": {
-    "metaTitle": "Campaign 3.0 Boost — Black Rock",
-    "metaDescription": "Get the Black Rock reward tank with our WoT Campaign 3.0 mission boost. Expert boosters finish every mission stage fast, safely and hassle-free.",
+    "metaTitle": "Black Rock Mission Boost (Campaign 3.0)",
+    "metaDescription": "Earn the Black Rock reward tank — we clear all Campaign 3.0 missions for you. Fast, secure boosting by professional players.",
     "breadcrumb": {
       "home": "Home",
       "services": "Services",
@@ -927,7 +927,7 @@
     "backToHome": "Back to Home",
     "hero": {
       "back": "Back to Campaigns",
-      "title": "Campaign 3.0",
+      "title": "World of Tanks Black Rock Mission Boost",
       "subtitle": "Complete Vanguard, Ambush, and Assistance missions for Windhund, Dravec, and Black Rock.",
       "anyMissionSet": "Any Mission Set",
       "extremeDifficulty": "Extreme Difficulty",
@@ -1008,7 +1008,7 @@
     }
   },
   "campaignMissions": {
-    "metaTitle": "Campaign Missions Boost",
+    "metaTitle": "WoT Campaign Missions — Obj. 279e & 260",
     "metaDescription": "Complete the toughest World of Tanks campaign missions — Obj. 260, Obj. 279(e) and Black Rock — with expert boosters and unlock elite reward tanks.",
     "breadcrumb": {
       "home": "Home",
@@ -1017,7 +1017,7 @@
     },
     "backToHome": "Back to Home",
     "hero": {
-      "title": "Choose Your Campaign"
+      "title": "World of Tanks Campaign Missions Boost (Obj. 279e)"
     },
     "campaignTitle": "Campaign {version}",
     "rewardTanks": "Reward Tanks:",
@@ -1123,8 +1123,8 @@
     "lastUpdated": "Last Updated: December 1, 2025"
   },
   "creditFarm": {
-    "metaTitle": "Credit & Bonds Farming",
-    "metaDescription": "Farm millions of World of Tanks credits and bonds fast — no grinding. Efficient Front Line credit farming by pro players with VPN-protected account safety.",
+    "metaTitle": "WoT Credit Booster & Bonds Farm",
+    "metaDescription": "WoT credit booster: farm millions of credits & bonds fast — no grind. Efficient Front Line farming by pros, VPN-protected account safety.",
     "breadcrumb": {
       "home": "Home",
       "services": "Services",
@@ -1132,7 +1132,7 @@
     },
     "backToHome": "Back to Home",
     "hero": {
-      "title": "Credit and Bonds Farming Service",
+      "title": "WoT Credit Booster & Bonds Farming",
       "subtitle": "Fast and secure credit farming to build your in-game wealth with professional players",
       "calculatePrice": "Calculate Your Price"
     },
@@ -1230,8 +1230,8 @@
     }
   },
   "expFarm": {
-    "metaTitle": "Experience (XP) Farm",
-    "metaDescription": "Farm experience on any tank in your World of Tanks garage. Fast, affordable XP boosting to unlock modules and new vehicles without the grind.",
+    "metaTitle": "World of Tanks XP Boost — Exp & Free XP Farm",
+    "metaDescription": "World of Tanks XP boost: farm experience on any tank in your garage. Fast, affordable XP & Free XP farming to unlock modules and new tanks — no grind.",
     "breadcrumb": {
       "home": "Home",
       "services": "Services",
@@ -1239,7 +1239,7 @@
     },
     "backToHome": "Back to Home",
     "hero": {
-      "title": "Experience (XP) Farming",
+      "title": "World of Tanks XP Boost & Experience Farm",
       "subtitle": "Level up your tanks and unlock new tiers faster with our professional XP farming service",
       "calculatePrice": "Calculate Your Price"
     },
@@ -1372,7 +1372,7 @@
     }
   },
   "markOfExcellence": {
-    "metaTitle": "Mark of Excellence Boost (3 MoE)",
+    "metaTitle": "WoT Marks of Excellence Boost — 3 MoE",
     "metaDescription": "Get 3 Marks of Excellence on your favourite tanks with top-1% boosters. Show elite World of Tanks performance with guaranteed MoE results and safety.",
     "breadcrumb": {
       "home": "Home",
@@ -1381,7 +1381,7 @@
     },
     "backToHome": "Back to Home",
     "hero": {
-      "title": "Mark of Excellence",
+      "title": "WoT 3 Marks of Excellence (MoE) Boost",
       "description": "Achieve your desired Mark of Excellence percentage with our professional boosting service. Select your current and target progress, tank difficulty, and additional options.",
       "progressBadge": "1% - 95% Progress",
       "anyTank": "Any Tank",
@@ -1461,7 +1461,7 @@
     }
   },
   "onslaught": {
-    "metaTitle": "Onslaught Rank Boost",
+    "metaTitle": "WoT Onslaught Boost — Legend Rank",
     "metaDescription": "Climb to Legend rank in World of Tanks Onslaught. Our 7v7 specialists boost your rating and earn bonds, styles and the annual reward tank — securely.",
     "breadcrumb": {
       "home": "Home",
@@ -1470,7 +1470,7 @@
     },
     "backToHome": "Back to Home",
     "hero": {
-      "title": "Onslaught Boosting",
+      "title": "World of Tanks Onslaught Rank Boost (Legend)",
       "subtitle": "Climb the ranks in Onslaught mode 7v7 battles to earn exclusive rewards and unlock the powerful 114 SP2 tank at Gold rank.",
       "tagYearOfDragon": "Year of the Dragon",
       "tagAshbringer": "Ashbringer Tank",
@@ -1784,7 +1784,7 @@
     }
   },
   "referralProgram": {
-    "metaTitle": "WoT Referral Program Service",
+    "metaTitle": "WoT Referral Program — Tier 8 Premium Tank",
     "metaDescription": "Get a Tier 8 Premium tank and bonds through the WoT Referral Program. We handle all recruiting for you — fixed $100 price, completed in 7–14 days.",
     "breadcrumb": {
       "home": "Home",
@@ -1793,7 +1793,7 @@
     },
     "backToHome": "Back to Home",
     "hero": {
-      "title": "Referral Program Service",
+      "title": "WoT Referral Program — Free Tier 8 Premium Tank",
       "subtitle": "Get a Tier 8 Premium Tank and Bonds through the WoT Referral Program. We handle all the recruiting for you!",
       "fixedPrice": "Fixed Price",
       "orderNow": "Order Now"
@@ -1910,7 +1910,7 @@
     }
   },
   "tierLeveling": {
-    "metaTitle": "Tier Leveling & Tank Grinding",
+    "metaTitle": "WoT Tier Leveling Service — Tank Grinding",
     "metaDescription": "Rapidly level any World of Tanks tank line or crew to Tier X. Skip the grind with fast, secure tech-tree boosting by professional players.",
     "breadcrumb": {
       "home": "Home",
@@ -1919,7 +1919,7 @@
     },
     "backToHome": "Back to Home",
     "hero": {
-      "title": "Tier Leveling Service",
+      "title": "World of Tanks Tier Leveling & Tank Grinding",
       "subtitle": "Rapidly level up your tanks from any tier to your desired tier. Select your current and target tier to get instant pricing.",
       "calculatePrice": "Calculate Price"
     },
@@ -1993,7 +1993,7 @@
     }
   },
   "wn8Boost": {
-    "metaTitle": "WN8, Winrate & High Damage Boost",
+    "metaTitle": "WoT WN8 Boost — Winrate & High Damage",
     "metaDescription": "Raise your World of Tanks WN8, winrate and average damage with top-0.1% boosters. Transparent per-battle pricing, volume discounts and full account safety.",
     "breadcrumb": {
       "home": "Home",
@@ -2002,7 +2002,7 @@
     },
     "backToHome": "Back to Home",
     "hero": {
-      "title": "WN8, Winrate, High Damage Service",
+      "title": "WoT WN8 Boost — Winrate & High Damage",
       "subtitle": "Professional boosting to elevate your WN8 rating through expertly played battles",
       "calculatePrice": "Calculate Your Price"
     },

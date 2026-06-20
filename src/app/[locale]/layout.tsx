@@ -7,7 +7,6 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "../globals.css";
 import ChatWidget from "@/components/ChatWidget";
-import EventBanner from "@/components/EventBanner";
 import {
   SITE_URL,
   SITE_NAME,
@@ -118,7 +117,6 @@ export default async function LocaleLayout({ children, params }: Props) {
         <JsonLd data={websiteJsonLd(locale as Locale)} />
         <GoogleAnalytics gaId="G-ZTPTXGLVQ4" />
         <NextIntlClientProvider>
-          <EventBanner />
           {children}
           <ChatWidget />
         </NextIntlClientProvider>
