@@ -108,7 +108,7 @@ export default function ExpFarmPage() {
               <div className="flex items-center gap-3 mb-4">
                 <BookOpen className="h-10 w-10 text-primary" />
                 <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-                  Experience (XP) Farming
+                  World of Tanks XP Boost & Experience Farm
                 </h1>
               </div>
               <p className="text-lg text-muted-foreground mb-6">

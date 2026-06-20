@@ -4,9 +4,9 @@ import { pageMetadata, serviceJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/JsonLd";
 
 const PATH = "/services/exp-farm";
-const TITLE = "Experience (XP) Farm";
+const TITLE = "World of Tanks XP Boost — Exp & Free XP Farm";
 const DESCRIPTION =
-  "Farm experience on any tank in your World of Tanks garage. Fast, affordable XP boosting to unlock modules and new vehicles without the grind.";
+  "World of Tanks XP boost: farm experience on any tank in your garage. Fast, affordable XP & Free XP farming to unlock modules and new tanks — no grind.";
 
 export const metadata: Metadata = pageMetadata({ title: TITLE, description: DESCRIPTION, path: PATH });
 
