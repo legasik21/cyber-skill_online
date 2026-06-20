@@ -4,7 +4,7 @@ import { pageMetadata, serviceJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/JsonLd";
 
 const PATH = "/services/tier-leveling";
-const TITLE = "Tier Leveling & Tank Grinding";
+const TITLE = "WoT Tier Leveling Service — Tank Grinding";
 const DESCRIPTION =
   "Rapidly level any World of Tanks tank line or crew to Tier X. Skip the grind with fast, secure tech-tree boosting by professional players.";
 
