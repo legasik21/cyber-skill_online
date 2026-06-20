@@ -4,7 +4,7 @@ import { pageMetadata, serviceJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/JsonLd";
 
 const PATH = "/services/ace-tanker";
-const TITLE = "Ace Tanker Mastery Boost";
+const TITLE = "WoT Ace Tanker Boost — Mastery Badge";
 const DESCRIPTION =
   "Get the Ace Tanker mastery badge on any World of Tanks vehicle. Top-0.1% boosters secure the top-marksman score for your tanks — fast and safe.";
 
