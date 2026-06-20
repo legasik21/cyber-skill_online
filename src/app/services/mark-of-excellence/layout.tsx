@@ -4,7 +4,7 @@ import { pageMetadata, serviceJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/JsonLd";
 
 const PATH = "/services/mark-of-excellence";
-const TITLE = "Mark of Excellence Boost (3 MoE)";
+const TITLE = "WoT Marks of Excellence Boost — 3 MoE";
 const DESCRIPTION =
   "Get 3 Marks of Excellence on your favourite tanks with top-1% boosters. Show elite World of Tanks performance with guaranteed MoE results and safety.";
 
