@@ -18,9 +18,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const HOME_TITLE = "CyberSkill — Professional World of Tanks Boosting Services";
+const HOME_TITLE = "World of Tanks Boosting Service — WoT Boost | CyberSkill";
 const HOME_DESCRIPTION =
-  "Professional World of Tanks boosting by top-0.1% players. Raise your WN8, farm credits, complete campaign missions and earn Marks of Excellence — fast, secure and guaranteed.";
+  "WoT boosting service by top-0.1% players. Raise your WN8, farm credits, complete campaign missions & get 3 Marks of Excellence — fast, safe, guaranteed.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

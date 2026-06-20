@@ -269,7 +269,7 @@ export default function Home() {
               transition={{ duration: 0.5 }}
             >
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight">
-                WoT Boosting Service by <span className="text-primary">CyberSkill</span>
+                World of Tanks <span className="text-primary">Boosting Service</span>
               </h1>
             </motion.div>
             <motion.p
