@@ -295,7 +295,7 @@ export default function Campaign2Page() {
               <div className="flex items-center gap-3 mb-4">
                 <Trophy className="h-10 w-10 text-primary" />
                 <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-                  Campaign 2.0
+                  World of Tanks Obj. 279(e) Mission Boost
                 </h1>
               </div>
               <p className="text-lg text-muted-foreground mb-4">

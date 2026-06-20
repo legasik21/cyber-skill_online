@@ -4,9 +4,9 @@ import { pageMetadata, serviceJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/JsonLd";
 
 const PATH = "/services/campaign-missions/2.0";
-const TITLE = "Campaign 2.0 Boost — Object 279(e)";
+const TITLE = "Obj. 279(e) Mission Boost (Campaign 2.0)";
 const DESCRIPTION =
-  "Earn the legendary Object 279(e) with our WoT Campaign 2.0 boost. We complete all 279e personal missions, including the hardest, with top players.";
+  "Get the Object 279(e) — we complete every Campaign 2.0 mission with honors. Expert boosters, guaranteed result, full account safety.";
 
 export const metadata: Metadata = pageMetadata({ title: TITLE, description: DESCRIPTION, path: PATH });
 
