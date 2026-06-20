@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+// Locale-aware router: the order API returns locale-agnostic paths
+// (e.g. /order/success); this prefixes /de automatically for German visitors.
+import { useRouter } from '@/i18n/navigation';
 
 interface OrderData {
   email: string;

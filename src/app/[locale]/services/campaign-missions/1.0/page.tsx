@@ -1,0 +1,999 @@
+// app/services/campaign-missions/Campaign1Page.tsx
+"use client";
+
+import { useState, useMemo } from "react";
+import { Button } from "@/components/ui/Button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import {
+  Trophy,
+  Shield,
+  ChevronRight,
+  Check,
+  ArrowLeft,
+  Target,
+  Award,
+  Calculator,
+  X,
+  Trash2,
+  Loader2,
+} from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
+import { useOrderSubmit } from "@/hooks/useOrderSubmit"
+import {
+  TANKS_1_0 as TANKS,
+  MISSION_TYPES_1_0 as MISSION_TYPES,
+  MISSIONS_PER_TYPE,
+  priceCampaignMissions,
+  getMissionPrice as getMissionPriceForCampaign,
+  type SelectedMissions,
+} from "@/lib/pricing/campaign-missions";
+
+const CAMPAIGN_ID = "1.0" as const;
+
+// Calculate price for a mission
+function getMissionPrice(
+  tankId: string,
+  typeId: string,
+  missionNumber: number
+): number {
+  return getMissionPriceForCampaign(CAMPAIGN_ID, tankId, typeId, missionNumber);
+}
+
+export default function Campaign1Page() {
+  const t = useTranslations("campaign10");
+  const { submitOrder, isSubmitting } = useOrderSubmit()
+  const [activeTank, setActiveTank] = useState<string>(TANKS[0].id);
+  const [selectedMissions, setSelectedMissions] = useState<SelectedMissions>(
+    {}
+  );
+
+  const orderFormSchema = useMemo(
+    () =>
+      z.object({
+        email: z.string().email({ message: t("errors.email") }),
+        discordTag: z.string().min(3, { message: t("errors.discord") }),
+        server: z.string().min(1, { message: t("errors.server") }),
+        additionalInfo: z.string().optional(),
+      }),
+    [t]
+  );
+
+  const form = useForm<z.infer<typeof orderFormSchema>>({
+    resolver: zodResolver(orderFormSchema),
+    defaultValues: {
+      email: "",
+      discordTag: "",
+      server: "",
+      additionalInfo: "",
+    },
+  });
+
+  const range1to15 = () =>
+    Array.from({ length: MISSIONS_PER_TYPE }, (_, i) => i + 1);
+
+  // Toggle mission selection (полная иммутабельность вложенных структур)
+  const toggleMission = (
+    tankId: string,
+    missionType: string,
+    missionNumber: number
+  ) => {
+    setSelectedMissions((prev) => {
+      const prevTank = prev[tankId] ?? {};
+      const prevTypeArr = prevTank[missionType] ?? [];
+
+      const exists = prevTypeArr.includes(missionNumber);
+      const nextTypeArr = exists
+        ? prevTypeArr.filter((m) => m !== missionNumber)
+        : [...prevTypeArr, missionNumber].sort((a, b) => a - b);
+
+      // если после тоггла тип пуст — чистим ключи
+      if (nextTypeArr.length === 0) {
+        const { [missionType]: _rmType, ...restTypes } = prevTank;
+        if (Object.keys(restTypes).length === 0) {
+          const { [tankId]: _rmTank, ...rest } = prev;
+          return { ...rest };
+        }
+        return { ...prev, [tankId]: restTypes };
+      }
+
+      // иначе пишем новый массив для типа
+      return {
+        ...prev,
+        [tankId]: {
+          ...prevTank,
+          [missionType]: nextTypeArr,
+        },
+      };
+    });
+  };
+
+  // Toggle all missions for a specific type (15% discount)
+  const selectAllType = (tankId: string, missionType: string) => {
+    setSelectedMissions((prev) => {
+      const prevTank = prev[tankId] ?? {};
+      const isFullySelected =
+        (prev[tankId]?.[missionType]?.length ?? 0) === MISSIONS_PER_TYPE;
+
+      if (isFullySelected) {
+        const { [missionType]: _rm, ...restTypes } = prevTank;
+        if (Object.keys(restTypes).length === 0) {
+          const { [tankId]: _rmTank, ...rest } = prev;
+          return { ...rest };
+        }
+        return { ...prev, [tankId]: restTypes };
+      }
+
+      return {
+        ...prev,
+        [tankId]: {
+          ...prevTank,
+          [missionType]: range1to15(),
+        },
+      };
+    });
+  };
+
+  // Toggle all missions for a tank (25% discount)
+  const selectAllTank = (tankId: string) => {
+    setSelectedMissions((prev) => {
+      const isFullySelected = MISSION_TYPES.every(
+        (type) => prev[tankId]?.[type.id]?.length === MISSIONS_PER_TYPE
+      );
+
+      if (isFullySelected) {
+        const { [tankId]: _rm, ...rest } = prev;
+        return { ...rest };
+      } else {
+        const allTypes: Record<string, number[]> = {};
+        MISSION_TYPES.forEach((type) => (allTypes[type.id] = range1to15()));
+        return { ...prev, [tankId]: allTypes };
+      }
+    });
+  };
+
+  // Check if a mission is selected
+  const isMissionSelected = (
+    tankId: string,
+    missionType: string,
+    missionNumber: number
+  ): boolean =>
+    selectedMissions[tankId]?.[missionType]?.includes(missionNumber) ?? false;
+
+  // Check if all missions of a type are selected
+  const isTypeFullSelected = (tankId: string, missionType: string): boolean =>
+    selectedMissions[tankId]?.[missionType]?.length === MISSIONS_PER_TYPE;
+
+  // Check if all missions of a tank are selected
+  const isTankFullSelected = (tankId: string): boolean => {
+    if (!selectedMissions[tankId]) return false;
+    return MISSION_TYPES.every(
+      (type) => selectedMissions[tankId][type.id]?.length === MISSIONS_PER_TYPE
+    );
+  };
+
+  // Calculate price details including discounts
+  const priceDetails = useMemo(
+    () => priceCampaignMissions(CAMPAIGN_ID, selectedMissions),
+    [selectedMissions]
+  );
+
+  // Count total selected missions
+  const totalMissions = useMemo(() => {
+    return Object.values(selectedMissions).reduce(
+      (acc, tank) =>
+        acc + Object.values(tank).reduce((a, m) => a + m.length, 0),
+      0
+    );
+  }, [selectedMissions]);
+
+  // Clear all selections for a tank
+  const clearTankSelections = (tankId: string) => {
+    setSelectedMissions((prev) => {
+      const { [tankId]: _rm, ...rest } = prev;
+      return { ...rest };
+    });
+  };
+
+  // Clear all selections
+  const clearAllSelections = () => {
+    setSelectedMissions({});
+  };
+
+  async function onSubmit(values: z.infer<typeof orderFormSchema>) {
+    // Format selected missions for detailed view
+    const formattedMissions = Object.entries(selectedMissions)
+      .map(([tankId, types]) => {
+        const tankName = TANKS.find((t) => t.id === tankId)?.name || tankId;
+        const typeDetails = Object.entries(types)
+          .map(([typeId, missions]) => {
+            const typeName = MISSION_TYPES.find((t) => t.id === typeId)?.name || typeId;
+            const sortedMissions = [...missions].sort((a, b) => a - b);
+            return `${typeName}: [${sortedMissions.join(", ")}]`;
+          })
+          .join("; ");
+        return `${tankName}: ${typeDetails}`;
+      })
+      .join("\n");
+
+    await submitOrder({
+      email: values.email,
+      discordTag: values.discordTag,
+      service: 'campaign-missions-1.0',
+      message: values.additionalInfo,
+      page: 'Campaign Missions 1.0',
+      orderDetails: {
+          campaign: "1.0",
+          missionsSelected: `${totalMissions} missions`,
+          missionsDetails: formattedMissions,
+          originalPrice: `$${priceDetails.original}`,
+          discount: priceDetails.discount > 0 ? `-$${priceDetails.discount}` : 'None',
+          totalPrice: `$${priceDetails.total}`,
+      },
+    })
+  }
+
+  return (
+    <>
+      <Header />
+      <div className="min-h-screen bg-background text-foreground overflow-x-hidden pt-20">
+        {/* Hero Section */}
+        <section className="relative py-16 overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-background to-background opacity-50" />
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-4xl mx-auto">
+              <Link
+                href="/services/campaign-missions"
+                className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-6 transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4 mr-1" />
+                {t("hero.back")}
+              </Link>
+              <div className="flex items-center gap-3 mb-4">
+                <Trophy className="h-10 w-10 text-primary" />
+                <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+                  {t("hero.title")}
+                </h1>
+              </div>
+              <p className="text-lg text-muted-foreground mb-4">
+                {t("hero.subtitle")}
+              </p>
+              <div className="flex items-center gap-4 mb-6">
+                <div className="flex items-center gap-2">
+                  <Award className="h-5 w-5 text-primary" />
+                  <span className="text-sm">{t("hero.anyMissionSet")}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Target className="h-5 w-5 text-primary" />
+                  <span className="text-sm">{t("hero.anyDifficulty")}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold text-primary">
+                    {t("hero.priceFrom")}
+                  </span>
+                </div>
+              </div>
+              <Button
+                size="lg"
+                className="text-lg px-8"
+                onClick={() =>
+                  document
+                    .getElementById("calculator")
+                    ?.scrollIntoView({ behavior: "smooth", block: "start" })
+                }
+              >
+                {t("hero.calculateNow")}
+                <ChevronRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* Mission Calculator Section */}
+        <section id="calculator" className="py-12 bg-secondary/20">
+          <div className="container mx-auto px-4">
+            <div className="max-w-7xl mx-auto">
+              <div className="text-center mb-8">
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  <Calculator className="h-6 w-6 text-primary" />
+                  <h2 className="text-3xl font-bold">{t("calculator.heading")}</h2>
+                </div>
+                <p className="text-muted-foreground">
+                  {t("calculator.subheading")}
+                </p>
+              </div>
+
+              <div className="grid lg:grid-cols-3 gap-6">
+                {/* Left Side - Tank Selector + Active Tank Grid (2/3 width) */}
+                <div className="lg:col-span-2 space-y-4">
+                  {/* Tank Selector Tabs */}
+                  <div className="flex flex-wrap gap-2">
+                    {TANKS.map((tank) => {
+                      const tankMissionCount = selectedMissions[tank.id]
+                        ? Object.values(selectedMissions[tank.id]).reduce(
+                            (a, m) => a + m.length,
+                            0
+                          )
+                        : 0;
+                      const isActive = activeTank === tank.id;
+
+                      return (
+                        <button
+                          key={tank.id}
+                          type="button"
+                          onClick={() => setActiveTank(tank.id)}
+                          className={`relative px-4 py-2 rounded-lg font-semibold text-sm transition-all border-2 ${
+                            isActive
+                              ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/25"
+                              : "bg-card hover:bg-primary/10 text-foreground border-primary/30 hover:border-primary/50"
+                          }`}
+                        >
+                          <span>{tank.name}</span>
+                          {tankMissionCount > 0 && (
+                            <span
+                              className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
+                                isActive
+                                  ? "bg-primary-foreground/20 text-primary-foreground"
+                                  : "bg-green-500/20 text-green-500"
+                              }`}
+                            >
+                              {tankMissionCount}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Active Tank Mission Grid */}
+                  {(() => {
+                    const tank = TANKS.find((t) => t.id === activeTank)!;
+                    const tankMissionCount = selectedMissions[tank.id]
+                      ? Object.values(selectedMissions[tank.id]).reduce(
+                          (a, m) => a + m.length,
+                          0
+                        )
+                      : 0;
+                    const isFullTank = isTankFullSelected(tank.id);
+
+                    return (
+                      <Card className="border-2 border-primary/20 bg-card">
+                        <CardContent className="pt-3 pb-3">
+                          {/* Tank Header */}
+                          <div className="mb-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-base text-primary">
+                                {tank.name}
+                              </span>
+                              {tankMissionCount > 0 && (
+                                <span className="bg-green-500/20 text-green-500 text-xs px-2 py-0.5 rounded">
+                                  {tankMissionCount} {t("calculator.selected")}
+                                </span>
+                              )}
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => selectAllTank(tank.id)}
+                              className={`text-xs font-bold px-3 py-1 rounded border transition-colors flex items-center gap-2 ${
+                                isFullTank
+                                  ? "bg-green-500/20 text-green-500 border-green-500/50"
+                                  : "bg-primary/10 text-primary border-primary/30 hover:bg-primary/20"
+                              }`}
+                            >
+                              <Award className="h-3 w-3" />
+                              {isFullTank
+                                ? t("calculator.allSelectedTank25")
+                                : t("calculator.selectAllTank25")}
+                            </button>
+                          </div>
+
+                          {/* Mission Grid - Desktop */}
+                          <div className="hidden md:block overflow-x-auto">
+                            <table className="w-full border-collapse text-xs">
+                              <thead>
+                                <tr>
+                                  <th className="p-1 text-left font-medium text-muted-foreground border-b border-border w-20">
+                                    {t("calculator.typeColumn")}
+                                  </th>
+                                  {range1to15().map((num) => (
+                                    <th
+                                      key={num}
+                                      className="p-1 text-center font-medium text-muted-foreground border-b border-border w-8"
+                                    >
+                                      {num}
+                                    </th>
+                                  ))}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {MISSION_TYPES.map((type) => {
+                                  const isFullType = isTypeFullSelected(
+                                    tank.id,
+                                    type.id
+                                  );
+                                  return (
+                                    <tr key={type.id}>
+                                      <td className="p-1 font-medium text-xs align-middle">
+                                        <div className="flex flex-col gap-0.5">
+                                          <span>{type.name}</span>
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              selectAllType(tank.id, type.id)
+                                            }
+                                            className={`text-[8px] px-1 py-0.5 rounded border w-fit whitespace-nowrap ${
+                                              isFullType
+                                                ? "bg-green-500/20 text-green-500 border-green-500/50"
+                                                : "bg-secondary hover:bg-secondary/80 text-muted-foreground border-border"
+                                            }`}
+                                          >
+                                            {isFullType
+                                              ? t("calculator.off15")
+                                              : t("calculator.all")}
+                                          </button>
+                                        </div>
+                                      </td>
+                                      {range1to15().map((num) => {
+                                        const isSelected = isMissionSelected(
+                                          tank.id,
+                                          type.id,
+                                          num
+                                        );
+                                        const price = getMissionPrice(
+                                          tank.id,
+                                          type.id,
+                                          num
+                                        );
+
+                                        return (
+                                          <td
+                                            key={num}
+                                            className="p-0.5 align-middle"
+                                          >
+                                            <button
+                                              type="button"
+                                              onClick={() =>
+                                                toggleMission(
+                                                  tank.id,
+                                                  type.id,
+                                                  num
+                                                )
+                                              }
+                                              className={`w-full h-7 rounded text-[10px] font-medium transition-all ${
+                                                isSelected
+                                                  ? "bg-primary text-primary-foreground"
+                                                  : "bg-secondary/50 hover:bg-primary/20 text-foreground"
+                                              }`}
+                                            >
+                                              ${price}
+                                            </button>
+                                          </td>
+                                        );
+                                      })}
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
+
+                          {/* Mission Grid - Mobile (3 rows x 5 missions per section) */}
+                          <div className="md:hidden space-y-4">
+                            {MISSION_TYPES.map((type) => {
+                              const isFullType = isTypeFullSelected(
+                                tank.id,
+                                type.id
+                              );
+                              return (
+                                <div key={type.id} className="border border-border/50 rounded-lg p-3 bg-secondary/10">
+                                  {/* Section Header */}
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className="font-medium text-sm">{type.name}</span>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        selectAllType(tank.id, type.id)
+                                      }
+                                      className={`text-[10px] px-2 py-1 rounded border ${
+                                        isFullType
+                                          ? "bg-green-500/20 text-green-500 border-green-500/50"
+                                          : "bg-secondary hover:bg-secondary/80 text-muted-foreground border-border"
+                                      }`}
+                                    >
+                                      {isFullType
+                                        ? t("calculator.off15")
+                                        : t("calculator.selectAll")}
+                                    </button>
+                                  </div>
+                                  {/* Mission Grid: 3 rows x 5 columns */}
+                                  <div className="grid grid-cols-5 gap-1">
+                                    {range1to15().map((num) => {
+                                      const isSelected = isMissionSelected(
+                                        tank.id,
+                                        type.id,
+                                        num
+                                      );
+                                      const price = getMissionPrice(
+                                        tank.id,
+                                        type.id,
+                                        num
+                                      );
+
+                                      return (
+                                        <button
+                                          key={num}
+                                          type="button"
+                                          onClick={() =>
+                                            toggleMission(
+                                              tank.id,
+                                              type.id,
+                                              num
+                                            )
+                                          }
+                                          className={`h-10 rounded text-xs font-medium transition-all flex flex-col items-center justify-center ${
+                                            isSelected
+                                              ? "bg-primary text-primary-foreground"
+                                              : "bg-secondary/50 hover:bg-primary/20 text-foreground"
+                                          }`}
+                                        >
+                                          <span className="text-[10px] opacity-60">#{num}</span>
+                                          <span>${price}</span>
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })()}
+
+                  {/* Quick Actions & Info */}
+                  <div className="flex flex-wrap items-center justify-between gap-3 px-2">
+                    <div className="flex-1">
+                      <p className="text-xs text-muted-foreground italic">
+                        {t("calculator.honorsNote")}
+                      </p>
+                    </div>
+                    {totalMissions > 0 && (
+                      <button
+                        type="button"
+                        onClick={clearAllSelections}
+                        className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1 flex-shrink-0"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                        {t("calculator.clearAll")}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Right Side - Selected Missions Panel (1/3 width) */}
+                <div className="lg:col-span-1">
+                  <Card className="border-2 border-primary/20 bg-card h-full">
+                    <CardHeader className="py-3 px-4">
+                      <CardTitle className="text-base flex items-center justify-between">
+                        <span>{t("panel.title")}</span>
+                        <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">
+                          {totalMissions} {t("panel.selected")}
+                        </span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="px-4 pb-4">
+                      {Object.keys(selectedMissions).length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground text-sm">
+                          <p>{t("panel.emptyTitle")}</p>
+                          <p className="text-xs mt-1">
+                            {t("panel.emptyHint")}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-4 max-h-[300px] overflow-y-auto">
+                          {Object.entries(selectedMissions).map(
+                            ([tankId, missionTypes]) => {
+                              const tank = TANKS.find((t) => t.id === tankId);
+                              const isFullTank = isTankFullSelected(tankId);
+
+                              return (
+                                <div
+                                  key={tankId}
+                                  className="bg-secondary/30 rounded-lg p-3 relative"
+                                >
+                                  {isFullTank && (
+                                    <div className="absolute top-0 right-0 bg-green-500 text-white text-[9px] px-2 py-0.5 rounded-bl font-bold">
+                                      {t("panel.off25")}
+                                    </div>
+                                  )}
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className="font-bold text-sm text-primary">
+                                      {tank?.name}:
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        clearTankSelections(tankId)
+                                      }
+                                      className="text-red-400 hover:text-red-300"
+                                    >
+                                      <X className="h-3 w-3" />
+                                    </button>
+                                  </div>
+                                  <div className="space-y-1">
+                                    {Object.entries(missionTypes).map(
+                                      ([typeId, missions]) => {
+                                        const type = MISSION_TYPES.find(
+                                          (t) => t.id === typeId
+                                        );
+                                        const isFullType =
+                                          missions.length === MISSIONS_PER_TYPE;
+                                        const sortedMissions = [
+                                          ...missions,
+                                        ].sort((a, b) => a - b);
+
+                                        return (
+                                          <div
+                                            key={typeId}
+                                            className="flex items-start gap-2 text-sm"
+                                          >
+                                            <span className="text-muted-foreground font-medium min-w-[32px]">
+                                              {type?.name}:
+                                            </span>
+                                            <span className="text-foreground">
+                                              {isFullType ? (
+                                                <span className="text-green-500 font-medium">
+                                                  {t("panel.allRange")}
+                                                </span>
+                                              ) : (
+                                                sortedMissions.join(", ")
+                                              )}
+                                            </span>
+                                            {!isFullTank && isFullType && (
+                                              <span className="text-[9px] text-green-500 font-bold ml-auto">
+                                                {t("panel.off15")}
+                                              </span>
+                                            )}
+                                          </div>
+                                        );
+                                      }
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            }
+                          )}
+                        </div>
+                      )}
+
+                      {/* Price Summary */}
+                      <div className="mt-4 pt-4 border-t border-border">
+                        <div className="flex justify-between items-center text-sm mb-1">
+                          <span className="text-muted-foreground">
+                            {t("panel.basePrice")}
+                          </span>
+                          <span>${priceDetails.original}</span>
+                        </div>
+                        {priceDetails.discount > 0 && (
+                          <div className="flex justify-between items-center text-sm mb-1 text-green-500">
+                            <span>{t("panel.discount")}</span>
+                            <span>-${priceDetails.discount}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between items-center mt-2 pt-2 border-t border-border">
+                          <span className="font-semibold">{t("panel.total")}</span>
+                          <span className="text-2xl font-bold text-primary">
+                            ${priceDetails.total}
+                          </span>
+                        </div>
+                        <Button
+                          className="w-full mt-4"
+                          onClick={() =>
+                            document
+                              .getElementById("order-form")
+                              ?.scrollIntoView({ behavior: "smooth" })
+                          }
+                          disabled={totalMissions === 0}
+                        >
+                          {t("panel.continueOrder")}
+                          <ChevronRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Order Form Section */}
+        <section id="order-form" className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="max-w-2xl mx-auto">
+              <Card className="border-border bg-card">
+                <CardHeader>
+                  <CardTitle className="text-2xl">
+                    {t("order.title")}
+                  </CardTitle>
+                  <CardDescription>
+                    {t("order.description")}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-6"
+                  >
+                    {/* Email */}
+                    <div className="space-y-2">
+                      <label htmlFor="email" className="text-sm font-medium">
+                        {t("order.emailLabel")}
+                      </label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder={t("order.emailPlaceholder")}
+                        {...form.register("email")}
+                        className="bg-background"
+                      />
+                      {form.formState.errors.email && (
+                        <p className="text-sm text-red-500">
+                          {form.formState.errors.email.message}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Discord Tag */}
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="discordTag"
+                        className="text-sm font-medium"
+                      >
+                        {t("order.discordLabel")}
+                      </label>
+                      <Input
+                        id="discordTag"
+                        placeholder={t("order.discordPlaceholder")}
+                        {...form.register("discordTag")}
+                        className="bg-background"
+                      />
+                      {form.formState.errors.discordTag && (
+                        <p className="text-sm text-red-500">
+                          {form.formState.errors.discordTag.message}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Server */}
+                    <div className="space-y-2">
+                      <label htmlFor="server" className="text-sm font-medium">
+                        {t("order.serverLabel")}
+                      </label>
+                      <select
+                        id="server"
+                        {...form.register("server")}
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        <option value="">{t("order.serverSelect")}</option>
+                        <option value="na">{t("order.serverNa")}</option>
+                        <option value="eu">{t("order.serverEu")}</option>
+                        <option value="asia">{t("order.serverAsia")}</option>
+                        <option value="ru">{t("order.serverRu")}</option>
+                      </select>
+                      {form.formState.errors.server && (
+                        <p className="text-sm text-red-500">
+                          {form.formState.errors.server.message}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Order Summary */}
+                    <div className="bg-secondary/20 rounded-lg p-4 space-y-2">
+                      <div className="text-sm font-semibold mb-2">
+                        {t("order.summaryTitle")}
+                      </div>
+                      <div className="space-y-1 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">
+                            {t("order.summaryCampaign")}
+                          </span>
+                          <span className="font-medium">1.0</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">
+                            {t("order.summaryMissionsSelected")}
+                          </span>
+                          <span className="font-medium">{totalMissions}</span>
+                        </div>
+                        {Object.entries(selectedMissions).map(
+                          ([tankId, missionTypes]) => {
+                            const tank = TANKS.find((t) => t.id === tankId);
+                            const missionCount = Object.values(
+                              missionTypes
+                            ).reduce((a, m) => a + m.length, 0);
+                            const isFullTank = isTankFullSelected(tankId);
+
+                            return (
+                              <div
+                                key={tankId}
+                                className="flex justify-between pl-2 text-xs"
+                              >
+                                <span className="text-muted-foreground">
+                                  • {tank?.name}:
+                                </span>
+                                <div className="flex items-center gap-2">
+                                  <span>{t("order.missionsUnit", { count: missionCount })}</span>
+                                  {isFullTank && (
+                                    <span className="text-green-500 font-bold text-[10px]">
+                                      {t("order.off25")}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          }
+                        )}
+
+                        <div className="border-t border-border pt-2 mt-2 space-y-1">
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>{t("order.basePrice")}</span>
+                            <span>${priceDetails.original}</span>
+                          </div>
+                          {priceDetails.discount > 0 && (
+                            <div className="flex justify-between text-xs text-green-500">
+                              <span>{t("order.totalDiscount")}</span>
+                              <span>-${priceDetails.discount}</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between pt-1">
+                            <span className="text-muted-foreground">
+                              {t("order.totalPrice")}
+                            </span>
+                            <span className="font-bold text-primary text-lg">
+                              ${priceDetails.total}.00
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      {totalMissions === 0 && (
+                        <p className="text-xs text-muted-foreground mt-2">
+                          {t("order.noMissionsNote")}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Additional Info */}
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="additionalInfo"
+                        className="text-sm font-medium"
+                      >
+                        {t("order.additionalInfoLabel")}
+                      </label>
+                      <textarea
+                        id="additionalInfo"
+                        {...form.register("additionalInfo")}
+                        className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        placeholder={t("order.additionalInfoPlaceholder")}
+                      />
+                    </div>
+
+                    {/* Submit Button */}
+                    <Button
+                      type="submit"
+                      className="w-full h-12 text-base"
+                      size="lg"
+                      disabled={totalMissions === 0 || isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          {t("order.submitting")}
+                        </>
+                      ) : (
+                        <>
+                          {totalMissions > 0
+                            ? t("order.submit", { price: priceDetails.total })
+                            : t("order.submitNoMissions")}
+                          <ChevronRight className="ml-2 h-5 w-5" />
+                        </>
+                      )}
+                    </Button>
+
+                    <p className="text-xs text-center text-muted-foreground">
+                      {t("order.disclaimer")}
+                    </p>
+                  </form>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="py-16 bg-secondary/20">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-3xl font-bold mb-8 text-center">
+                {t("features.heading")}
+              </h2>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Shield className="h-5 w-5 text-primary" />
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-1">{t("features.secureTitle")}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {t("features.secureBody")}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Target className="h-5 w-5 text-primary" />
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-1">{t("features.expertTitle")}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {t("features.expertBody")}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Check className="h-5 w-5 text-primary" />
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-1">{t("features.trackingTitle")}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {t("features.trackingBody")}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Trophy className="h-5 w-5 text-primary" />
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-1">{t("features.resultsTitle")}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {t("features.resultsBody")}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <Footer />
+    </>
+  );
+}

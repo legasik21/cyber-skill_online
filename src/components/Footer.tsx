@@ -1,14 +1,15 @@
 "use client"
 
-import Link from "next/link"
 import Image from "next/image"
+import { Link } from "@/i18n/navigation"
+import { useTranslations } from "next-intl"
 import { Twitter, Instagram, Youtube } from "lucide-react"
 
 // TikTok icon component (not available in lucide-react)
 const TikTokIcon = ({ className }: { className?: string }) => (
-  <svg 
-    className={className} 
-    viewBox="0 0 24 24" 
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
     fill="currentColor"
     xmlns="http://www.w3.org/2000/svg"
   >
@@ -17,6 +18,9 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 )
 
 export default function Footer() {
+  const t = useTranslations("footer")
+  const tn = useTranslations("serviceNav")
+
   const socialLinks = [
     { icon: Instagram, href: "https://www.instagram.com/cyberskill.pro/", label: "Instagram" },
     { icon: Twitter, href: "https://x.com/cyberskill_pro", label: "X (Twitter)" },
@@ -25,24 +29,24 @@ export default function Footer() {
   ]
 
   const legalLinks = [
-    { label: "Terms of Service", href: "/terms" },
-    { label: "Privacy Policy", href: "/privacy" },
-    { label: "Cookie Policy", href: "/cookies" },
-    { label: "Guarantee", href: "/guarantee" },
-    { label: "Referral Rewards", href: "/referral" },
+    { label: t("legal.terms"), href: "/terms" },
+    { label: t("legal.privacy"), href: "/privacy" },
+    { label: t("legal.cookies"), href: "/cookies" },
+    { label: t("legal.guarantee"), href: "/guarantee" },
+    { label: t("legal.referral"), href: "/referral" },
   ]
 
   const serviceLinks = [
-    { label: "WN8, Winrate, High Damage", href: "/services/wn8-boost" },
-    { label: "Credit and Bonds Farming", href: "/services/credit-farm" },
-    { label: "Campaign Missions", href: "/services/campaign-missions" },
-    { label: "Mark of Excellence", href: "/services/mark-of-excellence" },
-    { label: "Onslaught", href: "/services/onslaught" },
-    { label: "Tier Leveling", href: "/services/tier-leveling" },
-    { label: "Exp Farm", href: "/services/exp-farm" },
-    { label: "Ace Tanker", href: "/services/ace-tanker" },
-    { label: "Battle Pass", href: "/services/battle-pass" },
-    { label: "Referral Program", href: "/services/referral-program" },
+    { label: tn("wn8Boost"), href: "/services/wn8-boost" },
+    { label: tn("creditFarm"), href: "/services/credit-farm" },
+    { label: tn("campaign"), href: "/services/campaign-missions" },
+    { label: tn("moe"), href: "/services/mark-of-excellence" },
+    { label: tn("onslaught"), href: "/services/onslaught" },
+    { label: tn("tierLeveling"), href: "/services/tier-leveling" },
+    { label: tn("expFarm"), href: "/services/exp-farm" },
+    { label: tn("aceTanker"), href: "/services/ace-tanker" },
+    { label: tn("battlePass"), href: "/services/battle-pass" },
+    { label: tn("referralProgram"), href: "/services/referral-program" },
   ]
 
   return (
@@ -52,25 +56,25 @@ export default function Footer() {
           {/* Brand Section */}
           <div className="space-y-4">
             <Link href="/" className="flex items-center">
-              <Image 
+              <Image
                 src="/cyber-skill_logo.svg"
-                alt="CyberSkill Logo" 
-                width={40} 
+                alt="CyberSkill Logo"
+                width={40}
                 height={40}
                 className="h-10 w-auto"
               />
             </Link>
             <p className="text-sm text-muted-foreground">
-              Professional World of Tanks boosting services. Raise your WN8, get 3 Marks of Excellence, and complete campaign missions effortlessly.
+              {t("tagline")}
             </p>
           </div>
 
           {/* Services Links */}
           <div>
-            <h3 className="font-semibold text-lg mb-4">Our Services</h3>
+            <h3 className="font-semibold text-lg mb-4">{t("servicesHeading")}</h3>
             <ul className="space-y-2">
               {serviceLinks.map((link) => (
-                <li key={link.label}>
+                <li key={link.href}>
                   <Link
                     href={link.href}
                     className="text-sm text-muted-foreground hover:text-primary transition-colors"
@@ -84,7 +88,7 @@ export default function Footer() {
 
           {/* Legal Links */}
           <div>
-            <h3 className="font-semibold text-lg mb-4">Legal</h3>
+            <h3 className="font-semibold text-lg mb-4">{t("legalHeading")}</h3>
             <ul className="space-y-2">
               {legalLinks.map((link) => (
                 <li key={link.href}>
@@ -101,7 +105,7 @@ export default function Footer() {
 
           {/* Social Media */}
           <div>
-            <h3 className="font-semibold text-lg mb-4">Connect With Us</h3>
+            <h3 className="font-semibold text-lg mb-4">{t("connectHeading")}</h3>
             <div className="flex space-x-4">
               {socialLinks.map((social) => {
                 const Icon = social.icon
@@ -125,9 +129,9 @@ export default function Footer() {
         {/* Copyright */}
         <div className="mt-12 pt-8 border-t border-border/50">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-              © 2017-{new Date().getFullYear()} CyberSkill. All rights reserved.
+              {t("copyright", { year: new Date().getFullYear() })}
             <p className="text-xs text-muted-foreground">
-              Not affiliated with Wargaming. World of Tanks is a trademark of Wargaming.net.
+              {t("disclaimer")}
             </p>
           </div>
         </div>
