@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { pageMetadata, SITE_NAME } from "@/lib/seo";
 
 const PATH = "/services/campaign-missions";
-const TITLE = "Campaign Missions Boost";
+const TITLE = "WoT Campaign Missions — Obj. 279e & 260";
 const DESCRIPTION =
   "Complete the toughest World of Tanks campaign missions — Obj. 260, Obj. 279(e) and Black Rock — with expert boosters and unlock elite reward tanks.";
 

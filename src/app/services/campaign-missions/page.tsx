@@ -52,7 +52,7 @@ export default function CampaignMissionsPage() {
         <section className="py-8">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
-              <h1 className="text-5xl md:text-6xl font-bold mb-12 text-center tracking-tight">Choose Your Campaign</h1>
+              <h1 className="text-5xl md:text-6xl font-bold mb-12 text-center tracking-tight">World of Tanks Campaign Missions Boost (Obj. 279e)</h1>
               <div className="grid md:grid-cols-3 gap-6">
                 {CAMPAIGNS.map((campaign) => (
                   <Card key={campaign.version} className="border-2 border-primary/20 bg-card hover:border-primary/40 transition-all flex flex-col">
