@@ -4,7 +4,7 @@ import { pageMetadata, serviceJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { JsonLd } from "@/components/JsonLd";
 
 const PATH = "/services/onslaught";
-const TITLE = "Onslaught Rank Boost";
+const TITLE = "WoT Onslaught Boost — Legend Rank";
 const DESCRIPTION =
   "Climb to Legend rank in World of Tanks Onslaught. Our 7v7 specialists boost your rating and earn bonds, styles and the annual reward tank — securely.";
 
