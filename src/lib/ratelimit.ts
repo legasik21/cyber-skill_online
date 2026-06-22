@@ -83,3 +83,9 @@ export const CONVERSATION_RATE_LIMIT: RateLimitConfig = {
   maxRequests: 3, // 3 conversations
   windowMs: 60 * 60 * 1000, // per hour
 };
+
+// Accepted orders per IP (+ visitor cookie) — throttles direct-API order spam.
+export const ORDER_RATE_LIMIT: RateLimitConfig = {
+  maxRequests: 3, // 3 orders
+  windowMs: 60 * 60 * 1000, // per hour
+};

@@ -1,7 +1,8 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useRef, useState } from "react"
 import { Button } from "@/components/ui/Button"
+import { useOrderToken } from "@/hooks/useOrderToken"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Input } from "@/components/ui/Input"
 import { Shield, Target, Zap, Trophy, ChevronRight, Star, ChevronsUp, BookOpen, Swords, Medal, Users, Loader2 } from "lucide-react"
@@ -135,23 +136,40 @@ export default function Home() {
     },
   })
 
+  const { getToken, refresh } = useOrderToken()
+  const honeypotRef = useRef<HTMLInputElement>(null)
+  const [hasInteracted, setHasInteracted] = useState(false)
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true)
     try {
-      const response = await fetch('/api/order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...values,
-          page: 'Home Page - Contact Form',
-        }),
-      })
+      const post = (formToken: string | null) =>
+        fetch('/api/order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...values,
+            page: 'Home Page - Contact Form',
+            company_url: honeypotRef.current?.value || '',
+            formToken,
+          }),
+        })
 
-      const data = await response.json()
+      let response = await post(getToken())
+      let data = await response.json().catch(() => ({} as Record<string, unknown>))
+      // Long-open tab? token may be stale/used — fetch a fresh one and retry once.
+      if (data?.error === 'invalid_token') {
+        const fresh = await refresh()
+        if (fresh) {
+          response = await post(fresh)
+          data = await response.json().catch(() => ({} as Record<string, unknown>))
+        }
+      }
+      void refresh()
 
-      if (data.redirect) {
-        router.push(data.redirect)
-      } else if (data.success) {
+      if (data?.redirect) {
+        router.push(data.redirect as string)
+      } else if (data?.success) {
         router.push('/order/success')
       } else {
         router.push('/order/error')
@@ -435,7 +453,24 @@ export default function Home() {
               <CardDescription>{t("contact.subheading")}</CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6"
+                onFocusCapture={() => setHasInteracted(true)}
+                onPointerDownCapture={() => setHasInteracted(true)}
+                onKeyDownCapture={() => setHasInteracted(true)}
+              >
+                {/* Honeypot — off-screen, hidden from real users & password
+                    managers; bots that fill every field trip it server-side. */}
+                <input
+                  ref={honeypotRef}
+                  type="text"
+                  name="company_url"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
+                />
                 <div className="space-y-2">
                   <label htmlFor="email" className="text-sm font-medium">{t("contact.emailLabel")}</label>
                   <Input
@@ -489,7 +524,7 @@ export default function Home() {
                   />
                 </div>
 
-                <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+                <Button type="submit" className="w-full" size="lg" disabled={isSubmitting || !hasInteracted}>
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
