@@ -35,7 +35,16 @@ export function useOrderToken() {
       tokenRef.current = token;
       if (challenge && difficulty > 0) {
         const nonce = await solvePow(challenge, difficulty);
-        tokenRef.current = nonce ? `${token}~${nonce}` : token;
+        if (!nonce) {
+          // Solver gave up (e.g. an extremely slow device hitting the time cap).
+          // Surface this like a network failure rather than handing back a bare
+          // token the server will reject as pow_missing — otherwise refresh()
+          // would re-solve, time out again, and loop. null lets callers degrade
+          // to a clean retry/error.
+          tokenRef.current = null;
+          return null;
+        }
+        tokenRef.current = `${token}~${nonce}`;
       }
       return tokenRef.current;
     } catch {

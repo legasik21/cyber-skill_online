@@ -234,6 +234,10 @@ export function scoreOrderContent(input: OrderContentInput): ContentScore {
     signals.push('name_gibberish');
   }
 
-  const threshold = Number(process.env.FORM_CONTENT_REJECT_SCORE || 5);
+  // Guarded parse: a finite value > 0, else default 5. Critically this means a
+  // stray FORM_CONTENT_REJECT_SCORE=0 (or empty/garbage) can NEVER collapse the
+  // threshold to 0 and reject every legitimate order.
+  const parsed = Number(process.env.FORM_CONTENT_REJECT_SCORE);
+  const threshold = Number.isFinite(parsed) && parsed > 0 ? parsed : 5;
   return { score, threshold, signals, reject: score >= threshold };
 }

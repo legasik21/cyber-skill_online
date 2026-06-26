@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import {
   scoreOrderContent,
   gibberishSignals,
@@ -111,6 +111,32 @@ describe('isPlausibleDiscord', () => {
   });
   it('rejects clearly invalid handles', () => {
     expect(isPlausibleDiscord('zmHspUicVxsLCTkCoRN')).toBe(false); // caps, no #digits
+  });
+});
+
+describe('reject-score env guard (critical: must never reject every order)', () => {
+  const orig = process.env.FORM_CONTENT_REJECT_SCORE;
+  afterEach(() => {
+    if (orig === undefined) delete process.env.FORM_CONTENT_REJECT_SCORE;
+    else process.env.FORM_CONTENT_REJECT_SCORE = orig;
+  });
+  const clean = { email: 'john.smith@gmail.com', discordTag: 'CoolGamer#1234', message: 'please boost my account' };
+
+  it('FORM_CONTENT_REJECT_SCORE=0 does NOT reject clean orders (guards to 5)', () => {
+    process.env.FORM_CONTENT_REJECT_SCORE = '0';
+    const r = scoreOrderContent(clean);
+    expect(r.threshold).toBe(5);
+    expect(r.reject).toBe(false);
+  });
+  it('empty / garbage values default to 5', () => {
+    process.env.FORM_CONTENT_REJECT_SCORE = '';
+    expect(scoreOrderContent(clean).threshold).toBe(5);
+    process.env.FORM_CONTENT_REJECT_SCORE = 'abc';
+    expect(scoreOrderContent(clean).threshold).toBe(5);
+  });
+  it('a valid positive override is honored', () => {
+    process.env.FORM_CONTENT_REJECT_SCORE = '3';
+    expect(scoreOrderContent(clean).threshold).toBe(3);
   });
 });
 
