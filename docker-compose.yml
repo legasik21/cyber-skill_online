@@ -57,6 +57,10 @@ services:
       TELEGRAM_ORDERS_CHAT_ID: ${TELEGRAM_ORDERS_CHAT_ID:-}
       CRON_SECRET: ${CRON_SECRET}
       FORM_TOKEN_SECRET: ${FORM_TOKEN_SECRET:-}
+      # Anti-spam tuning knobs (safe defaults; override in .env without code change).
+      # FORM_POW_BITS=0 disables the order-form Proof-of-Work instantly.
+      FORM_POW_BITS: ${FORM_POW_BITS:-16}
+      FORM_CONTENT_REJECT_SCORE: ${FORM_CONTENT_REJECT_SCORE:-5}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       GEMINI_MODEL: ${GEMINI_MODEL:-}
       GEMINI_FALLBACK_MODEL: ${GEMINI_FALLBACK_MODEL:-}

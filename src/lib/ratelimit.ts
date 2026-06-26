@@ -89,3 +89,17 @@ export const ORDER_RATE_LIMIT: RateLimitConfig = {
   maxRequests: 3, // 3 orders
   windowMs: 60 * 60 * 1000, // per hour
 };
+
+// Accepted orders per normalized email identity (gmail dots/+tags collapsed) —
+// stops one spammer cycling dotted variants of the same address past the per-IP cap.
+export const ORDER_EMAIL_RATE_LIMIT: RateLimitConfig = {
+  maxRequests: 3, // 3 orders
+  windowMs: 60 * 60 * 1000, // per hour
+};
+
+// Form-token issuance per IP — generous enough for real reloads, tight enough to
+// throttle bots farming fresh tokens in bulk.
+export const TOKEN_ISSUE_RATE_LIMIT: RateLimitConfig = {
+  maxRequests: 40, // 40 token fetches
+  windowMs: 10 * 60 * 1000, // per 10 minutes
+};

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { checkRateLimit, ORDER_RATE_LIMIT } from '@/lib/ratelimit';
+import { checkRateLimit, ORDER_RATE_LIMIT, ORDER_EMAIL_RATE_LIMIT } from '@/lib/ratelimit';
 import { verifyFormToken, formTokenConfigured } from '@/lib/formToken';
+import { scoreOrderContent, normalizeEmail } from '@/lib/contentPlausibility';
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_ORDERS_CHAT_ID = process.env.TELEGRAM_ORDERS_CHAT_ID;
@@ -43,9 +44,10 @@ export async function POST(request: NextRequest) {
     }
 
     // 2) Signed form token — core defense against direct-API bots; also enforces
-    //    a minimum think-time and single-use. Missing/invalid -> 400 (the client
-    //    re-fetches a fresh token and retries). Fail OPEN only if misconfigured,
-    //    so a missing secret can never block real customers.
+    //    a minimum think-time, single-use, and a Proof-of-Work bound to the
+    //    signed challenge (per-submission CPU cost). Missing/invalid -> 400 (the
+    //    client re-fetches a fresh token, re-solves the PoW, and retries). Fail
+    //    OPEN only if misconfigured, so a missing secret can never block customers.
     if (formTokenConfigured()) {
       const verdict = verifyFormToken(body.formToken);
       if (!verdict.ok) {
@@ -74,7 +76,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3) Rate limit accepted orders per IP (+ visitor cookie if present).
+    // 3) Content-plausibility scoring — the method-agnostic defense. A bot that
+    //    drives the real form (or fetches a fresh token + solves the PoW) passes
+    //    the honeypot/token/timing checks, but its free-text content is garbage:
+    //    a random-token "Discord handle", high-entropy "message", gmail-dot-abuse
+    //    email. Reject ONLY when multiple INDEPENDENT signals agree (conservative;
+    //    no human to catch false positives). Every non-zero score is logged for
+    //    tuning. Rejections route to the ERROR page, so no Telegram is sent and no
+    //    conversion (which fires only on /order/success) can occur.
+    const content = scoreOrderContent({
+      email: body.email,
+      discordTag: body.discordTag,
+      message: body.message,
+    });
+    if (content.signals.length > 0) {
+      console.warn(
+        `[order] content score=${content.score}/${content.threshold} reject=${content.reject} ` +
+          `signals=[${content.signals.join(',')}] ip=${ip}`
+      );
+    }
+    if (content.reject) {
+      return NextResponse.json(
+        { success: false, error: 'invalid', redirect: '/order/error?reason=validation' },
+        { status: 422 }
+      );
+    }
+
+    // 4) Rate limit accepted orders per IP (+ visitor cookie if present).
     const visitorId = request.cookies.get('visitor_id')?.value || '';
     const rl = checkRateLimit(`order:${ip}:${visitorId}`, ORDER_RATE_LIMIT);
     if (!rl.allowed) {
@@ -83,6 +111,20 @@ export async function POST(request: NextRequest) {
         { success: false, error: 'rate_limited', redirect: '/order/error?reason=rate' },
         { status: 429 }
       );
+    }
+
+    // 5) Rate limit per normalized email identity (gmail dots/+tags collapsed),
+    //    so one spammer can't slip dotted variants of one address past the IP cap.
+    const emailId = normalizeEmail(body.email);
+    if (emailId) {
+      const erl = checkRateLimit(`order-email:${emailId}`, ORDER_EMAIL_RATE_LIMIT);
+      if (!erl.allowed) {
+        console.warn(`[order] rejected: email rate limit (ip=${ip} email=${emailId})`);
+        return NextResponse.json(
+          { success: false, error: 'rate_limited', redirect: '/order/error?reason=rate' },
+          { status: 429 }
+        );
+      }
     }
 
     // Format Telegram message
